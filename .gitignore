@@ -1,0 +1,15 @@
+##### Directories
+/target
+
+
+
+
+##### Files
+
+# OS related
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+[Dd]esktop.ini
+Thumbs.db
