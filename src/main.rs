@@ -8,8 +8,9 @@ use std::ffi::OsStr;
 use std::fs;
 use std::path::Path;
 use std::time::Instant;
-// use std::rc::Rc;
 use structopt::StructOpt;
+
+
 
 
 #[derive(StructOpt)]
@@ -26,7 +27,10 @@ fn main() {
 		.unwrap()
 		.is_match(&args.source);
 	let mut glob_string = String::from(&args.source);
-	// let mut selectors: Rc<HashSet<String>> = Rc::new(HashSet::new());
+
+	// Counter of unique selectors
+	let mut selector_counter: u32 = 0;
+
 
 	// If glob string is for a directory
 	if is_glob_a_directory {
@@ -43,22 +47,25 @@ fn main() {
 
 	for entry in globwalk::glob(&glob_string).unwrap() {
 		match entry {
-			Ok(file) => process_file(file.path()),
+			Ok(file) => process_file(file.path(), &mut selector_counter),
 			Err(e) => println!("{:?}", e),
 		}
 	}
 
-    println!("minify-selectors finished in: {:.2?}", stopwatch.elapsed());
+	println!(
+		"minify-selectors finished in: {:.2?}",
+		stopwatch.elapsed()
+	);
 }
 
-fn process_file(file: &Path) {
+fn process_file(file: &Path, index: &mut u32) {
 	let file_extension = Path::new(file)
 		.extension()
 		.and_then(OsStr::to_str)
 		.unwrap();
 	let mut file_contents = fs::read_to_string(file).unwrap();
 	let selector = Regex::new(r"(?<=\#|\.)(?>[A-Za-z\_]{1}|\-[A-Za-z\_]{2})[\w\-\_]*(?=\s*[\{\#\.\,\:\>\[\+\~])").unwrap();
-	let mut selectors: HashMap<&str, &str> = HashMap::new();
+	let mut selectors: HashMap<&str, String> = HashMap::new();
 
 	println!(
 		"Processing {} file: {}",
@@ -69,10 +76,16 @@ fn process_file(file: &Path) {
 	if file_extension == "css" {
 		for item in selector.captures_iter(&file_contents) {
 			if !selectors.contains_key(item.at(0).unwrap()) {
+				// todo: increment counter that avoids generating
+				// base62 strings that start with a numeral
+				*index += 1;
+
 				selectors.insert(
 					item.at(0).unwrap(),
-					"todo"
+					generate_id(index)
 				);
+
+				println!("{:?}", index);
 			}
 		}
 
@@ -80,4 +93,9 @@ fn process_file(file: &Path) {
 			println!("{:?}", item);
 		}
 	}
+}
+
+
+fn generate_id(index: &u32) -> String {
+	return bs62::encode_num(index);
 }
