@@ -6,6 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+bs62 = "0.1.4"
 globwalk = "0.8.1"
-regex = "1.5.4"
+onig = "6.3.1"
 structopt = "0.3.25"

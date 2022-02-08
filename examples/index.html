@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>minify-selectors</title>
+
+		<style>
+			.foo {}
+			.bar {}
+		</style>
+	</head>
+
+	<body>
+		<main class="foo--foo">
+			<header class="foo">
+				<section class="foo__foo is-active"></section>
+				<section class="foo__bar"></section>
+			</header>
+			<footer class="bar">
+				<section class="bar__foo"></section>
+				<section class="bar__bar"></section>
+			</footer>
+		</main>
+
+		<script>
+			const foo = document.querySelector(".foo");
+			const bar = document.querySelectorAll(".bar");
+			const baz = document.getElementById("main")
+				.getElementsByClassName("example test");
+
+			foo.classList.remove("foo");
+			foo.classList.add("foo");
+			foo.classList.toggle("is-active");
+			console.log(foo.classList.contains("foo"));
+
+			bar.classList.remove("foo", "baz");
+			bar.classList.add("foo", "baz");
+			foo.classList.toggle("is-active", !foo);
+
+			baz.classList.replace("baz", "foo");
+		</script>
+	</body>
+</html>

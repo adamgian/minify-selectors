@@ -1,0 +1,46 @@
+/* Simple selectors */
+#foo {}
+#bar {}
+#foo__bar {}
+#foo--bar
+#foo-bar {}
+
+.foo {}
+.bar {}
+.foo__bar {}
+.foo--bar {}
+.foo-bar {}
+
+#foo.bar {}
+main.bar {}
+#foo, .bar {}
+#foo, table.bar {}
+
+
+
+
+.foo:first-child {}
+.foo:nth-child(2n+1) {}
+.foo[href="https://example.org"]
+.foo[href$=".org"]
+.bar::before {}
+.bar[title] {}
+.bar[title] {}
+
+
+
+
+/* Combinators */
+.foo * {}
+.foo .bar {}
+header .bar {}
+
+.foo > .bar {}
+.foo > li {}
+
+.foo + .foo {}
+#foo + .bar {}
+
+.foo ~ * {}
+.foo ~ footer {}
+.foo ~ .bar {}
