@@ -283,6 +283,7 @@ version = "0.0.1"
 dependencies = [
  "bs62",
  "globwalk",
+ "lazy_static",
  "onig",
  "structopt",
 ]

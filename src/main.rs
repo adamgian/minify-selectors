@@ -1,13 +1,15 @@
 extern crate globwalk;
 
-use bs62::*;
+// use bs62::*;
+use lazy_static::lazy_static;
 use onig::*;
-use std::collections::HashMap;
-use std::env;
-use std::ffi::OsStr;
-use std::fs;
-use std::path::Path;
-use std::time::Instant;
+use std::{
+	collections::HashMap,
+	ffi::OsStr,
+	fs,
+	path::Path,
+	time::Instant,
+};
 use structopt::StructOpt;
 
 
@@ -17,6 +19,11 @@ use structopt::StructOpt;
 struct Cli {
 	#[structopt(short = "i", long = "input")]
 	source: String,
+}
+
+lazy_static! {
+	static ref SELECTORS_IN_CSS: Regex = Regex::new(r"[#.](?>[A-Za-z\_]{1}|\-[A-Za-z\_]{2})[\w\-\_]*(?=\s*[\{\#\.\,\:\>\[\+\~])")
+		.unwrap();
 }
 
 
@@ -63,8 +70,8 @@ fn process_file(file: &Path, index: &mut u32) {
 		.extension()
 		.and_then(OsStr::to_str)
 		.unwrap();
+	// let selector = Regex::new(r"(?<=\#|\.)(?>[A-Za-z\_]{1}|\-[A-Za-z\_]{2})[\w\-\_]*(?=\s*[\{\#\.\,\:\>\[\+\~])").unwrap();
 	let mut file_contents = fs::read_to_string(file).unwrap();
-	let selector = Regex::new(r"(?<=\#|\.)(?>[A-Za-z\_]{1}|\-[A-Za-z\_]{2})[\w\-\_]*(?=\s*[\{\#\.\,\:\>\[\+\~])").unwrap();
 	let mut selectors: HashMap<&str, String> = HashMap::new();
 
 	println!(
@@ -74,18 +81,14 @@ fn process_file(file: &Path, index: &mut u32) {
 	);
 
 	if file_extension == "css" {
-		for item in selector.captures_iter(&file_contents) {
+		for item in SELECTORS_IN_CSS.captures_iter(&file_contents) {
 			if !selectors.contains_key(item.at(0).unwrap()) {
-				// todo: increment counter that avoids generating
-				// base62 strings that start with a numeral
 				*index += 1;
 
 				selectors.insert(
 					item.at(0).unwrap(),
-					generate_id(index)
+					generate_selector(index)
 				);
-
-				println!("{:?}", index);
 			}
 		}
 
@@ -96,6 +99,22 @@ fn process_file(file: &Path, index: &mut u32) {
 }
 
 
-fn generate_id(index: &u32) -> String {
-	return bs62::encode_num(index);
+fn generate_selector(position: &u32) -> String {
+	const BASE: u32 = 62;
+	const OFFSET: u32 = 10;
+	const SUBSET: u32 = 52;
+
+	let index: u32 = position - 1;
+	let mut assigned_index: u32 = 0;
+	let mut exponent: u32 = 0;
+	let mut carry: u32 = 0;
+
+	while index >= SUBSET * u32::pow(BASE, exponent) + carry {
+		carry += SUBSET * u32::pow(BASE, exponent);
+		exponent += 1;
+	}
+
+	assigned_index += OFFSET * u32::pow(BASE, exponent) - carry + index;
+
+	return bs62::encode_num(&assigned_index);
 }
