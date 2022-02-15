@@ -11,6 +11,7 @@
 .foo__bar {}
 .foo--bar {}
 .foo-bar {}
+.sidebar {}
 
 #foo.bar {}
 main.bar {}

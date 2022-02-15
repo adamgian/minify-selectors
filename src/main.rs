@@ -22,8 +22,28 @@ struct Cli {
 }
 
 lazy_static! {
-	static ref SELECTORS_IN_CSS: Regex = Regex::new(r"[#.](?>[A-Za-z\_]{1}|\-[A-Za-z\_]{2})[\w\-\_]*(?=\s*[\{\#\.\,\:\>\[\+\~])")
-		.unwrap();
+	static ref SELECTORS_IN_CSS: Regex = Regex::new(
+		r"(?x)
+			[\#\.]
+			(?>[A-Za-z\_]|\-[A-Za-z\_])
+			[\w\-\_]*+
+			(?=\s*+[\{\#\.\,\:\>\[\+\~])
+		"
+	).unwrap();
+
+	// FIXME
+	static ref SELECTORS_IN_JS: Regex = Regex::new(
+		r##"(?x)
+			()
+		"##
+	).unwrap();
+
+	// FIXME
+	static ref SELECTORS_IN_HTML: Regex = Regex::new(
+		r##"(?x)
+			()
+		"##
+	).unwrap();
 }
 
 
@@ -70,7 +90,6 @@ fn process_file(file: &Path, index: &mut u32) {
 		.extension()
 		.and_then(OsStr::to_str)
 		.unwrap();
-	// let selector = Regex::new(r"(?<=\#|\.)(?>[A-Za-z\_]{1}|\-[A-Za-z\_]{2})[\w\-\_]*(?=\s*[\{\#\.\,\:\>\[\+\~])").unwrap();
 	let mut file_contents = fs::read_to_string(file).unwrap();
 	let mut selectors: HashMap<&str, String> = HashMap::new();
 
