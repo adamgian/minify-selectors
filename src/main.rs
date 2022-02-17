@@ -24,10 +24,15 @@ struct Cli {
 lazy_static! {
 	static ref SELECTORS_IN_CSS: Regex = Regex::new(
 		r"(?x)
-			[\#\.]
-			(?>[A-Za-z\_]|\-[A-Za-z\_])
-			[\w\-\_]*+
-			(?=\s*+[\{\#\.\,\:\>\[\+\~])
+			([\#\.])
+			(
+				(?>[A-Za-z\_]|\-[A-Za-z\_])
+				[\w\-\_]*+
+			)
+			(?=
+				\s*+
+				[\{\#\.\,\:\>\[\+\~]
+			)
 		"
 	).unwrap();
 
@@ -44,23 +49,26 @@ lazy_static! {
 			()
 		"##
 	).unwrap();
+
+	static ref IS_GLOB_A_DIRECTORY: Regex = Regex::new(
+		r"\.\{?(\w{2,4},?)+\}?$"
+	).unwrap();
 }
 
 
 fn main() {
 	let stopwatch = Instant::now();
 	let args = Cli::from_args();
-	let is_glob_a_directory = !Regex::new(r"\.\{?(\w{2,4},?)+\}?$")
-		.unwrap()
-		.is_match(&args.source);
-	let mut glob_string = String::from(&args.source);
 
+	let mut glob_string = String::from(&args.source);
+	// Set of selectors with its assigned base62 name
+	let mut selectors: HashMap<String, String> = HashMap::new();
 	// Counter of unique selectors
 	let mut selector_counter: u32 = 0;
 
 
 	// If glob string is for a directory
-	if is_glob_a_directory {
+	if !IS_GLOB_A_DIRECTORY.is_match(&glob_string) {
 		if glob_string.ends_with("/") {
 			glob_string.push_str("**/*.{css,html,js}");
 		}
@@ -74,7 +82,11 @@ fn main() {
 
 	for entry in globwalk::glob(&glob_string).unwrap() {
 		match entry {
-			Ok(file) => process_file(file.path(), &mut selector_counter),
+			Ok(file) => process_file(
+				file.path(),
+				&mut selectors,
+				&mut selector_counter
+			),
 			Err(e) => println!("{:?}", e),
 		}
 	}
@@ -85,13 +97,16 @@ fn main() {
 	);
 }
 
-fn process_file(file: &Path, index: &mut u32) {
+fn process_file(
+	file: &Path,
+	selectors: &mut HashMap<String, String>,
+	index: &mut u32
+) {
 	let file_extension = Path::new(file)
 		.extension()
 		.and_then(OsStr::to_str)
 		.unwrap();
 	let mut file_contents = fs::read_to_string(file).unwrap();
-	let mut selectors: HashMap<&str, String> = HashMap::new();
 
 	println!(
 		"Processing {} file: {}",
@@ -101,11 +116,11 @@ fn process_file(file: &Path, index: &mut u32) {
 
 	if file_extension == "css" {
 		for item in SELECTORS_IN_CSS.captures_iter(&file_contents) {
-			if !selectors.contains_key(item.at(0).unwrap()) {
+			if !selectors.contains_key(&item.at(0).unwrap().to_owned()) {
 				*index += 1;
 
 				selectors.insert(
-					item.at(0).unwrap(),
+					item.at(0).unwrap().to_owned(),
 					generate_selector(index)
 				);
 			}
