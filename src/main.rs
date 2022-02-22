@@ -27,7 +27,7 @@ lazy_static! {
 			([\#\.])
 			(
 				(?>[A-Za-z\_]|\-[A-Za-z\_])
-				[\w\-\_]*+
+				[\w\-]*+
 			)
 			(?=
 				\s*+
@@ -39,7 +39,35 @@ lazy_static! {
 	// FIXME
 	static ref SELECTORS_IN_JS: Regex = Regex::new(
 		r##"(?x)
-			()
+			\.
+			(
+				querySelectorAll
+				| querySelector
+				| getElementById
+				| getElementsByClassName
+				| classList\s?+\.(?> add | remove | contains | replace | toggle )
+			)
+			\(
+			(?>
+				\s*+[\"\']
+				(
+					[\#\.]?
+					(?>[A-Za-z\_]|\-[A-Za-z\_])
+					[\w\-]*+
+				)
+				[\"\']?
+				(?>
+					(?>
+						\,\s*+[\"\']
+						| \s*+
+					)
+					(
+						[\#\.]?
+						(?>[A-Za-z\_]|\-[A-Za-z\_])
+						[\w\-]*+
+					)
+				)*+
+			)
 		"##
 	).unwrap();
 
