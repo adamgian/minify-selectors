@@ -24,14 +24,17 @@ struct Cli {
 lazy_static! {
 	static ref SELECTORS_IN_CSS: Regex = Regex::new(
 		r"(?x)
-			([\#\.])
-			(
+			(?<type>[\#\.])
+			(?<name>
 				(?>[A-Za-z\_]|\-[A-Za-z\_])
 				[\w\-]*+
 			)
 			(?=
 				\s*+
-				[\{\#\.\,\:\>\[\+\~]
+				[\{\*\#\,\:\>\[\+\~]
+				|
+				\s*+
+				\.[\w\-\s\.\*]*+[\{\[]
 			)
 		"
 	).unwrap();
@@ -45,7 +48,7 @@ lazy_static! {
 				| querySelector
 				| getElementById
 				| getElementsByClassName
-				| classList\s?+\.(?> add | remove | contains | replace | toggle )
+				| classList\s*+\.(?> add | remove | contains | replace | toggle )
 			)
 			\(
 			(?>
@@ -72,6 +75,7 @@ lazy_static! {
 	).unwrap();
 
 	// FIXME
+	// https://html.spec.whatwg.org/#valid-custom-element-name
 	static ref SELECTORS_IN_HTML: Regex = Regex::new(
 		r##"(?x)
 			()
@@ -143,20 +147,37 @@ fn process_file(
 	);
 
 	if file_extension == "css" {
-		for item in SELECTORS_IN_CSS.captures_iter(&file_contents) {
-			if !selectors.contains_key(&item.at(0).unwrap().to_owned()) {
-				*index += 1;
+		file_contents = SELECTORS_IN_CSS.replace_all(
+			&file_contents,
+			|capture: &Captures| {
+				if !selectors.contains_key(&capture.at(0).unwrap().to_owned()) {
+					*index += 1;
+					let generated_selector: String = generate_selector(index);
 
-				selectors.insert(
-					item.at(0).unwrap().to_owned(),
-					generate_selector(index)
+					selectors.insert(
+						capture.at(0).unwrap().to_owned(),
+						generated_selector.clone()
+					);
+
+					return format!(
+						"{prefix}{identifier}",
+						prefix = &capture.at(1).unwrap(),
+						identifier = generated_selector
+					);
+				}
+
+				return format!(
+					"{prefix}{identifier}",
+					prefix = selectors
+						.get_key_value(capture.at(0).unwrap())
+						.unwrap().0.
+						chars().next().unwrap(),
+					identifier = selectors
+						.get_key_value(capture.at(0).unwrap())
+						.unwrap().1
 				);
 			}
-		}
-
-		for item in selectors {
-			println!("{:?}", item);
-		}
+		);
 	}
 }
 
