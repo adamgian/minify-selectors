@@ -43,7 +43,7 @@ lazy_static! {
 	static ref SELECTORS_IN_JS: Regex = Regex::new(
 		r##"(?x)
 			\.
-			(
+			(?<function>
 				querySelectorAll
 				| querySelector
 				| getElementById
@@ -52,24 +52,11 @@ lazy_static! {
 			)
 			\(
 			(?>
-				\s*+[\"\']
-				(
-					[\#\.]?
-					(?>[A-Za-z\_]|\-[A-Za-z\_])
-					[\w\-]*+
+				\s*+
+				(?<arguments>
+					[\,]?
+					[\w\-\ \#\.\*\:\>\[\]\+\~\"\']*+
 				)
-				[\"\']?
-				(?>
-					(?>
-						\,\s*+[\"\']
-						| \s*+
-					)
-					(
-						[\#\.]?
-						(?>[A-Za-z\_]|\-[A-Za-z\_])
-						[\w\-]*+
-					)
-				)*+
 			)
 		"##
 	).unwrap();
@@ -78,7 +65,28 @@ lazy_static! {
 	// https://html.spec.whatwg.org/#valid-custom-element-name
 	static ref SELECTORS_IN_HTML: Regex = Regex::new(
 		r##"(?x)
-			()
+			(?<attribute>
+				[^\f\n\t\ \>\"\'\=]++
+			)
+			=[\"\']?+
+			(?<value>
+				(?(?<=[\"\'])
+					[\w\-\ ]*+
+					| [\w\-]*+
+				)
+			)
+			(?=
+				[\"\']?+
+				(?>
+					[\ ]++
+					[^\f\n\t\ \>\"\'\=]++
+					(?>
+						=
+						[^\ \>]++
+					)?+
+				)*+
+				[\s]*+\/?>
+			)
 		"##
 	).unwrap();
 

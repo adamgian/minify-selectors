@@ -2,7 +2,7 @@
 #foo {}
 #bar {}
 #foo__bar {}
-#foo--bar
+#foo--bar {}
 #foo-bar {}
 #baz {}
 
@@ -23,8 +23,8 @@ main.bar {}
 
 .foo:first-child {}
 .foo:nth-child(2n+1) {}
-.foo[href="https://example.org"]
-.foo[href$=".org"]
+.foo[href="https://example.org"] {}
+.foo[href$=".org"] {}
 .bar::before {}
 .bar[title] {}
 .bar[title] {}
