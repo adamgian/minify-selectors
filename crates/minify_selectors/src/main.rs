@@ -65,7 +65,7 @@ fn main() {
 				&mut selectors,
 				&mut selector_counter
 			),
-			Err(e) => println!("{:?}", e),
+			Err(error) => println!("{:?}", error),
 		}
 	}
 
@@ -76,17 +76,18 @@ fn main() {
 }
 
 fn process_file(
-	file: &Path,
+	file_path: &Path,
 	selectors: &mut HashMap<String, String>,
 	index: &mut u32
 ) {
-	let file_extension = Path::new(file).extension().and_then(OsStr::to_str);
-	let mut file_contents = fs::read_to_string(file).unwrap();
+	let file = Path::new(file_path);
+	let file_extension = file.extension().and_then(OsStr::to_str);
+	let mut file_contents = fs::read_to_string(file_path).unwrap();
 
 	println!(
 		"Processing {} file: {}",
 		file_extension.unwrap().to_ascii_uppercase(),
-		file.display()
+		file_path.display()
 	);
 
 	match file_extension {
@@ -114,6 +115,18 @@ fn process_file(
 		_ => {},
 	}
 
-	// println!("{}", file_contents);
-	// println!("");
+	println!("{}", file_contents);
+	println!("");
+
+	// TODO:
+	fs::create_dir_all("examples/dist/");
+
+	fs::write(
+		format!(
+			"{path}{file_name}",
+			path = "examples/dist/",
+			file_name = file.file_name().and_then(OsStr::to_str).unwrap()
+		),
+		file_contents
+	);
 }
