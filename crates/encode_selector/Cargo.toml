@@ -1,0 +1,8 @@
+[package]
+authors = ["Adam Gian <contact@adamgian.com>"]
+edition = "2021"
+name = "encode_selector"
+version = "0.0.1"
+
+[dependencies]
+bs62 = "0.1.4"
