@@ -9,7 +9,7 @@ use encode_selector;
 
 lazy_static! {
 	static ref SELECTORS_IN_CSS: Regex = Regex::new(
-		r"(?x)
+		r##"(?x)
 			(?<type>[\#\.])
 			(?<name>
 				(?>[A-Za-z\_]|\-[A-Za-z\_])
@@ -22,7 +22,7 @@ lazy_static! {
 				\s*+
 				\.[\w\-\s\.\*]*+[\{\[]
 			)
-		"
+		"##
 	).unwrap();
 
 	// FIXME
