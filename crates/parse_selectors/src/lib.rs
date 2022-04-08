@@ -1,9 +1,6 @@
 use lazy_static::lazy_static;
 use onig::*;
-use std::{
-	collections::HashMap,
-	collections::HashSet,
-};
+use std::collections::HashMap;
 
 use encode_selector;
 
@@ -11,10 +8,9 @@ use encode_selector;
 
 
 lazy_static! {
-	// Current limitations:
-	// - classes or ids in attribute selectors
-	//   (i.e. [id="foo"], [class="bar"])
-	static ref CSS_CLASSES_OR_IDS: Regex = Regex::new(
+	// Extracts classes and IDs from selector rules in
+	// stylesheets and embedded styles.
+	static ref CSS_CLASSES_AND_IDS: Regex = Regex::new(
 		r##"(?x)
 			(?<type>[\#\.])
 			(?<name>
@@ -31,7 +27,25 @@ lazy_static! {
 		"##
 	).unwrap();
 
-	// Extracts arguments from DOM
+	// Extracts classes and IDs from a limited set of
+	// attribute selectors. Attribute name must be 'class' or 'id'
+	// and use the exact match operator.
+	// i.e. [class="foo"][id="bar"]
+	static ref CSS_ATTRIBUTE_SELECTORS: Regex = Regex::new(
+		r##"(?x)
+			\[\s*+
+			(?<type>class|id)
+			=[\"\']?
+			(?<name>
+				(?>[A-Za-z\_\\]|\-[A-Za-z\-\_])
+				[\w\-\\]*+
+			)
+			[\"\']?\s*+\]
+		"##
+	).unwrap();
+
+	// Extracts arguments from functions that take
+	// classes, IDs or a CSS selector string.
 	static ref JS_ARGUMENTS: Regex = Regex::new(
 		r##"(?x)
 			\.
@@ -46,15 +60,18 @@ lazy_static! {
 			(?>
 				\s*+
 				(?<arguments>
-					[\,]?
-					[\w\-\ \#\.\*\:\>\[\]\+\~\"\']*+
+					(?>
+						[\w\-\ \#\.\*\:\>\[\]\+\~\"\']*+
+						[\,]?
+					)++
 				)
 			)
 		"##
 	).unwrap();
 
-	// Extracts all attributes with values
-	//
+	// Extracts all attributes with values from HTML.
+	// Will need additional processing to consider
+	// 'whitelisted' attributes and separate values.
 	static ref HTML_ATTRIBUTES: Regex = Regex::new(
 		r##"(?x)
 			(?<attribute>
@@ -128,7 +145,7 @@ pub fn from_css(
 	selectors: &mut HashMap<String, String>,
 	index: &mut u32
 ) -> String {
-	return CSS_CLASSES_OR_IDS.replace_all(
+	return CSS_CLASSES_AND_IDS.replace_all(
 		&file_string,
 		|capture: &Captures| {
 			if !selectors.contains_key(&capture.at(0).unwrap().to_owned()) {
@@ -250,4 +267,44 @@ pub fn from_html(
 	);
 }
 
-// pub fn from_js() -> String {}
+pub fn from_js(
+	file_string: &mut String,
+	selectors: &mut HashMap<String, String>,
+	index: &mut u32
+) -> String {
+	return JS_ARGUMENTS.replace_all(
+		&file_string,
+		|capture: &Captures| {
+			// TODO: remove quotes and commas
+
+			println!(
+				"1: {}, 2: {}",
+				capture.at(1).unwrap(),
+				capture.at(2).unwrap(),
+			);
+			// Work out function call and its argument pattern:
+			match capture.at(1).unwrap() {
+				// Takes one argument, an CSS selector string.
+				"querySelector" | "querySelectorAll" => {},
+
+				// Takes one argument, a string of classes (no period prefixed)
+				// separated by spaces (if more than one).
+				"getElementsByClassName" => {},
+
+				// Takes one argument, an ID (no hash prefixed).
+				"getElementsById" => {},
+
+				// Takes one or more arguments, each argument is for
+				// an individual class name (no period prefixed).
+				"classList.add"
+				| "classList.replace"
+				| "classList.remove"
+				| "classList.contains"
+				| "classList.toggle" => {},
+
+				_ => {},
+			}
+			return String::from("FIXME");
+		}
+	);
+}

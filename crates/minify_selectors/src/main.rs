@@ -123,11 +123,11 @@ fn process_file(
 				"Processing JS file: {}",
 				file_path.display()
 			);
-			// file_contents = parse_selectors::from_html(
-			// 	&mut file_contents,
-			// 	selectors,
-			// 	index
-			// );
+			file_contents = parse_selectors::from_js(
+				&mut file_contents,
+				selectors,
+				index
+			);
 		},
 		_ => {},
 	}
