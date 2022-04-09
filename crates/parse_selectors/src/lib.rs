@@ -148,33 +148,15 @@ pub fn from_css(
 	return CSS_CLASSES_AND_IDS.replace_all(
 		&file_string,
 		|capture: &Captures| {
-			if !selectors.contains_key(&capture.at(0).unwrap().to_owned()) {
-				*index += 1;
-				let encoded_selector: String = encode_selector::to_base62(index);
-
-				selectors.insert(
-					capture.at(0).unwrap().to_owned(),
-					encoded_selector.clone()
-				);
-
-				return format!(
-					"{prefix}{identifier}",
-					prefix = &capture.at(1).unwrap(),
-					identifier = encoded_selector
-				);
-			}
-			else {
-				return format!(
-					"{prefix}{identifier}",
-					prefix = selectors
-						.get_key_value(capture.at(0).unwrap())
-						.unwrap().0
-						.chars().next().unwrap(),
-					identifier = selectors
-						.get_key_value(capture.at(0).unwrap())
-						.unwrap().1
-				);
-			}
+			return format!(
+				"{prefix}{identifier}",
+				prefix = &capture.at(1).unwrap(),
+				identifier = get_encoded_selector(
+					&capture.at(0).unwrap().to_owned(),
+					selectors,
+					index
+				)
+			);
 		}
 	);
 }
@@ -223,31 +205,18 @@ pub fn from_html(
 				}.to_string();
 
 				for value in values.split_whitespace() {
-					let selector: String = format!("{}{}", prefix, value);
+					let encoded_selector: String = get_encoded_selector(
+						&format!("{}{}", prefix, value),
+						selectors,
+						index
+					);
 
 					// Adding space between values
 					if !replacement_value.is_empty() {
 						replacement_value.push_str(" ");
 					}
 
-					if !selectors.contains_key(&selector) {
-						*index += 1;
-						let encoded_selector: String = encode_selector::to_base62(index);
-
-						selectors.insert(
-							selector.to_owned(),
-							encoded_selector.clone()
-						);
-
-						replacement_value.push_str(&encoded_selector);
-					}
-					else {
-						replacement_value.push_str(
-							selectors
-								.get_key_value(capture.at(0).unwrap())
-								.unwrap().1
-						);
-					}
+					replacement_value.push_str(&encoded_selector);
 				}
 
 				return format!(
@@ -275,13 +244,10 @@ pub fn from_js(
 	return JS_ARGUMENTS.replace_all(
 		&file_string,
 		|capture: &Captures| {
-			// TODO: remove quotes and commas
+			let mut replacement_value: String = String::new();
+			// TODO: remove quotes?
+			// TODO: remove commas later in match when necessary?
 
-			println!(
-				"1: {}, 2: {}",
-				capture.at(1).unwrap(),
-				capture.at(2).unwrap(),
-			);
 			// Work out function call and its argument pattern:
 			match capture.at(1).unwrap() {
 				// Takes one argument, an CSS selector string.
@@ -304,7 +270,41 @@ pub fn from_js(
 
 				_ => {},
 			}
-			return String::from("FIXME");
+
+			return format!(
+				".{function}({arguments}",
+				function = capture.at(1).unwrap(),
+				arguments = capture.at(2).unwrap()
+			);
 		}
 	);
+}
+
+/// Fetch encoded selector from selectors hashmap.
+/// If selector is new and unique, generate one for it
+/// and add it to selectors.
+fn get_encoded_selector(
+	selector: &str,
+	selectors: &mut HashMap<String, String>,
+	index: &mut u32
+) -> String {
+	match selectors.contains_key(selector) {
+		true => {
+			return selectors
+				.get_key_value(selector)
+				.unwrap().1.to_string();
+		},
+
+		false => {
+			*index += 1;
+			let encoded_selector: String = encode_selector::to_base62(index);
+
+			selectors.insert(
+				selector.to_owned(),
+				encoded_selector.clone()
+			);
+
+			return encoded_selector;
+		}
+	}
 }
