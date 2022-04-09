@@ -27,6 +27,17 @@ lazy_static! {
 		"##
 	).unwrap();
 
+	// Extracts classes and IDs from selector strings
+	static ref CSS_SELECTOR_STRING: Regex = Regex::new(
+		r##"(?x)
+			(?<type>[\#\.])
+			(?<name>
+				(?>[A-Za-z\_\\]|\-[A-Za-z\-\_])
+				[\w\-\\]*+
+			)
+		"##
+	).unwrap();
+
 	// Extracts classes and IDs from a limited set of
 	// attribute selectors. Attribute name must be 'class' or 'id'
 	// and use the exact match operator.
@@ -50,13 +61,18 @@ lazy_static! {
 		r##"(?x)
 			\.
 			(?<function>
-				querySelectorAll
+				className
+				| querySelectorAll
 				| querySelector
 				| getElementById
 				| getElementsByClassName
 				| classList\s*+\.(?> add | remove | contains | replace | toggle )
+				| setAttribute
 			)
-			\(
+			(?<join>
+				\(\s*+
+				| \s*+[\=\+\!]++\s*+
+			)
 			(?>
 				\s*+
 				(?<arguments>
@@ -145,19 +161,10 @@ pub fn from_css(
 	selectors: &mut HashMap<String, String>,
 	index: &mut u32
 ) -> String {
-	return CSS_CLASSES_AND_IDS.replace_all(
-		&file_string,
-		|capture: &Captures| {
-			return format!(
-				"{prefix}{identifier}",
-				prefix = &capture.at(1).unwrap(),
-				identifier = get_encoded_selector(
-					&capture.at(0).unwrap().to_owned(),
-					selectors,
-					index
-				)
-			);
-		}
+	return process_css_selectors(
+		file_string,
+		selectors,
+		index
 	);
 }
 
@@ -166,7 +173,9 @@ pub fn from_html(
 	selectors: &mut HashMap<String, String>,
 	index: &mut u32
 ) -> String {
-	return HTML_ATTRIBUTES.replace_all(
+	let mut replacement_string: String = String::new();
+
+	replacement_string = HTML_ATTRIBUTES.replace_all(
 		&file_string,
 		|capture: &Captures| {
 			let mut values: String = capture.at(2).unwrap().to_string();
@@ -234,6 +243,15 @@ pub fn from_html(
 			}
 		}
 	);
+
+	// Processing any embedded styles
+	replacement_string = process_css_selectors(
+		&mut replacement_string,
+		selectors,
+		index
+	);
+
+	return replacement_string;
 }
 
 pub fn from_js(
@@ -241,42 +259,10 @@ pub fn from_js(
 	selectors: &mut HashMap<String, String>,
 	index: &mut u32
 ) -> String {
-	return JS_ARGUMENTS.replace_all(
-		&file_string,
-		|capture: &Captures| {
-			let mut replacement_value: String = String::new();
-			// TODO: remove quotes?
-			// TODO: remove commas later in match when necessary?
-
-			// Work out function call and its argument pattern:
-			match capture.at(1).unwrap() {
-				// Takes one argument, an CSS selector string.
-				"querySelector" | "querySelectorAll" => {},
-
-				// Takes one argument, a string of classes (no period prefixed)
-				// separated by spaces (if more than one).
-				"getElementsByClassName" => {},
-
-				// Takes one argument, an ID (no hash prefixed).
-				"getElementsById" => {},
-
-				// Takes one or more arguments, each argument is for
-				// an individual class name (no period prefixed).
-				"classList.add"
-				| "classList.replace"
-				| "classList.remove"
-				| "classList.contains"
-				| "classList.toggle" => {},
-
-				_ => {},
-			}
-
-			return format!(
-				".{function}({arguments}",
-				function = capture.at(1).unwrap(),
-				arguments = capture.at(2).unwrap()
-			);
-		}
+	return process_js(
+		file_string,
+		selectors,
+		index
 	);
 }
 
@@ -307,4 +293,114 @@ fn get_encoded_selector(
 			return encoded_selector;
 		}
 	}
+}
+
+/// Process CSS selectors
+fn process_css_selectors(
+	file_string: &mut String,
+	selectors: &mut HashMap<String, String>,
+	index: &mut u32
+) -> String {
+	return CSS_CLASSES_AND_IDS.replace_all(
+		&file_string,
+		|capture: &Captures| {
+			return format!(
+				"{prefix}{identifier}",
+				prefix = &capture.at(1).unwrap(),
+				identifier = get_encoded_selector(
+					&capture.at(0).unwrap().to_owned(),
+					selectors,
+					index
+				)
+			);
+		}
+	);
+}
+
+/// Process CSS selector string.
+fn process_css_selector_string(
+	string: &str,
+	selectors: &mut HashMap<String, String>,
+	index: &mut u32
+) -> String {
+	return CSS_SELECTOR_STRING.replace_all(
+		&string,
+		|capture: &Captures| {
+			return format!(
+				"{prefix}{identifier}",
+				prefix = &capture.at(1).unwrap(),
+				identifier = get_encoded_selector(
+					&capture.at(0).unwrap().to_owned(),
+					selectors,
+					index
+				)
+			);
+		}
+	);
+}
+
+/// Process JS
+fn process_js(
+	file_string: &mut String,
+	selectors: &mut HashMap<String, String>,
+	index: &mut u32
+) -> String {
+	return JS_ARGUMENTS.replace_all(
+		&file_string,
+		|capture: &Captures| {
+			let mut replacement_value: String = String::new();
+
+			// Work out function call and its argument pattern:
+			match capture.at(1).unwrap() {
+				// Takes one argument, an CSS selector string.
+				"querySelector" | "querySelectorAll" => {
+					replacement_value = process_css_selector_string(
+						&mut capture.at(3).unwrap().to_string(),
+						selectors,
+						index
+					);
+				},
+
+				// Takes one argument, a string of classes (no period prefixed)
+				// separated by spaces (if more than one) —
+				"getElementsByClassName"
+				// or property will be operated on with a string of classes.
+				| "className" => {
+					replacement_value = String::from("FIXME2");
+				},
+
+				// Takes one argument, an ID (no hash prefixed).
+				"getElementsById" => {
+					replacement_value = String::from("FIXME3");
+				},
+
+				// Takes one or more arguments, each argument is for
+				// an individual class name (no period prefixed).
+				"classList.add"
+				| "classList.replace"
+				| "classList.remove"
+				| "classList.contains"
+				| "classList.toggle" => {
+					replacement_value = String::from("FIXME4");
+				},
+
+				// Takes two arguments: attribute name and value,
+				// process calue if attribute is whitelisted (TODO).
+				"setAttribute" => {
+					replacement_value = String::from("FIXME5");
+				},
+
+				_ => {
+					return format!("{}", capture.at(0).unwrap());
+				},
+			}
+
+			return format!(
+				".{function}{join}{arguments}",
+				function = capture.at(1).unwrap(),
+				join = capture.at(2).unwrap(),
+				arguments = replacement_value
+			);
+		}
+	);
 }
