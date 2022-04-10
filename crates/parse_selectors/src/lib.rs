@@ -86,6 +86,7 @@ lazy_static! {
 	).unwrap();
 
 	// Extracts all attributes with values from HTML.
+	//
 	// Will need additional processing to consider
 	// 'whitelisted' attributes and separate values.
 	static ref HTML_ATTRIBUTES: Regex = Regex::new(
@@ -110,6 +111,27 @@ lazy_static! {
 					)?+
 				)*+
 				[\s]*+[\/]?>
+			)
+		"##
+	).unwrap();
+
+	//
+	static ref STRING_DELIMITED_BY_SPACE: Regex = Regex::new(
+		r##"(?x)
+			(?<token>
+				(?>[A-Za-z\_\\]|\-[A-Za-z\-\_])
+				[\w\-\\]*+
+			)
+		"##
+	).unwrap();
+
+	//
+	static ref STRING_DELIMITED_BY_COMMA: Regex = Regex::new(
+		r##"(?x)
+			(?<=[\"\'])
+			(?<token>
+				(?>[A-Za-z\_\\]|\-[A-Za-z\-\_])
+				[\w\-\\]*+
 			)
 		"##
 	).unwrap();
@@ -175,77 +197,65 @@ pub fn from_html(
 ) -> String {
 	let mut replacement_string: String = String::new();
 
+	// Processing HTML attributes
 	replacement_string = HTML_ATTRIBUTES.replace_all(
 		&file_string,
 		|capture: &Captures| {
-			let mut values: String = capture.at(2).unwrap().to_string();
-			let mut replacement_value: String = String::new();
-
-			// Quote type will either be single or double
-			let quote_type: String = match values.chars().nth(0){
-				Some('\'') => { r#"'"# },
-				Some('\"') => { r#"""# },
-				_ => { "" }
-			}.to_string();
-
-			// Trim quotes (if any) from value capture group.
-			// Should not need to worry about string length,
-			// HTML_ATTRIBUTES regex only picks up values that have
-			// at least a character in it.
-			if !quote_type.is_empty() {
-				values.pop();
-				values.remove(0);
-			}
+			let attribute_name: &str = capture.at(1).unwrap();
+			let mut attribute_values: String = capture.at(2).unwrap().to_string();
 
 			// TODO:
 			// Attributes whitelist of which its
 			// values should be processed.
-			if HTML_ATTRIBUTES_WHITELIST.contains_key(capture.at(1).unwrap()) {
+			match HTML_ATTRIBUTES_WHITELIST.contains_key(attribute_name) {
+				true => {
+					// Work out if value(s) are classes, ids or selectors.
+					let attribute_type_designation: &str = HTML_ATTRIBUTES_WHITELIST
+						.get(capture.at(1).unwrap())
+						.unwrap();
 
-				// Work out if value(s) are classes, ids or selectors.
-				let identifier = HTML_ATTRIBUTES_WHITELIST.get(capture.at(1).unwrap());
+					println!("{:?}", attribute_type_designation);
 
-				// TODO: handle CSS selector string
-
-				let prefix: String = match identifier.unwrap().as_str() {
-					"id" => { "#" },
-					"class" => { "." },
-					_ => { "" }
-				}.to_string();
-
-				for value in values.split_whitespace() {
-					let encoded_selector: String = get_encoded_selector(
-						&format!("{}{}", prefix, value),
-						selectors,
-						index
-					);
-
-					// Adding space between values
-					if !replacement_value.is_empty() {
-						replacement_value.push_str(" ");
+					// TODO: handle CSS selector string
+					match attribute_type_designation {
+						"id" | "class" => {
+							attribute_values = process_string_of_tokens(
+								&mut attribute_values,
+								selectors,
+								index,
+								attribute_type_designation
+							);
+						},
+						"selector-string" => {},
+						_ => {}
 					}
 
-					replacement_value.push_str(&encoded_selector);
-				}
+					return format!(
+						"{attribute}={value}",
+						attribute = attribute_name,
+						value = attribute_values,
+					);
+				},
 
-				return format!(
-					"{attribute}={quote}{value}{quote}",
-					attribute = capture.at(1).unwrap(),
-					value = replacement_value,
-					quote = quote_type
-				);
+				// Attribute does not contain classes and/or ids.
+				// Leave it as is.
+				false => {
+					return format!("{}", capture.at(0).unwrap());
+				},
 			}
 
-			// Attribute does not contain classes and/or ids.
-			// Leave it as is.
-			else {
-				return format!("{}", capture.at(0).unwrap());
-			}
 		}
 	);
 
 	// Processing any embedded styles
 	replacement_string = process_css_selectors(
+		&mut replacement_string,
+		selectors,
+		index
+	);
+
+	// Processing any embedded js
+	return process_js(
 		&mut replacement_string,
 		selectors,
 		index
@@ -295,7 +305,7 @@ fn get_encoded_selector(
 	}
 }
 
-/// Process CSS selectors
+/// Process CSS selectors.
 fn process_css_selectors(
 	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
@@ -339,7 +349,7 @@ fn process_css_selector_string(
 	);
 }
 
-/// Process JS
+/// Process Javascript.
 fn process_js(
 	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
@@ -366,12 +376,22 @@ fn process_js(
 				"getElementsByClassName"
 				// or property will be operated on with a string of classes.
 				| "className" => {
-					replacement_value = String::from("FIXME2");
+					replacement_value = process_string_of_tokens(
+						&mut capture.at(3).unwrap().to_string(),
+						selectors,
+						index,
+						"class"
+					);
 				},
 
 				// Takes one argument, an ID (no hash prefixed).
-				"getElementsById" => {
-					replacement_value = String::from("FIXME3");
+				"getElementById" => {
+					replacement_value = process_string_of_tokens(
+						&mut capture.at(3).unwrap().to_string(),
+						selectors,
+						index,
+						"id"
+					);
 				},
 
 				// Takes one or more arguments, each argument is for
@@ -381,11 +401,16 @@ fn process_js(
 				| "classList.remove"
 				| "classList.contains"
 				| "classList.toggle" => {
-					replacement_value = String::from("FIXME4");
+					replacement_value = process_string_of_arguments(
+						&mut capture.at(3).unwrap().to_string(),
+						selectors,
+						index,
+						"class"
+					);
 				},
 
 				// Takes two arguments: attribute name and value,
-				// process calue if attribute is whitelisted (TODO).
+				// process value if attribute is whitelisted (TODO).
 				"setAttribute" => {
 					replacement_value = String::from("FIXME5");
 				},
@@ -400,6 +425,68 @@ fn process_js(
 				function = capture.at(1).unwrap(),
 				join = capture.at(2).unwrap(),
 				arguments = replacement_value
+			);
+		}
+	);
+}
+
+///
+///
+/// selector_type
+fn process_string_of_tokens(
+	file_string: &mut String,
+	selectors: &mut HashMap<String, String>,
+	index: &mut u32,
+	selector_type: &str
+) -> String {
+	let prefix: String = match selector_type {
+		"id" => { "#" },
+		"class" => { "." },
+		_ => { "" }
+	}.to_string();
+
+	return STRING_DELIMITED_BY_SPACE.replace_all(
+		&file_string,
+		|capture: &Captures| {
+			return get_encoded_selector(
+				&format!(
+					"{prefix}{token}",
+					prefix = prefix,
+					token = &capture.at(1).unwrap()
+				),
+				selectors,
+				index
+			);
+		}
+	);
+}
+
+///
+///
+/// selector_type
+fn process_string_of_arguments(
+	file_string: &mut String,
+	selectors: &mut HashMap<String, String>,
+	index: &mut u32,
+	selector_type: &str
+) -> String {
+	let prefix: String = match selector_type {
+		"id" => { "#" },
+		"class" => { "." },
+		_ => { "" }
+	}.to_string();
+
+	return STRING_DELIMITED_BY_COMMA.replace_all(
+		&file_string,
+		|capture: &Captures| {
+			return get_encoded_selector(
+				&format!(
+					"{prefix}{token}",
+					prefix = prefix,
+					token = capture.at(1).unwrap()
+				),
+				selectors,
+				index
 			);
 		}
 	);
