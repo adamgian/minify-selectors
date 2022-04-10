@@ -214,9 +214,6 @@ pub fn from_html(
 						.get(capture.at(1).unwrap())
 						.unwrap();
 
-					println!("{:?}", attribute_type_designation);
-
-					// TODO: handle CSS selector string
 					match attribute_type_designation {
 						"id" | "class" => {
 							attribute_values = process_string_of_tokens(
@@ -226,7 +223,15 @@ pub fn from_html(
 								attribute_type_designation
 							);
 						},
-						"selector-string" => {},
+
+						"selector" => {
+							attribute_values = process_css_selector_string(
+								&mut attribute_values,
+								selectors,
+								index
+							);
+						},
+
 						_ => {}
 					}
 
@@ -358,14 +363,14 @@ fn process_js(
 	return JS_ARGUMENTS.replace_all(
 		&file_string,
 		|capture: &Captures| {
-			let mut replacement_value: String = String::new();
+			let mut replacement_value: String = capture.at(3).unwrap().to_string();
 
 			// Work out function call and its argument pattern:
 			match capture.at(1).unwrap() {
 				// Takes one argument, an CSS selector string.
 				"querySelector" | "querySelectorAll" => {
 					replacement_value = process_css_selector_string(
-						&mut capture.at(3).unwrap().to_string(),
+						&mut replacement_value,
 						selectors,
 						index
 					);
@@ -377,7 +382,7 @@ fn process_js(
 				// or property will be operated on with a string of classes.
 				| "className" => {
 					replacement_value = process_string_of_tokens(
-						&mut capture.at(3).unwrap().to_string(),
+						&mut replacement_value,
 						selectors,
 						index,
 						"class"
@@ -387,7 +392,7 @@ fn process_js(
 				// Takes one argument, an ID (no hash prefixed).
 				"getElementById" => {
 					replacement_value = process_string_of_tokens(
-						&mut capture.at(3).unwrap().to_string(),
+						&mut replacement_value,
 						selectors,
 						index,
 						"id"
@@ -402,7 +407,7 @@ fn process_js(
 				| "classList.contains"
 				| "classList.toggle" => {
 					replacement_value = process_string_of_arguments(
-						&mut capture.at(3).unwrap().to_string(),
+						&mut replacement_value,
 						selectors,
 						index,
 						"class"
@@ -410,14 +415,64 @@ fn process_js(
 				},
 
 				// Takes two arguments: attribute name and value,
-				// process value if attribute is whitelisted (TODO).
+				// process value if attribute is whitelisted.
 				"setAttribute" => {
-					replacement_value = String::from("FIXME5");
+					let attribute_name: &str = STRING_DELIMITED_BY_COMMA
+						.captures(&replacement_value)
+						.unwrap()
+						.at(0)
+						.unwrap();
+
+					match HTML_ATTRIBUTES_WHITELIST.contains_key(attribute_name) {
+						true => {
+							let attribute_type_designation: &str = HTML_ATTRIBUTES_WHITELIST
+								.get(attribute_name)
+								.unwrap();
+
+							replacement_value = STRING_DELIMITED_BY_COMMA.replace_all(
+								&replacement_value,
+								|capture: &Captures| {
+									let current_value: &str = capture.at(1).unwrap();
+
+									if current_value == attribute_name {
+										return current_value.to_string();
+									}
+
+									match attribute_type_designation {
+										"id" | "class" => {
+											return process_string_of_tokens(
+												&mut current_value.to_string(),
+												selectors,
+												index,
+												attribute_type_designation
+											);
+										},
+
+										"selector" => {
+											return process_css_selector_string(
+												&mut current_value.to_string(),
+												selectors,
+												index
+											);
+										},
+
+										_ => {
+											return current_value.to_string();
+										}
+									}
+								}
+							);
+						},
+
+						// Attribute does not contain classes and/or ids.
+						// Leave it as is.
+						false => {
+							return format!("{}", capture.at(0).unwrap());
+						},
+					}
 				},
 
-				_ => {
-					return format!("{}", capture.at(0).unwrap());
-				},
+				_ => {},
 			}
 
 			return format!(
@@ -434,7 +489,7 @@ fn process_js(
 ///
 /// selector_type
 fn process_string_of_tokens(
-	file_string: &mut String,
+	string: &mut String,
 	selectors: &mut HashMap<String, String>,
 	index: &mut u32,
 	selector_type: &str
@@ -446,7 +501,7 @@ fn process_string_of_tokens(
 	}.to_string();
 
 	return STRING_DELIMITED_BY_SPACE.replace_all(
-		&file_string,
+		&string,
 		|capture: &Captures| {
 			return get_encoded_selector(
 				&format!(
@@ -465,7 +520,7 @@ fn process_string_of_tokens(
 ///
 /// selector_type
 fn process_string_of_arguments(
-	file_string: &mut String,
+	string: &mut String,
 	selectors: &mut HashMap<String, String>,
 	index: &mut u32,
 	selector_type: &str
@@ -477,7 +532,7 @@ fn process_string_of_arguments(
 	}.to_string();
 
 	return STRING_DELIMITED_BY_COMMA.replace_all(
-		&file_string,
+		&string,
 		|capture: &Captures| {
 			return get_encoded_selector(
 				&format!(
