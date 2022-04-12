@@ -2,12 +2,12 @@
 authors = ["Adam Gian <contact@adamgian.com>"]
 edition = "2021"
 name = "minify_selectors"
-version = "0.0.4"
+version = "0.0.5"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+clap = { version = "3.1.8", features = ["derive"] }
 globwalk = "0.8.1"
-structopt = "0.3.25"
 
 parse_selectors = { path = "../parse_selectors" }

@@ -1,26 +1,29 @@
 extern crate globwalk;
 
+use clap::Parser;
 use std::{
 	collections::HashMap,
 	ffi::OsStr,
 	fs,
 	path::Path,
+	path::PathBuf,
 	time::Instant,
 };
-use structopt::StructOpt;
 
 use parse_selectors;
 
 
 
-
-#[derive(StructOpt)]
+/// Post-processor that minifies classes and IDs in CSS, HTML and JS files.
+#[derive(Parser, Debug)]
 struct Cli {
-	#[structopt(short = "i", long = "input")]
+	/// Directory or file to process
+	#[clap(short = 'i', long = "input")]
 	source: String,
 
-	// #[structopt(short = "o", long = "output")]
-	// output: String,
+	/// Output directory to save file(s)
+	#[clap(short = 'o', long = "output")]
+	output: String,
 }
 
 
@@ -28,54 +31,86 @@ struct Cli {
 
 fn main() {
 	let stopwatch = Instant::now();
-	let args = Cli::from_args();
+	let args = Cli::parse();
 
-	let mut input_glob = String::from(&args.source);
+	let mut source_dir = PathBuf::from(&args.source);
+	let mut source_glob = String::from(&args.source);
 	// let mut output_glob = String::from(&args.output);
 	// Set of selectors with its assigned base62 name
 	let mut selectors: HashMap<String, String> = HashMap::new();
 	// Counter of unique selectors
 	let mut selector_counter: u32 = 0;
 
+	let output_dir = String::from(&args.output);
+
+	let is_source_a_dir: bool = source_dir.is_dir();
 
 	// If glob string is for a directory,
 	// append
-	if is_dir(&input_glob) {
-		if input_glob.ends_with("/") {
-			input_glob.push_str("**/*.{css,html,js}");
+	if is_source_a_dir {
+		if source_glob.ends_with("/") {
+			source_glob.push_str("**/*.{css,html,js}");
 		}
-		else if input_glob.ends_with("/*") {
-			input_glob.push_str(".{css,html,js}");
+		else if source_glob.ends_with("/*") {
+			source_glob.push_str(".{css,html,js}");
 		}
 		else {
-			input_glob.push_str("/**/*.{css,html,js}");
+			source_glob.push_str("/**/*.{css,html,js}");
 		}
 	}
 
-	for entry in globwalk::glob(&input_glob).unwrap() {
+	// globwalk doesn't handle relative globs starting with "./".
+	// https://github.com/Gilnaa/globwalk/issues/28
+	if source_glob.starts_with("./") {
+		source_glob = source_glob.strip_prefix("./").unwrap().to_string();
+	}
+
+	// Force all relative paths to start with "./"
+	if source_dir.is_relative() & !source_dir.starts_with("./") {
+		source_dir = Path::new("./").join(source_dir);
+	}
+
+	for entry in globwalk::glob(&source_glob).unwrap() {
 		match entry {
 			Ok(file) => {
-				println!(
-					"{}",
+				let file_path = Path::new(file.path());
+				let mut output_file = PathBuf::new();
+
+				// Remove given source directory to make each
+				// match file relative to the output directory.
+				if is_source_a_dir {
+					output_file = PathBuf::from(&output_dir)
+						.join(
+							PathBuf::from(file.path())
+								.strip_prefix(&source_dir)
+								.unwrap()
+						);
+				}
+				// Or if input path was to a file, append only
+				// the file name to the given output directory
+				else {
+					output_file = PathBuf::from(&output_dir)
+						.join(
+							PathBuf::from(file.path())
+								.file_name()
+								.unwrap()
+						);
+				}
+
+				if let Some(p) = output_file.parent() {
+					fs::create_dir_all(p);
+				};
+
+				fs::write(
+					output_file,
 					process_file(
-						file.path(),
+						file_path,
 						&mut selectors,
 						&mut selector_counter
 					)
 				);
-				println!("");
-				// TODO:
-				// fs::create_dir_all("examples/dist/");
-
-				// fs::write(
-				// 	format!(
-				// 		"{path}{file_name}",
-				// 		path = "examples/dist/",
-				// 		file_name = file.file_name().and_then(OsStr::to_str).unwrap()
-				// 	),
-				// 	file_contents
-				// );
 			},
+
 			Err(error) => println!("{:?}", error),
 		}
 	}
@@ -91,52 +126,38 @@ fn process_file(
 	selectors: &mut HashMap<String, String>,
 	index: &mut u32
 ) -> String {
-	let file = Path::new(file_path);
-	let file_extension = file.extension().and_then(OsStr::to_str);
+	let file_extension = file_path.extension().and_then(OsStr::to_str).unwrap();
 	let mut file_contents = fs::read_to_string(file_path).unwrap();
 
+	println!(
+		"Processing file: {}",
+		file_path.display()
+	);
+
 	match file_extension {
-		Some("css") => {
-			println!(
-				"Processing CSS file: {}",
-				file_path.display()
-			);
+		"css" => {
 			file_contents = parse_selectors::from_css(
 				&mut file_contents,
 				selectors,
 				index
 			);
 		},
-		Some("html") => {
-			println!(
-				"Processing HTML file: {}",
-				file_path.display()
-			);
+		"html" => {
 			file_contents = parse_selectors::from_html(
 				&mut file_contents,
 				selectors,
 				index
 			);
 		},
-		Some("js") => {
-			println!(
-				"Processing JS file: {}",
-				file_path.display()
-			);
+		"js" => {
 			file_contents = parse_selectors::from_js(
 				&mut file_contents,
 				selectors,
 				index
 			);
 		},
-		_ => {},
+		_ => {}
 	}
 
 	return file_contents;
-}
-
-fn is_dir(glob: &String) -> bool {
-	return fs::metadata(glob)
-		.unwrap()
-		.is_dir();
 }
