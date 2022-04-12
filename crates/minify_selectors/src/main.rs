@@ -31,32 +31,30 @@ struct Cli {
 
 fn main() {
 	let stopwatch = Instant::now();
-	let args = Cli::parse();
 
-	let mut source_dir = PathBuf::from(&args.source);
-	let mut source_glob = String::from(&args.source);
-	// let mut output_glob = String::from(&args.output);
 	// Set of selectors with its assigned base62 name
 	let mut selectors: HashMap<String, String> = HashMap::new();
 	// Counter of unique selectors
 	let mut selector_counter: u32 = 0;
 
+	let args = Cli::parse();
+	let mut source_dir = PathBuf::from(&args.source);
+	let mut source_glob = String::from(&args.source);
 	let output_dir = String::from(&args.output);
 
-	let is_source_a_dir: bool = source_dir.is_dir();
-
-	// If glob string is for a directory,
-	// append
-	if is_source_a_dir {
+	// If glob string is for a directory, append
+	// glob pattern to search for CSS, HTML and JS files.
+	if source_dir.is_dir() {
 		if source_glob.ends_with("/") {
 			source_glob.push_str("**/*.{css,html,js}");
-		}
-		else if source_glob.ends_with("/*") {
-			source_glob.push_str(".{css,html,js}");
 		}
 		else {
 			source_glob.push_str("/**/*.{css,html,js}");
 		}
+	}
+	else if source_glob.ends_with("/*") {
+		source_dir = source_dir.parent().unwrap().to_path_buf();
+		source_glob.push_str(".{css,html,js}");
 	}
 
 	// globwalk doesn't handle relative globs starting with "./".
@@ -78,10 +76,10 @@ fn main() {
 
 				// Remove given source directory to make each
 				// match file relative to the output directory.
-				if is_source_a_dir {
+				if source_dir.is_dir() {
 					output_file = PathBuf::from(&output_dir)
 						.join(
-							PathBuf::from(file.path())
+							file_path
 								.strip_prefix(&source_dir)
 								.unwrap()
 						);
@@ -91,14 +89,16 @@ fn main() {
 				else {
 					output_file = PathBuf::from(&output_dir)
 						.join(
-							PathBuf::from(file.path())
+							file_path
 								.file_name()
 								.unwrap()
 						);
 				}
 
-				if let Some(p) = output_file.parent() {
-					fs::create_dir_all(p);
+				// Making sure directories exists or are created
+				// before writing file.
+				if let Some(dir_only) = output_file.parent() {
+					fs::create_dir_all(dir_only);
 				};
 
 				fs::write(
