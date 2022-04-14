@@ -10,20 +10,49 @@ use encode_selector;
 lazy_static! {
 	// Extracts classes and IDs from selector rules in
 	// stylesheets and embedded styles.
+	//
+	// See for reference: https://www.w3.org/TR/selectors-3/#grammar
+	//
+	// 1. Needs '#' or '.' to define in CSS an ID or class respectively.
+	// 2. Next character after is '-', which is optional.
+	// 3. Next character after is the 'nmstart' which is any of:
+	//    a. underscore and lowercase/uppercase latin letters ([A-Za-z\_]).
+	//    b. anything else that is not ASCII ([^\0-\177]).
+	//    c. escaped unicode number or character. Unicode numbers are 6 hex
+	//        digits following the backslash. Unicode numbers can also be
+	//        terminated earlier by by a space, newline, tab or form feed
+	// 4. Finally after the mandatory 'nmstart' character, there are zero,
+	//    one or many of 'nmchar' characters. 'nmchar's have exactly the
+	//    same rules as 'nmstart' except for part a. — it is acceptable
+	//    to have numerical digits and dashes as well (simplified down
+	//    to [\w\-]).
 	static ref CSS_CLASSES_AND_IDS: Regex = Regex::new(
 		r##"(?x)
 			(?<type>[\#\.])
 			(?<name>
-				(?>[A-Za-z\_\\]|\-[A-Za-z\-\_])
-				[\w\-\\]*+
+				-?
+				(?>
+					[A-Za-z\_]
+					| [^\0-\177]
+					| (?>
+						\\[0-9A-Fa-f]{1,6}(?>\r\n|[ \n\r\t\f])?
+						| \\[^\n\r\f0-9A-Fa-f]
+					)
+				)
+				(?>
+					[\w\-]
+					| [^\0-\177]
+					| (?>
+						\\[0-9A-Fa-f]{1,6}(?>\r\n|[ \n\r\t\f])?
+						| \\[^\n\r\f0-9A-Fa-f]
+					)
+				)*
 			)
 			(?=
-				\s*+
-				[\{\*\#\,\:\>\[\+\~]
-				|
-				\s*+
-				\.[\w\-\s\.\*]*+[\{\[]
+				[^\{]*
+				\{
 			)
+
 		"##
 	).unwrap();
 
@@ -32,8 +61,23 @@ lazy_static! {
 		r##"(?x)
 			(?<type>[\#\.])
 			(?<name>
-				(?>[A-Za-z\_\\]|\-[A-Za-z\-\_])
-				[\w\-\\]*+
+				-?
+				(?>
+					[A-Za-z\_]
+					| [^\0-\177]
+					| (?>
+						\\[0-9A-Fa-f]{1,6}(?>\r\n|[ \n\r\t\f])?
+						| \\[^\n\r\f0-9A-Fa-f]
+					)
+				)
+				(?>
+					[\w\-]
+					| [^\0-\177]
+					| (?>
+						\\[0-9A-Fa-f]{1,6}(?>\r\n|[ \n\r\t\f])?
+						| \\[^\n\r\f0-9A-Fa-f]
+					)
+				)*
 			)
 		"##
 	).unwrap();
@@ -48,8 +92,23 @@ lazy_static! {
 			(?<type>class|id)
 			=[\"\']?
 			(?<name>
-				(?>[A-Za-z\_\\]|\-[A-Za-z\-\_])
-				[\w\-\\]*+
+				-?
+				(?>
+					[A-Za-z\_]
+					| [^\0-\177]
+					| (?>
+						\\[0-9A-Fa-f]{1,6}(?>\r\n|[ \n\r\t\f])?
+						| \\[^\n\r\f0-9A-Fa-f]
+					)
+				)
+				(?>
+					[\w\-]
+					| [^\0-\177]
+					| (?>
+						\\[0-9A-Fa-f]{1,6}(?>\r\n|[ \n\r\t\f])?
+						| \\[^\n\r\f0-9A-Fa-f]
+					)
+				)*
 			)
 			[\"\']?\s*+\]
 		"##
