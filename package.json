@@ -1,0 +1,27 @@
+{
+	"name": "minify-selectors",
+	"version": "1.0.0-alpha.1",
+	"description": "Post-processor that minifies classes and IDs in CSS, HTML and Javascript files.",
+	"author": {
+		"name": "Adam Gian",
+		"email": "contact@adamgian.com",
+		"url": "adamgian.com"
+	},
+	"license": "ISC",
+	"main": "index.js",
+	"scripts": {
+		"build": "",
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/adamgian/minify-selectors.git"
+	},
+	"keywords": [
+		"selectors"
+	],
+	"bugs": {
+		"url": "https://github.com/adamgian/minify-selectors/issues"
+	},
+	"homepage": "https://github.com/adamgian/minify-selectors#readme"
+}

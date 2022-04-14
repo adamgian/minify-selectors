@@ -1,0 +1,17 @@
+##### EditorConfig (editorconfig.org)
+
+# Should be located at root so that a supported editor
+# will adhere to the coding styles project wide.
+
+root = true
+
+[*]
+charset = utf-8
+indent_size = 4
+indent_style = tab
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.{toml}]
+indent_size = 2
+indent_style = space
