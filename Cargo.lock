@@ -328,7 +328,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "308cc39be01b73d0d18f82a0e7b2a3df85245f84af96fdddc5d202d27e47b86a"
 
 [[package]]
-name = "minify_selectors"
+name = "minify-selectors"
 version = "0.0.6"
 dependencies = [
  "clap 3.1.8",
@@ -416,7 +416,7 @@ dependencies = [
 
 [[package]]
 name = "parse_selectors"
-version = "0.0.8"
+version = "0.0.10"
 dependencies = [
  "encode_selector",
  "lazy_static",

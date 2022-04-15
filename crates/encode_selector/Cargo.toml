@@ -2,7 +2,7 @@
 authors = ["Adam Gian <contact@adamgian.com>"]
 edition = "2021"
 name = "encode_selector"
-version = "0.0.1"
+version = "0.1.0"
 
 [dependencies]
 bs62 = "0.1.4"

@@ -1,10 +1,13 @@
 ##### Directories
+/node_modules
 /target
 
 
 
 
 ##### Files
+/build/*
+!/build/*.js
 
 # OS related
 .DS_Store
