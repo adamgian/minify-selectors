@@ -66,10 +66,6 @@ For a full outline of capabilities and current limitations, see TODO
 
 Install from npm
 ```shell
-# Globally
-npm i -g minify-selectors
-
-# Or in project
 npm i minify-selectors
 ```
 
