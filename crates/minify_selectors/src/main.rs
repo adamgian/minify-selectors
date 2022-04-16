@@ -3,6 +3,7 @@ extern crate globwalk;
 use clap::Parser;
 use std::{
 	collections::HashMap,
+	error::Error,
 	ffi::OsStr,
 	fs,
 	path::Path,
@@ -29,15 +30,15 @@ struct Cli {
 
 
 
-fn main() {
+fn main() -> Result<(), Box<dyn Error>> {
 	let stopwatch = Instant::now();
+	let args = Cli::parse();
 
 	// Set of selectors with its assigned base62 name
 	let mut selectors: HashMap<String, String> = HashMap::new();
 	// Counter of unique selectors
 	let mut selector_counter: u16 = 0;
 
-	let args = Cli::parse();
 	let mut source_dir = PathBuf::from(&args.source);
 	let mut source_glob = String::from(&args.source);
 	let output_dir = String::from(&args.output);
@@ -72,33 +73,27 @@ fn main() {
 		match entry {
 			Ok(file) => {
 				let file_path = Path::new(file.path());
-				let mut output_file = PathBuf::new();
-
-				// Remove given source directory to make each
-				// match file relative to the output directory.
-				if source_dir.is_dir() {
-					output_file = PathBuf::from(&output_dir)
-						.join(
-							file_path
-								.strip_prefix(&source_dir)
-								.unwrap()
-						);
-				}
-				// Or if input path was to a file, append only
-				// the file name to the given output directory
-				else {
-					output_file = PathBuf::from(&output_dir)
-						.join(
-							file_path
-								.file_name()
-								.unwrap()
-						);
-				}
+				let output_file = match source_dir.is_dir() {
+					// Remove given source directory to make each
+					// match file relative to the output directory.
+					true => {
+						PathBuf::from(&output_dir).join(
+							file_path.strip_prefix(&source_dir).unwrap()
+						)
+					},
+					// Or if input path was to a file, append only
+					// the file name to the given output directory
+					false => {
+						PathBuf::from(&output_dir).join(
+							file_path.file_name().unwrap()
+						)
+					},
+				};
 
 				// Making sure directories exists or are created
 				// before writing file.
-				if let Some(dir_only) = output_file.parent() {
-					fs::create_dir_all(dir_only);
+				if let Some(dir_only) = &output_file.parent() {
+					fs::create_dir_all(dir_only)?;
 				};
 
 				fs::write(
@@ -107,8 +102,8 @@ fn main() {
 						file_path,
 						&mut selectors,
 						&mut selector_counter
-					)
-				);
+					)?
+				)?;
 			},
 
 			Err(error) => println!("{:?}", error),
@@ -119,15 +114,17 @@ fn main() {
 		"minify-selectors finished in: {:.2?}",
 		stopwatch.elapsed()
 	);
+
+	return Ok(());
 }
 
 fn process_file(
 	file_path: &Path,
 	selectors: &mut HashMap<String, String>,
 	index: &mut u16
-) -> String {
+) -> Result<String, std::io::Error> {
 	let file_extension = file_path.extension().and_then(OsStr::to_str).unwrap();
-	let mut file_contents = fs::read_to_string(file_path).unwrap();
+	let mut file_contents = fs::read_to_string(file_path)?;
 
 	println!(
 		"Processing file: {}",
@@ -159,5 +156,5 @@ fn process_file(
 		_ => {}
 	}
 
-	return file_contents;
+	return Ok(file_contents);
 }
