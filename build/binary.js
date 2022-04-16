@@ -11,12 +11,12 @@ const SUPPORTED_PLATFORMS = [
 	{
 		type: 'Windows_NT',
 		architecture: 'x64',
-		binary: 'windows-64',
+		binary: 'windows-64.exe',
 	},
 	{
 		type: 'Windows_NT',
 		architecture: 'x32',
-		binary: 'windows-32',
+		binary: 'windows-32.exe',
 	},
 	{
 		type: 'Linux',
@@ -64,7 +64,7 @@ const getPlatform = () => {
 const getBinary = () => {
 	const platform = getPlatform();
 	const url = `${ REPO_URL }/releases/download/v${ package.version }/${ package.name }-${ platform.binary }.tar.gz`;
-	return new Binary(platform.binary, url);
+	return new Binary(package.name, url);
 };
 
 const run = () => {
