@@ -17,6 +17,7 @@ use parse_selectors;
 
 /// Post-processor that minifies classes and IDs in CSS, HTML and JS files.
 #[derive(Parser, Debug)]
+#[clap(version, about, long_about = None)]
 struct Cli {
 	/// Directory or file to process
 	#[clap(short = 'i', long = "input")]
