@@ -26,39 +26,20 @@ lazy_static! {
 	//    same rules as 'nmstart' except for part a. — it is acceptable
 	//    to have numerical digits and dashes as well (simplified down
 	//    to [\w\-]).
-	static ref CSS_CLASSES_AND_IDS: Regex = Regex::new(
+	//
+	// Caveats:
+	// -  This regex in HTML files will match JS functions, objects, inner
+	//    HTML, etc. — stuff it should not pick up. To circumvent this
+	//    problem, this regex should only be run a subset of the HTML file
+	//    string (i.e. content within <style></style>).
+	// -  This regex will 'ignore' attibutes selectors completely to avoid
+	//    any false positives.
+	static ref CSS_SELECTORS: Regex = Regex::new(
 		r##"(?x)
-			(?<type>[\#\.])
-			(?<name>
-				-?
-				(?>
-					[A-Za-z\_]
-					| [^\0-\177]
-					| (?>
-						\\[0-9A-Fa-f]{1,6}(?>\r\n|[ \n\r\t\f])?
-						| \\[^\n\r\f0-9A-Fa-f]
-					)
-				)
-				(?>
-					[\w\-]
-					| [^\0-\177]
-					| (?>
-						\\[0-9A-Fa-f]{1,6}(?>\r\n|[ \n\r\t\f])?
-						| \\[^\n\r\f0-9A-Fa-f]
-					)
-				)*
-			)
-			(?=
-				[^\{]*
-				\{
-			)
-
-		"##
-	).unwrap();
-
-	// Extracts classes and IDs from selector strings
-	static ref CSS_SELECTOR_STRING: Regex = Regex::new(
-		r##"(?x)
+			\[
+				\s*["']?.*?["']?\s*
+			\]
+			|
 			(?<type>[\#\.])
 			(?<name>
 				-?
@@ -90,7 +71,7 @@ lazy_static! {
 		r##"(?x)
 			\[\s*+
 			(?<type>class|id)
-			=[\"\']?
+			=["']?
 			(?<name>
 				-?
 				(?>
@@ -110,7 +91,7 @@ lazy_static! {
 					)
 				)*
 			)
-			[\"\']?\s*+\]
+			["']?\s*+\]
 		"##
 	).unwrap();
 
@@ -140,6 +121,21 @@ lazy_static! {
 						[\,]?
 					)++
 				)
+			)
+		"##
+	).unwrap();
+
+	// Extract instances of <style></style> from HTML files.
+	static ref HTML_STYLE_EMBED: Regex = Regex::new(
+		r##"(?x)
+			(?<tag_open>
+				<style[^>]*>
+			)
+			(?<styles>
+				(?:.|\n|\r)*?
+			)
+			(?<tag_close>
+				<\/style>
 			)
 		"##
 	).unwrap();
@@ -254,10 +250,8 @@ pub fn from_html(
 	selectors: &mut HashMap<String, String>,
 	index: &mut u16
 ) -> String {
-	let mut replacement_string: String = String::new();
-
 	// Processing HTML attributes
-	replacement_string = HTML_ATTRIBUTES.replace_all(
+	let mut replacement_string: String = HTML_ATTRIBUTES.replace_all(
 		&file_string,
 		|capture: &Captures| {
 			let attribute_name: &str = capture.at(1).unwrap();
@@ -284,7 +278,7 @@ pub fn from_html(
 						},
 
 						"selector" => {
-							attribute_values = process_css_selector_string(
+							attribute_values = process_css_selectors(
 								&mut attribute_values,
 								selectors,
 								index
@@ -312,14 +306,25 @@ pub fn from_html(
 	);
 
 	// Processing any embedded styles
-	replacement_string = process_css_selectors(
-		&mut replacement_string,
-		selectors,
-		index
+	// Create subset string(s) to process <style> embeds
+	replacement_string = HTML_STYLE_EMBED.replace_all(
+		&replacement_string,
+		|capture: &Captures| {
+			return format!(
+				"{tag_open}{styles}{tag_close}",
+				tag_open = capture.at(1).unwrap(),
+				styles = process_css_selectors(
+					&mut capture.at(2).unwrap().to_owned(),
+					selectors,
+					index
+				),
+				tag_close = capture.at(3).unwrap()
+			);
+		}
 	);
 
 	// Processing any embedded js
-	return process_js(
+	replacement_string = process_js(
 		&mut replacement_string,
 		selectors,
 		index
@@ -369,46 +374,34 @@ fn get_encoded_selector(
 	}
 }
 
-/// Process CSS selectors.
+/// Process classes and IDs in CSS file/embed or as a
+/// CSS selector string.
 fn process_css_selectors(
 	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
 	index: &mut u16
 ) -> String {
-	return CSS_CLASSES_AND_IDS.replace_all(
+	// TODO: Process attribute selectors separately
+	return CSS_SELECTORS.replace_all(
 		&file_string,
 		|capture: &Captures| {
-			return format!(
-				"{prefix}{identifier}",
-				prefix = &capture.at(1).unwrap(),
-				identifier = get_encoded_selector(
-					&capture.at(0).unwrap().to_owned(),
-					selectors,
-					index
-				)
-			);
-		}
-	);
-}
-
-/// Process CSS selector string.
-fn process_css_selector_string(
-	string: &str,
-	selectors: &mut HashMap<String, String>,
-	index: &mut u16
-) -> String {
-	return CSS_SELECTOR_STRING.replace_all(
-		&string,
-		|capture: &Captures| {
-			return format!(
-				"{prefix}{identifier}",
-				prefix = &capture.at(1).unwrap(),
-				identifier = get_encoded_selector(
-					&capture.at(0).unwrap().to_owned(),
-					selectors,
-					index
-				)
-			);
+			// Check that capture group 2 exists,
+			// i.e. matched to a class/id name and not an attribute
+			// selector which does not have this group.
+			if !capture.at(2).is_none() {
+				return format!(
+					"{prefix}{identifier}",
+					prefix = &capture.at(1).unwrap(),
+					identifier = get_encoded_selector(
+						&capture.at(0).unwrap().to_owned(),
+						selectors,
+						index
+					)
+				);
+			}
+			// Matched to an attribute selector,
+			// leave it as is.
+			return capture.at(0).unwrap().to_owned();
 		}
 	);
 }
@@ -428,7 +421,7 @@ fn process_js(
 			match capture.at(1).unwrap() {
 				// Takes one argument, an CSS selector string.
 				"querySelector" | "querySelectorAll" => {
-					replacement_value = process_css_selector_string(
+					replacement_value = process_css_selectors(
 						&mut replacement_value,
 						selectors,
 						index
@@ -508,7 +501,7 @@ fn process_js(
 										},
 
 										"selector" => {
-											return process_css_selector_string(
+											return process_css_selectors(
 												&mut current_value.to_string(),
 												selectors,
 												index
