@@ -35,7 +35,7 @@ fn main() {
 	// Set of selectors with its assigned base62 name
 	let mut selectors: HashMap<String, String> = HashMap::new();
 	// Counter of unique selectors
-	let mut selector_counter: u32 = 0;
+	let mut selector_counter: u16 = 0;
 
 	let args = Cli::parse();
 	let mut source_dir = PathBuf::from(&args.source);
@@ -124,7 +124,7 @@ fn main() {
 fn process_file(
 	file_path: &Path,
 	selectors: &mut HashMap<String, String>,
-	index: &mut u32
+	index: &mut u16
 ) -> String {
 	let file_extension = file_path.extension().and_then(OsStr::to_str).unwrap();
 	let mut file_contents = fs::read_to_string(file_path).unwrap();

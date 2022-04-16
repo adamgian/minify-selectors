@@ -240,7 +240,7 @@ lazy_static! {
 pub fn from_css(
 	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
-	index: &mut u32
+	index: &mut u16
 ) -> String {
 	return process_css_selectors(
 		file_string,
@@ -252,7 +252,7 @@ pub fn from_css(
 pub fn from_html(
 	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
-	index: &mut u32
+	index: &mut u16
 ) -> String {
 	let mut replacement_string: String = String::new();
 
@@ -331,7 +331,7 @@ pub fn from_html(
 pub fn from_js(
 	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
-	index: &mut u32
+	index: &mut u16
 ) -> String {
 	return process_js(
 		file_string,
@@ -346,7 +346,7 @@ pub fn from_js(
 fn get_encoded_selector(
 	selector: &str,
 	selectors: &mut HashMap<String, String>,
-	index: &mut u32
+	index: &mut u16
 ) -> String {
 	match selectors.contains_key(selector) {
 		true => {
@@ -373,7 +373,7 @@ fn get_encoded_selector(
 fn process_css_selectors(
 	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
-	index: &mut u32
+	index: &mut u16
 ) -> String {
 	return CSS_CLASSES_AND_IDS.replace_all(
 		&file_string,
@@ -395,7 +395,7 @@ fn process_css_selectors(
 fn process_css_selector_string(
 	string: &str,
 	selectors: &mut HashMap<String, String>,
-	index: &mut u32
+	index: &mut u16
 ) -> String {
 	return CSS_SELECTOR_STRING.replace_all(
 		&string,
@@ -417,7 +417,7 @@ fn process_css_selector_string(
 fn process_js(
 	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
-	index: &mut u32
+	index: &mut u16
 ) -> String {
 	return JS_ARGUMENTS.replace_all(
 		&file_string,
@@ -550,7 +550,7 @@ fn process_js(
 fn process_string_of_tokens(
 	string: &mut String,
 	selectors: &mut HashMap<String, String>,
-	index: &mut u32,
+	index: &mut u16,
 	selector_type: &str
 ) -> String {
 	let prefix: String = match selector_type {
@@ -581,7 +581,7 @@ fn process_string_of_tokens(
 fn process_string_of_arguments(
 	string: &mut String,
 	selectors: &mut HashMap<String, String>,
-	index: &mut u32,
+	index: &mut u16,
 	selector_type: &str
 ) -> String {
 	let prefix: String = match selector_type {
