@@ -14,6 +14,11 @@ const SUPPORTED_PLATFORMS = [
 		binary: 'windows-64',
 	},
 	{
+		type: 'Windows_NT',
+		architecture: 'x32',
+		binary: 'windows-32',
+	},
+	{
 		type: 'Linux',
 		architecture: 'x64',
 		binary: 'linux-64'
