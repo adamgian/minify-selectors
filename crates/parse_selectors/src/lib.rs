@@ -32,13 +32,26 @@ lazy_static! {
 	//    HTML, etc. — stuff it should not pick up. To circumvent this
 	//    problem, this regex should only be run a subset of the HTML file
 	//    string (i.e. content within <style></style>).
-	// -  This regex will 'ignore' attibutes selectors completely to avoid
-	//    any false positives.
+	// -  This regex will 'ignore'/blackout CSS blocks ({...}) in the sense
+	//    that it will capture everything in the firstmost capture group
+	//    and block the main regex portion from ever matching hex color
+	//    values, units and the like.
+	// -  This regex will 'ignore'/blackout attibutes selectors completely
+	//    to avoid any false positives.
+	// -  Multiline comments are 'ignored'/blacked out.
 	static ref CSS_SELECTORS: Regex = Regex::new(
 		r##"(?x)
+			{
+				[^}]*
+			}
+			|
 			\[
-				\s*["']?.*?["']?\s*
+				\s*
+					["']?.*?["']?
+				\s*
 			\]
+			|
+			\/\*[^*]*\*+(?>[^\/*][^*]*\*+)*\/
 			|
 			(?<type>[\#\.])
 			(?<name>
@@ -97,6 +110,9 @@ lazy_static! {
 
 	// Extracts arguments from functions that take
 	// classes, IDs or a CSS selector string.
+	//
+	// Objective is to capture a string of the function
+	// input (between the parens) for further processing.
 	static ref JS_ARGUMENTS: Regex = Regex::new(
 		r##"(?x)
 			\.
@@ -116,9 +132,8 @@ lazy_static! {
 			(?>
 				\s*+
 				(?<arguments>
-					(?>
-						[\w\-\ \#\.\*\:\>\[\]\+\~\"\']*+
-						[\,]?
+					(?:
+						[^"']*["'].*?["']
 					)++
 				)
 			)
@@ -174,8 +189,7 @@ lazy_static! {
 	static ref STRING_DELIMITED_BY_SPACE: Regex = Regex::new(
 		r##"(?x)
 			(?<token>
-				(?>[A-Za-z\_\\]|\-[A-Za-z\-\_])
-				[\w\-\\]*+
+				[^\s]++
 			)
 		"##
 	).unwrap();
@@ -183,10 +197,12 @@ lazy_static! {
 	//
 	static ref STRING_DELIMITED_BY_COMMA: Regex = Regex::new(
 		r##"(?x)
-			(?<=[\"\'])
-			(?<token>
-				(?>[A-Za-z\_\\]|\-[A-Za-z\-\_])
-				[\w\-\\]*+
+			(?<argument>
+				["']
+				(?<token>
+					[^"']*+
+				)
+				["']
 			)
 		"##
 	).unwrap();
