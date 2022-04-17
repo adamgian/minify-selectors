@@ -60,7 +60,7 @@ for (let link of document.querySelectorAll('a.Bd')) {
 }
 ```
 
-For a full outline of capabilities and current limitations, see TODO
+For a full outline of capabilities and current limitations, see [parse_selectors info]](crates/parse_selectors/info.md)
 
 ## Usage
 
@@ -74,6 +74,15 @@ Running in the command line
 minify-selectors --input "example/dir/src" --output "example/dir/dist"
 ```
 
+minify-selectors only supports regular CSS, HTML and JS files. minify-selectors should be one of the final steps in your build process — SASS/SCSS, LESS, Typescript, JQuery, Handlebars, etc. should be processed first.
+
 For more CLI options, see the 'Options' section below.
 
 ## Options
+
+### CLI flags
+
+| Flag                 | Description                         |
+|----------------------|-------------------------------------|
+| `--input` (or `-i`)  | Directory or file to process. If a directory path is provided — any CSS, HTML and JS files in the given directory and sub-directories will be parsed. If only a filepath is provided only the given file will be parsed. |
+| `--output` (or `-o`) | Directory to ouput processed files to. If the output path is the same as the input path, files will be overwritten. |
