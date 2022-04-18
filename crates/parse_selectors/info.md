@@ -139,11 +139,38 @@ document.querySelectorAll('.foo');         // document.querySelectorAll('.b');
 document.querySelector('p.baz:disabled');  // document.querySelector('p.r:disabled');
 ```
 
+⚠️ **Please note:**
+<br>minify-selectors will not be able to detect
+
+```js
+let foo = "foo";
+document.getElementById(foo);  // 😢
+```
+
 ## HTML
 
 ```html
 <input id="foo" type="text">            // <input id="a" type="text">
 <div class="foo bar"></div>             // <div class="b e"></div>
 <label for="foo"></label>               // <label for="a"></label>
-<a href="#" aria-labelledby="foo"></a>  // <a href="#" aria-labelledby="a"></a>
+```
+
+minify-selectors supports all native HTML attibutes that contain IDs.
+
+```html
+<a href="#" aria-labelledby="foo"></a>   // <a href="#" aria-labelledby="a"></a>
+<a href="#" aria-describedby="foo"></a>  // <a href="#" aria-describedby="a"></a>
+<input form="foo">                       // <input form="a">
+<input list="foo">                       // <input list="a">
+<td headers="foo"></td>                  // <td headers="a"></td>
+<div itemref="foo bar"></div>            // <div itemref="a e"></div>
+```
+
+⚠️ **Please note:**
+<br>Custom attributes are currently not supported.
+
+```html
+// 😢
+<button data-toggle="modal" data-target="#modal-confirm-order-delete">
+</button>
 ```
