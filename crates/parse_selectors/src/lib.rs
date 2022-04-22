@@ -16,7 +16,7 @@ lazy_static! {
 	// 1. Needs '#' or '.' to define in CSS an ID or class respectively.
 	// 2. Next character after is '-', which is optional.
 	// 3. Next character after is the 'nmstart' which is any of:
-	//    a. underscore and lowercase/uppercase latin letters ([A-Za-z\_]).
+	//    a. underscore and lowercase/uppercase latin letters ([A-Za-z_]).
 	//    b. anything else that is not ASCII ([^\0-\177]).
 	//    c. escaped unicode number or character. Unicode numbers are 6 hex
 	//        digits following the backslash. Unicode numbers can also be
@@ -57,7 +57,7 @@ lazy_static! {
 			(?<name>
 				-?
 				(?>
-					[A-Za-z\_]
+					[A-Za-z_]
 					| [^\0-\177]
 					| (?>
 						\\[0-9A-Fa-f]{1,6}(?>\r\n|[ \n\r\t\f])?
@@ -80,15 +80,20 @@ lazy_static! {
 	// attribute selectors. Attribute name must be 'class' or 'id'
 	// and use the exact match operator.
 	// i.e. [class="foo"][id="bar"]
-	static ref CSS_ATTRIBUTE_SELECTORS: Regex = Regex::new(
+	static ref CSS_ATTRIBUTES: Regex = Regex::new(
 		r##"(?x)
 			\[\s*+
-			(?<type>class|id)
-			=["']?
-			(?<name>
+			(?<attribute>
+				[^\f\n\t\ >"'|^$*~=]++
+			)
+			(?<operator>
+				[~]?=
+			)
+			["']?
+			(?<value>
 				-?
 				(?>
-					[A-Za-z\_]
+					[A-Za-z_]
 					| [^\0-\177]
 					| (?>
 						\\[0-9A-Fa-f]{1,6}(?>\r\n|[ \n\r\t\f])?
@@ -104,7 +109,14 @@ lazy_static! {
 					)
 				)*
 			)
-			["']?\s*+\]
+			(?<quote>
+				["']
+			)?
+			\s*+
+			(?<flag>
+				i | c
+			)?
+			\s*+\]
 		"##
 	).unwrap();
 
@@ -141,7 +153,7 @@ lazy_static! {
 	).unwrap();
 
 	// Extract instances of <style></style> from HTML files.
-	static ref HTML_STYLE_EMBED: Regex = Regex::new(
+	static ref HTML_STYLE_ELEMENT: Regex = Regex::new(
 		r##"(?x)
 			(?<tag_open>
 				<style[^>]*>
@@ -155,10 +167,27 @@ lazy_static! {
 		"##
 	).unwrap();
 
+	// Extract <body> from HTML files.
+	static ref HTML_BODY: Regex = Regex::new(
+		r##"(?x)
+			(?<tag_open>
+				<body[^>]*>
+			)
+			(?<styles>
+				(?:.|\n|\r)*?
+			)
+			(?<tag_close>
+				<\/body>
+			)
+		"##
+	).unwrap();
+
 	// Extracts all attributes with values from HTML.
 	//
 	// Will need additional processing to consider
 	// 'whitelisted' attributes and separate values.
+	//
+	// See: https://www.w3.org/TR/2018/SPSD-html5-20180327/syntax.html#attributes-0
 	static ref HTML_ATTRIBUTES: Regex = Regex::new(
 		r##"(?x)
 			(?<attribute>
@@ -208,7 +237,7 @@ lazy_static! {
 	).unwrap();
 
 	// HTML attributes which its values will contain classes/ids
-	static ref HTML_ATTRIBUTES_WHITELIST: HashMap<String, String> = HashMap::from([
+	static ref ATTRIBUTES_WHITELIST: HashMap<String, String> = HashMap::from([
 		// div id="foo"
 		(String::from("id"), String::from("id")),
 
@@ -254,7 +283,7 @@ pub fn from_css(
 	selectors: &mut HashMap<String, String>,
 	index: &mut u16
 ) -> String {
-	return process_css_selectors(
+	return process_css(
 		file_string,
 		selectors,
 		index
@@ -266,87 +295,11 @@ pub fn from_html(
 	selectors: &mut HashMap<String, String>,
 	index: &mut u16
 ) -> String {
-	// Processing HTML attributes
-	let mut replacement_string: String = HTML_ATTRIBUTES.replace_all(
-		&file_string,
-		|capture: &Captures| {
-			let attribute_name: &str = capture.at(1).unwrap();
-			let mut attribute_values: String = capture.at(2).unwrap().to_string();
-
-			// TODO:
-			// Attributes whitelist of which its
-			// values should be processed.
-			match HTML_ATTRIBUTES_WHITELIST.contains_key(attribute_name) {
-				true => {
-					// Work out if value(s) are classes, ids or selectors.
-					let attribute_type_designation: &str = HTML_ATTRIBUTES_WHITELIST
-						.get(capture.at(1).unwrap())
-						.unwrap();
-
-					match attribute_type_designation {
-						"id" | "class" => {
-							attribute_values = process_string_of_tokens(
-								&mut attribute_values,
-								selectors,
-								index,
-								attribute_type_designation
-							);
-						},
-
-						"selector" => {
-							attribute_values = process_css_selectors(
-								&mut attribute_values,
-								selectors,
-								index
-							);
-						},
-
-						_ => {}
-					}
-
-					return format!(
-						"{attribute}={value}",
-						attribute = attribute_name,
-						value = attribute_values,
-					);
-				},
-
-				// Attribute does not contain classes and/or ids.
-				// Leave it as is.
-				false => {
-					return format!("{}", capture.at(0).unwrap());
-				},
-			}
-
-		}
-	);
-
-	// Processing any embedded styles
-	// Create subset string(s) to process <style> embeds
-	replacement_string = HTML_STYLE_EMBED.replace_all(
-		&replacement_string,
-		|capture: &Captures| {
-			return format!(
-				"{tag_open}{styles}{tag_close}",
-				tag_open = capture.at(1).unwrap(),
-				styles = process_css_selectors(
-					&mut capture.at(2).unwrap().to_owned(),
-					selectors,
-					index
-				),
-				tag_close = capture.at(3).unwrap()
-			);
-		}
-	);
-
-	// Processing any embedded js
-	replacement_string = process_js(
-		&mut replacement_string,
+	return process_html(
+		file_string,
 		selectors,
 		index
 	);
-
-	return replacement_string;
 }
 
 pub fn from_js(
@@ -360,6 +313,9 @@ pub fn from_js(
 		index
 	);
 }
+
+
+
 
 /// Fetch encoded selector from selectors hashmap.
 /// If selector is new and unique, generate one for it
@@ -390,36 +346,75 @@ fn get_encoded_selector(
 	}
 }
 
-/// Process classes and IDs in CSS file/embed or as a
-/// CSS selector string.
-fn process_css_selectors(
+fn process_css(
 	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
 	index: &mut u16
 ) -> String {
-	// TODO: Process attribute selectors separately
-	return CSS_SELECTORS.replace_all(
+	let mut css: String = process_css_selectors(
+		file_string,
+		selectors,
+		index
+	);
+
+	css = process_css_attributes(
+		&mut css,
+		selectors,
+		index
+	);
+
+	return css;
+}
+
+/// Process HTML.
+fn process_html(
+	file_string: &mut String,
+	selectors: &mut HashMap<String, String>,
+	index: &mut u16
+) -> String {
+	// Initial step — go through <body> and parse attributes
+	let mut html: String = HTML_BODY.replace_all(
 		&file_string,
 		|capture: &Captures| {
-			// Check that capture group 2 exists,
-			// i.e. matched to a class/id name and not an attribute
-			// selector which does not have this group.
-			if !capture.at(2).is_none() {
-				return format!(
-					"{prefix}{identifier}",
-					prefix = &capture.at(1).unwrap(),
-					identifier = get_encoded_selector(
-						&capture.at(0).unwrap().to_owned(),
-						selectors,
-						index
-					)
-				);
-			}
-			// Matched to an attribute selector,
-			// leave it as is.
-			return capture.at(0).unwrap().to_owned();
+			return format!(
+				"{tag_open}{styles}{tag_close}",
+				tag_open = capture.at(1).unwrap(),
+				styles = process_html_attributes(
+					&mut capture.at(2).unwrap().to_owned(),
+					selectors,
+					index
+				),
+				tag_close = capture.at(3).unwrap()
+			);
 		}
 	);
+
+	// Processing any embedded styles
+	// Create subset string(s) to process <style> embeds
+	html = HTML_STYLE_ELEMENT.replace_all(
+		&html,
+		|capture: &Captures| {
+			return format!(
+				"{tag_open}{styles}{tag_close}",
+				tag_open = capture.at(1).unwrap(),
+				styles = process_css(
+					&mut capture.at(2).unwrap().to_owned(),
+					selectors,
+					index
+				),
+				tag_close = capture.at(3).unwrap()
+			);
+		}
+	);
+
+	// Processing any embedded js
+	html = process_js(
+		&mut html,
+		selectors,
+		index
+	);
+
+	return html;
 }
 
 /// Process Javascript.
@@ -491,9 +486,9 @@ fn process_js(
 						.at(0)
 						.unwrap();
 
-					match HTML_ATTRIBUTES_WHITELIST.contains_key(attribute_name) {
+					match ATTRIBUTES_WHITELIST.contains_key(attribute_name) {
 						true => {
-							let attribute_type_designation: &str = HTML_ATTRIBUTES_WHITELIST
+							let attribute_type_designation: &str = ATTRIBUTES_WHITELIST
 								.get(attribute_name)
 								.unwrap();
 
@@ -549,6 +544,166 @@ fn process_js(
 				join = capture.at(2).unwrap(),
 				arguments = replacement_value
 			);
+		}
+	);
+}
+
+
+
+
+/// Process classes and IDs in CSS file/embed or as a
+/// CSS selector string.
+fn process_css_selectors(
+	file_string: &mut String,
+	selectors: &mut HashMap<String, String>,
+	index: &mut u16
+) -> String {
+	return CSS_SELECTORS.replace_all(
+		&file_string,
+		|capture: &Captures| {
+			// Check that capture group 2 exists,
+			// i.e. matched to a class/id name and not an attribute
+			// selector which does not have this group.
+			if !capture.at(2).is_none() {
+				return format!(
+					"{prefix}{identifier}",
+					prefix = &capture.at(1).unwrap(),
+					identifier = get_encoded_selector(
+						&capture.at(0).unwrap().to_owned(),
+						selectors,
+						index
+					)
+				);
+			}
+			// Matched to an attribute selector,
+			// leave it as is.
+			return capture.at(0).unwrap().to_owned();
+		}
+	);
+}
+
+// Process CSS attribute selectors.
+fn process_css_attributes(
+	file_string: &mut String,
+	selectors: &mut HashMap<String, String>,
+	index: &mut u16
+) -> String {
+	return CSS_ATTRIBUTES.replace_all(
+		&file_string,
+		|capture: &Captures| {
+			let attribute_name: &str = capture.at(1).unwrap();
+			let mut attribute_value: String = capture.at(3).unwrap().to_string();
+
+			match ATTRIBUTES_WHITELIST.contains_key(attribute_name) {
+				true => {
+					// Do not process attribute selector if case-insensitive
+					// flag has been set.
+					if let Some("i") = capture.at(5) {
+						return format!("{}", capture.at(0).unwrap());
+					}
+
+					// Work out if value(s) are classes, ids or selectors.
+					let attribute_type_designation: &str = ATTRIBUTES_WHITELIST
+						.get(capture.at(1).unwrap())
+						.unwrap();
+
+					match attribute_type_designation {
+						"id" | "class" => {
+							attribute_value = process_string_of_tokens(
+								&mut attribute_value,
+								selectors,
+								index,
+								attribute_type_designation
+							);
+						},
+
+						"selector" => {
+							attribute_value = process_css_selectors(
+								&mut attribute_value,
+								selectors,
+								index
+							);
+						},
+
+						_ => {}
+					}
+
+					return format!(
+						"[{attribute}{operator}{quote}{value}{quote}{flag}]",
+						attribute = attribute_name,
+						operator = capture.at(2).unwrap(),
+						quote = capture.at(4).unwrap_or_else(|| { "'" }),
+						value = attribute_value,
+						flag = capture.at(5).unwrap_or_else(|| { "" }),
+					);
+				},
+
+				// Attribute does not contain classes and/or ids.
+				// Leave it as is.
+				false => {
+					return format!("{}", capture.at(0).unwrap());
+				},
+			}
+		}
+	);
+}
+
+/// Process HTML attributes.
+fn process_html_attributes(
+	file_string: &mut String,
+	selectors: &mut HashMap<String, String>,
+	index: &mut u16
+) -> String {
+	return HTML_ATTRIBUTES.replace_all(
+		&file_string,
+		|capture: &Captures| {
+			let attribute_name: &str = capture.at(1).unwrap();
+			let mut attribute_values: String = capture.at(2).unwrap().to_string();
+
+			// Attributes whitelist of which its
+			// values should be processed.
+			match ATTRIBUTES_WHITELIST.contains_key(attribute_name) {
+				true => {
+					// Work out if value(s) are classes, ids or selectors.
+					let attribute_type_designation: &str = ATTRIBUTES_WHITELIST
+						.get(capture.at(1).unwrap())
+						.unwrap();
+
+					match attribute_type_designation {
+						"id" | "class" => {
+							attribute_values = process_string_of_tokens(
+								&mut attribute_values,
+								selectors,
+								index,
+								attribute_type_designation
+							);
+						},
+
+						"selector" => {
+							attribute_values = process_css_selectors(
+								&mut attribute_values,
+								selectors,
+								index
+							);
+						},
+
+						_ => {}
+					}
+
+					return format!(
+						"{attribute}={value}",
+						attribute = attribute_name,
+						value = attribute_values,
+					);
+				},
+
+				// Attribute does not contain classes and/or ids.
+				// Leave it as is.
+				false => {
+					return format!("{}", capture.at(0).unwrap());
+				},
+			}
+
 		}
 	);
 }
