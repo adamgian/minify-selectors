@@ -42,7 +42,7 @@ lazy_static! {
 	static ref CSS_SELECTORS: Regex = Regex::new(
 		r##"(?x)
 			{
-				[^}]*
+				[^{}]*
 			}
 			|
 			\[
