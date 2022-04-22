@@ -676,7 +676,7 @@ fn process_html_attributes(
 
 			// Attributes whitelist of which its
 			// values should be processed.
-			match ATTRIBUTES_WHITELIST.contains_key(attribute_name) {
+			match ATTRIBUTES_WHITELIST.contains_key(&attribute_name.to_ascii_lowercase()) {
 				true => {
 					// Work out if value(s) are classes, ids or selectors.
 					let attribute_type_designation: &str = ATTRIBUTES_WHITELIST
