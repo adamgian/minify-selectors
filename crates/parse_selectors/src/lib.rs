@@ -184,33 +184,46 @@ lazy_static! {
 
 	// Extracts all attributes with values from HTML.
 	//
-	// Will need additional processing to consider
-	// 'whitelisted' attributes and separate values.
+	// Will need additional processing to consider 'whitelisted'
+	// attributes and separate out the values.
 	//
 	// See: https://www.w3.org/TR/2018/SPSD-html5-20180327/syntax.html#attributes-0
+	//
+	// 1. Attribute name - consists of one of more characters.
+	//    - Cannot be a whitespace character, null, quotation ("),
+	//        apostrophe ('), forward slash (/) or equals sign (=).
+	//    - ASCII case insensitive
+	//    - Character references:
+	//        - Named: e.g. &copy;, &nbsp;
+	//        - Decimal numeric: &#931;, &#0931;
+	//        - Hexadecimal numeric: &#x3A3;, &#x03A3;, &#x3a3;
+	// 2. Then optionally followed by an attribute value. An single equals
+	//    sign is used to separate name from the value. Even though values
+	//    are optional, we are only interested in attributes that have a
+	//    value. Note: it is valid to have one or more whitespace chars
+	//    on either side of the equals sign.
+	// 3. Attibutes values cannot contain: <, >, `, or =. Additional
+	//    rules as follows:
+	//    - Unquoted value - cannot have: ", ' or be an empty string.
+	//    - Single-quoted value, cannot contain any ' characters.
+	//    - Double-quoted value, cannot contain any " characters.
+	//    - Like names, values can have character references also.
+	//    - If followed by another attribute or /, there must be at least
+	//        a whitespace character before them.
 	static ref HTML_ATTRIBUTES: Regex = Regex::new(
 		r##"(?x)
 			(?<attribute>
-				[^\f\n\t\ \>\"\'\=]++
+				[^\s\x00\/>"'=]+
 			)
-			=
+			(?<join>
+				\s*=\s*
+			)
 			(?<value>
-				(?([\"\'])
-					[\w\-\s\#\.]++[\"\']
-					| [\w\-\#\.]++
-				)
+				[^\s\/<>"'=]+
+				| "[^\/<>"=]+
+				| '[^\/<>'=]+
 			)
-			(?=
-				(?>
-					[\s]++
-					[^\f\n\t\ \>\"\'\=]++
-					(?>
-						=
-						[^\ \>]++
-					)?+
-				)*+
-				[\s]*+[\/]?>
-			)
+			(?<quote>["'])
 		"##
 	).unwrap();
 
@@ -658,7 +671,7 @@ fn process_html_attributes(
 		&file_string,
 		|capture: &Captures| {
 			let attribute_name: &str = capture.at(1).unwrap();
-			let mut attribute_values: String = capture.at(2).unwrap().to_string();
+			let mut attribute_values: String = capture.at(3).unwrap().to_string();
 
 			// Attributes whitelist of which its
 			// values should be processed.
@@ -691,9 +704,11 @@ fn process_html_attributes(
 					}
 
 					return format!(
-						"{attribute}={value}",
+						"{attribute}{join}{quote}{value}{quote}",
 						attribute = attribute_name,
+						join = capture.at(2).unwrap(),
 						value = attribute_values,
+						quote = capture.at(4).unwrap_or_else(|| { "" }),
 					);
 				},
 
