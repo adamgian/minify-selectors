@@ -671,7 +671,8 @@ fn process_html_attributes(
 		&file_string,
 		|capture: &Captures| {
 			let attribute_name: &str = capture.at(1).unwrap();
-			let mut attribute_values: String = capture.at(3).unwrap().to_string();
+			let attribute_quote: &str = capture.at(4).unwrap_or_else(|| { "" });
+			let mut attribute_value: String = capture.at(3).unwrap().to_string();
 
 			// Attributes whitelist of which its
 			// values should be processed.
@@ -682,10 +683,16 @@ fn process_html_attributes(
 						.get(capture.at(1).unwrap())
 						.unwrap();
 
+					// attribute_value will need to be cleaned up, as 'HTML_ATTRIBUTES'
+					// regex will capture the opening quote if it has been used.
+					if !attribute_quote.is_empty() {
+						attribute_value.remove(0);
+					}
+
 					match attribute_type_designation {
 						"id" | "class" => {
-							attribute_values = process_string_of_tokens(
-								&mut attribute_values,
+							attribute_value = process_string_of_tokens(
+								&mut attribute_value,
 								selectors,
 								index,
 								attribute_type_designation
@@ -693,8 +700,8 @@ fn process_html_attributes(
 						},
 
 						"selector" => {
-							attribute_values = process_css_selectors(
-								&mut attribute_values,
+							attribute_value = process_css_selectors(
+								&mut attribute_value,
 								selectors,
 								index
 							);
@@ -707,8 +714,8 @@ fn process_html_attributes(
 						"{attribute}{join}{quote}{value}{quote}",
 						attribute = attribute_name,
 						join = capture.at(2).unwrap(),
-						value = attribute_values,
-						quote = capture.at(4).unwrap_or_else(|| { "" }),
+						value = attribute_value,
+						quote = attribute_quote,
 					);
 				},
 
