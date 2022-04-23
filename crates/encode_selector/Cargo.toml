@@ -4,5 +4,8 @@ edition = "2021"
 name = "encode_selector"
 version = "0.2.0"
 
+
+
+
 [dependencies]
 bs62 = "0.1.4"
