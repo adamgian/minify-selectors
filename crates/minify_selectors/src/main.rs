@@ -31,7 +31,20 @@ struct Cli {
 
 
 
-fn main() -> Result<(), Box<dyn Error>> {
+fn main() {
+	std::process::exit(match minify_selectors() {
+		Ok(_) => 0,
+		Err(error) => {
+			eprintln!(
+				"minify-selectors has encounted an error: {:?}",
+				error
+			);
+			1
+		}
+	});
+}
+
+fn minify_selectors() -> Result<(), Box<dyn Error>> {
 	let stopwatch = Instant::now();
 	let args = Cli::parse();
 

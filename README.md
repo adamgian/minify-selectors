@@ -74,7 +74,8 @@ Run within npm scripts or in command line
 minify-selectors --input "example/dir/src" --output "example/dir/dist"
 ```
 
-minify-selectors only supports regular CSS, HTML and JS files. minify-selectors should be one of the final steps in your build process — SASS/SCSS, LESS, Typescript, JQuery, Handlebars, etc. should be processed first.
+⚠️ **Please note:**
+<br>minify-selectors only supports regular CSS, HTML and JS files. minify-selectors should be one of the final steps in your build process — SASS/SCSS, LESS, Typescript, JQuery, Handlebars, etc. should be compiled/transpiled first.
 
 ## Options
 
