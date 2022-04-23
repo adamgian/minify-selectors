@@ -243,13 +243,11 @@ lazy_static! {
 	//
 	static ref STRING_DELIMITED_BY_COMMA: Regex = Regex::new(
 		r##"(?x)
-			(?<argument>
-				["']
-				(?<token>
-					[^"']*+
-				)
-				["']
+			["']
+			(?<token>
+				[^"']*+
 			)
+			["']
 		"##
 	).unwrap();
 
