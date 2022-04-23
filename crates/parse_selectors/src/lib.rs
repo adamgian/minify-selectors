@@ -147,7 +147,7 @@ lazy_static! {
 					(?:
 						["']
 						(?:
-							[^"'\s]+
+							[^"']+
 						)
 						[^)]["',]?\s*
 					)++
@@ -749,20 +749,32 @@ fn process_string_of_tokens(
 		_ => { "" }
 	}.to_string();
 
-	return STRING_DELIMITED_BY_SPACE.replace_all(
-		&string,
-		|capture: &Captures| {
-			return get_encoded_selector(
-				&format!(
-					"{prefix}{token}",
-					prefix = prefix,
-					token = &capture.at(1).unwrap()
-				),
-				selectors,
-				index
-			);
-		}
+	// Handle strings that have quote delimiters included.
+	let quote_type: String = match string.chars().nth(0){
+		Some('\'') => { r#"'"# },
+		Some('\"') => { r#"""# },
+		_ => { "" }
+	}.to_string();
+
+	return format!(
+		"{quote}{tokens}{quote}",
+		tokens = STRING_DELIMITED_BY_SPACE.replace_all(
+			&string,
+			|capture: &Captures| {
+				return get_encoded_selector(
+					&format!(
+						"{prefix}{token}",
+						prefix = prefix,
+						token = &capture.at(1).unwrap()
+					),
+					selectors,
+					index
+				);
+			}
+		),
+		quote = quote_type
 	);
+
 }
 
 ///
@@ -783,14 +795,25 @@ fn process_string_of_arguments(
 	return STRING_DELIMITED_BY_COMMA.replace_all(
 		&string,
 		|capture: &Captures| {
-			return get_encoded_selector(
-				&format!(
-					"{prefix}{token}",
-					prefix = prefix,
-					token = capture.at(1).unwrap()
+			// Need to put quote delimiters back around the argument value
+			let quote_type: String = match capture.at(0).unwrap().chars().nth(0){
+				Some('\'') => { r#"'"# },
+				Some('\"') => { r#"""# },
+				_ => { "" }
+			}.to_string();
+
+			return format!(
+				"{quote}{argument}{quote}",
+				argument = get_encoded_selector(
+					&format!(
+						"{prefix}{token}",
+						prefix = prefix,
+						token = capture.at(1).unwrap()
+					),
+					selectors,
+					index
 				),
-				selectors,
-				index
+				quote = quote_type
 			);
 		}
 	);
