@@ -447,7 +447,7 @@ fn process_js(
 			match capture.at(1).unwrap() {
 				// Takes one argument, an CSS selector string.
 				"querySelector" | "querySelectorAll" => {
-					replacement_value = process_css_selectors(
+					replacement_value = process_css(
 						&mut replacement_value,
 						selectors,
 						index
@@ -527,7 +527,7 @@ fn process_js(
 										},
 
 										"selector" => {
-											return process_css_selectors(
+											return process_css(
 												&mut current_value.to_string(),
 												selectors,
 												index
@@ -579,7 +579,7 @@ fn process_css_selectors(
 			// Check that capture group 2 exists,
 			// i.e. matched to a class/id name and not an attribute
 			// selector which does not have this group.
-			if !capture.at(2).is_none() {
+			if capture.at(2).is_some() {
 				return format!(
 					"{prefix}{identifier}",
 					prefix = &capture.at(1).unwrap(),
@@ -633,7 +633,7 @@ fn process_css_attributes(
 						},
 
 						"selector" => {
-							attribute_value = process_css_selectors(
+							attribute_value = process_css(
 								&mut attribute_value,
 								selectors,
 								index
@@ -702,7 +702,7 @@ fn process_html_attributes(
 						},
 
 						"selector" => {
-							attribute_value = process_css_selectors(
+							attribute_value = process_css(
 								&mut attribute_value,
 								selectors,
 								index
