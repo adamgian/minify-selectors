@@ -7,7 +7,7 @@
 		"email": "contact@adamgian.com",
 		"url": "adamgian.com"
 	},
-	"license": "ISC",
+	"license": "Apache-2.0",
 	"main": "index.js",
 	"bin": "./build/run.js",
 	"scripts": {
