@@ -31,8 +31,8 @@ As long as the IDs and classes are valid as per https://www.w3.org/TR/selectors-
 	- `{unicode}|\\[^\n\r\f0-9a-f]` ('escape') — escaping a character that is not a newline, return or unicode (which has it's own set of rules, see next point below). 
 	- `\\[0-9a-f]{1,6}(\r\n|[ \n\r\t\f])?` ('unicode') an unicode number (`\01F60E`) which is up to six hexadecimal characters long. Note: shorter unicode numbers can be terminated earlier by a space, newline, tab or form feed (`\265F `) rather than padding the leading digit(s) with zeros (`\00265F`) to reach the six character limit.
 
-⚠️ **Please note:** 
-<br>minify-selector currently does not support escaped or unicode characters in CSS selectors.
+> **Please note:**
+minify-selector currently does not support escaped or unicode characters in CSS selectors.
 
 ```scss
 .foo-bar { … }  // .g { … }
@@ -97,8 +97,8 @@ minify-selectors will only work on attribute selectors with operators that can g
 .foo[href$=".com.au"] { … }  // .b[href$=".com.au"] { … }
 ```
 
-⚠️ **Please note:**
-<br>Operators other than exact match (`|=`, `^=`, `$=`, `*=`) and case-insensitive matches `[class="Foo" i]` are not supported.
+> **Please note:**
+Operators other than exact match (`|=`, `^=`, `$=`, `*=`) and case-insensitive matches `[class="Foo" i]` are not supported.
 
 ```scss
 [class^="foo"] { … }   // 😢
@@ -139,8 +139,8 @@ document.querySelectorAll('.foo');         // document.querySelectorAll('.b');
 document.querySelector('p.baz:disabled');  // document.querySelector('p.r:disabled');
 ```
 
-⚠️ **Please note:**
-<br>minify-selectors will not be able to detect
+> **Please note:**
+minify-selectors will not be able to detect
 
 ```js
 let foo = "foo";
@@ -166,8 +166,8 @@ minify-selectors supports all native HTML attibutes that contain IDs.
 <div itemref="foo bar"></div>            // <div itemref="a e"></div>
 ```
 
-⚠️ **Please note:**
-<br>Custom attributes are currently not supported.
+> **Please note:**
+Custom attributes are currently not supported.
 
 ```html
 // 😢
