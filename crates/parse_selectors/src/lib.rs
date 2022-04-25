@@ -296,7 +296,7 @@ lazy_static! {
 pub fn from_css(
 	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
-	index: &mut u16
+	index: &mut u32
 ) -> String {
 	return process_css(
 		file_string,
@@ -308,7 +308,7 @@ pub fn from_css(
 pub fn from_html(
 	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
-	index: &mut u16
+	index: &mut u32
 ) -> String {
 	return process_html(
 		file_string,
@@ -320,7 +320,7 @@ pub fn from_html(
 pub fn from_js(
 	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
-	index: &mut u16
+	index: &mut u32
 ) -> String {
 	return process_js(
 		file_string,
@@ -338,7 +338,7 @@ pub fn from_js(
 fn get_encoded_selector(
 	selector: &str,
 	selectors: &mut HashMap<String, String>,
-	index: &mut u16
+	index: &mut u32
 ) -> String {
 	match selectors.contains_key(selector) {
 		true => {
@@ -364,7 +364,7 @@ fn get_encoded_selector(
 fn process_css(
 	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
-	index: &mut u16
+	index: &mut u32
 ) -> String {
 	let mut css: String = process_css_selectors(
 		file_string,
@@ -385,7 +385,7 @@ fn process_css(
 fn process_html(
 	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
-	index: &mut u16
+	index: &mut u32
 ) -> String {
 	// Initial step — go through <body> and parse attributes
 	let mut html: String = HTML_BODY.replace_all(
@@ -436,7 +436,7 @@ fn process_html(
 fn process_js(
 	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
-	index: &mut u16
+	index: &mut u32
 ) -> String {
 	return JS_ARGUMENTS.replace_all(
 		&file_string,
@@ -571,7 +571,7 @@ fn process_js(
 fn process_css_selectors(
 	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
-	index: &mut u16
+	index: &mut u32
 ) -> String {
 	return CSS_SELECTORS.replace_all(
 		&file_string,
@@ -601,7 +601,7 @@ fn process_css_selectors(
 fn process_css_attributes(
 	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
-	index: &mut u16
+	index: &mut u32
 ) -> String {
 	return CSS_ATTRIBUTES.replace_all(
 		&file_string,
@@ -667,7 +667,7 @@ fn process_css_attributes(
 fn process_html_attributes(
 	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
-	index: &mut u16
+	index: &mut u32
 ) -> String {
 	return HTML_ATTRIBUTES.replace_all(
 		&file_string,
@@ -738,7 +738,7 @@ fn process_html_attributes(
 fn process_string_of_tokens(
 	string: &mut String,
 	selectors: &mut HashMap<String, String>,
-	index: &mut u16,
+	index: &mut u32,
 	selector_type: &str
 ) -> String {
 	let prefix: String = match selector_type {
@@ -781,7 +781,7 @@ fn process_string_of_tokens(
 fn process_string_of_arguments(
 	string: &mut String,
 	selectors: &mut HashMap<String, String>,
-	index: &mut u16,
+	index: &mut u32,
 	selector_type: &str
 ) -> String {
 	let prefix: String = match selector_type {

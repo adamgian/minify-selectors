@@ -1,11 +1,14 @@
 use bs62;
 
-pub fn to_base62(position: &u16) -> String {
+
+
+
+pub fn to_base62(position: &u32) -> String {
 	const BASE: u32 = 62;
 	const OFFSET: u32 = 10;
 	const SUBSET: u32 = 52;
 
-	let index: u16 = position - 1;
+	let index: u32 = position - 1;
 	let mut assigned_index: u32 = 0;
 	let mut exponent: u8 = 0;
 	let mut carry: u32 = 0;

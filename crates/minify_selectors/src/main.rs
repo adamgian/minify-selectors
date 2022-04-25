@@ -51,7 +51,7 @@ fn minify_selectors() -> Result<(), Box<dyn Error>> {
 	// Set of selectors with its assigned base62 name
 	let mut selectors: HashMap<String, String> = HashMap::new();
 	// Counter of unique selectors
-	let mut selector_counter: u16 = 0;
+	let mut selector_counter: u32 = 0;
 
 	let mut source_dir = PathBuf::from(&args.source);
 	let mut source_glob = String::from(&args.source);
@@ -135,7 +135,7 @@ fn minify_selectors() -> Result<(), Box<dyn Error>> {
 fn process_file(
 	file_path: &Path,
 	selectors: &mut HashMap<String, String>,
-	index: &mut u16
+	index: &mut u32
 ) -> Result<String, std::io::Error> {
 	let file_extension = file_path.extension().and_then(OsStr::to_str).unwrap();
 	let mut file_contents = fs::read_to_string(file_path)?;

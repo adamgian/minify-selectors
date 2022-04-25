@@ -1,10 +1,14 @@
 [package]
 authors = ["Adam Gian <contact@adamgian.com>"]
 edition = "2021"
-name = "minify-selectors"
-version = "0.8.0"
+license = "Apache-2.0"
+name = "minify_selectors"
+version = "0.2.2"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[[bin]]
+name = "minify-selectors"
+path = "./src/main.rs"
 
 
 [dependencies]
