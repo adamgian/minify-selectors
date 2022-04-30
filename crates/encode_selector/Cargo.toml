@@ -2,10 +2,11 @@
 authors = ["Adam Gian <contact@adamgian.com>"]
 edition = "2021"
 name = "encode_selector"
-version = "0.2.0"
+version = "0.3.0"
 
 
 
 
 [dependencies]
 bs62 = "0.1.4"
+lazy_static = "1.4.0"

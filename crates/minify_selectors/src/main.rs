@@ -12,6 +12,8 @@ use std::{
 };
 
 use parse_selectors;
+use encode_selector;
+
 
 
 
@@ -26,6 +28,14 @@ struct Cli {
 	/// Output directory to save file(s)
 	#[clap(short = 'o', long = "output")]
 	output: String,
+
+	// Index to start encoding from
+	#[clap(long = "start-index")]
+	start_index: Option<usize>,
+
+	// Sequence of characters to use when encoding
+	#[clap(long)]
+	alphabet: Option<String>,
 }
 
 
@@ -62,8 +72,7 @@ fn minify_selectors() -> Result<(), Box<dyn Error>> {
 	if source_dir.is_dir() {
 		if source_glob.ends_with("/") {
 			source_glob.push_str("**/*.{css,html,js}");
-		}
-		else {
+		} else {
 			source_glob.push_str("/**/*.{css,html,js}");
 		}
 	}
