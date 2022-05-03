@@ -296,36 +296,42 @@ lazy_static! {
 pub fn from_css(
 	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
-	index: &mut u32
+	index: &mut usize,
+	alphabet: &Vec<char>
 ) -> String {
 	return process_css(
 		file_string,
 		selectors,
-		index
+		index,
+		alphabet
 	);
 }
 
 pub fn from_html(
 	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
-	index: &mut u32
+	index: &mut usize,
+	alphabet: &Vec<char>
 ) -> String {
 	return process_html(
 		file_string,
 		selectors,
-		index
+		index,
+		alphabet
 	);
 }
 
 pub fn from_js(
 	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
-	index: &mut u32
+	index: &mut usize,
+	alphabet: &Vec<char>
 ) -> String {
 	return process_js(
 		file_string,
 		selectors,
-		index
+		index,
+		alphabet
 	);
 }
 
@@ -338,7 +344,8 @@ pub fn from_js(
 fn get_encoded_selector(
 	selector: &str,
 	selectors: &mut HashMap<String, String>,
-	index: &mut u32
+	index: &mut usize,
+	alphabet: &Vec<char>
 ) -> String {
 	match selectors.contains_key(selector) {
 		true => {
@@ -349,7 +356,7 @@ fn get_encoded_selector(
 
 		false => {
 			*index += 1;
-			let encoded_selector: String = encode_selector::to_base62(index);
+			let encoded_selector: String = encode_selector::to_radix(index, alphabet);
 
 			selectors.insert(
 				selector.to_owned(),
@@ -364,18 +371,21 @@ fn get_encoded_selector(
 fn process_css(
 	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
-	index: &mut u32
+	index: &mut usize,
+	alphabet: &Vec<char>
 ) -> String {
 	let mut css: String = process_css_selectors(
 		file_string,
 		selectors,
-		index
+		index,
+		alphabet
 	);
 
 	css = process_css_attributes(
 		&mut css,
 		selectors,
-		index
+		index,
+		alphabet
 	);
 
 	return css;
@@ -385,7 +395,8 @@ fn process_css(
 fn process_html(
 	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
-	index: &mut u32
+	index: &mut usize,
+	alphabet: &Vec<char>
 ) -> String {
 	// Initial step — go through <body> and parse attributes
 	let mut html: String = HTML_BODY.replace_all(
@@ -397,7 +408,8 @@ fn process_html(
 				styles = process_html_attributes(
 					&mut capture.at(2).unwrap().to_owned(),
 					selectors,
-					index
+					index,
+					alphabet
 				),
 				tag_close = capture.at(3).unwrap()
 			);
@@ -415,7 +427,8 @@ fn process_html(
 				styles = process_css(
 					&mut capture.at(2).unwrap().to_owned(),
 					selectors,
-					index
+					index,
+					alphabet
 				),
 				tag_close = capture.at(3).unwrap()
 			);
@@ -426,7 +439,8 @@ fn process_html(
 	html = process_js(
 		&mut html,
 		selectors,
-		index
+		index,
+		alphabet
 	);
 
 	return html;
@@ -436,7 +450,8 @@ fn process_html(
 fn process_js(
 	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
-	index: &mut u32
+	index: &mut usize,
+	alphabet: &Vec<char>
 ) -> String {
 	return JS_ARGUMENTS.replace_all(
 		&file_string,
@@ -450,7 +465,8 @@ fn process_js(
 					replacement_value = process_css(
 						&mut replacement_value,
 						selectors,
-						index
+						index,
+						alphabet
 					);
 				},
 
@@ -463,6 +479,7 @@ fn process_js(
 						&mut replacement_value,
 						selectors,
 						index,
+						alphabet,
 						"class"
 					);
 				},
@@ -473,6 +490,7 @@ fn process_js(
 						&mut replacement_value,
 						selectors,
 						index,
+						alphabet,
 						"id"
 					);
 				},
@@ -488,6 +506,7 @@ fn process_js(
 						&mut replacement_value,
 						selectors,
 						index,
+						alphabet,
 						"class"
 					);
 				},
@@ -522,6 +541,7 @@ fn process_js(
 												&mut current_value.to_string(),
 												selectors,
 												index,
+												alphabet,
 												attribute_type_designation
 											);
 										},
@@ -530,7 +550,8 @@ fn process_js(
 											return process_css(
 												&mut current_value.to_string(),
 												selectors,
-												index
+												index,
+												alphabet
 											);
 										},
 
@@ -571,7 +592,8 @@ fn process_js(
 fn process_css_selectors(
 	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
-	index: &mut u32
+	index: &mut usize,
+	alphabet: &Vec<char>
 ) -> String {
 	return CSS_SELECTORS.replace_all(
 		&file_string,
@@ -586,7 +608,8 @@ fn process_css_selectors(
 					identifier = get_encoded_selector(
 						&capture.at(0).unwrap().to_owned(),
 						selectors,
-						index
+						index,
+						alphabet
 					)
 				);
 			}
@@ -601,7 +624,8 @@ fn process_css_selectors(
 fn process_css_attributes(
 	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
-	index: &mut u32
+	index: &mut usize,
+	alphabet: &Vec<char>
 ) -> String {
 	return CSS_ATTRIBUTES.replace_all(
 		&file_string,
@@ -628,6 +652,7 @@ fn process_css_attributes(
 								&mut attribute_value,
 								selectors,
 								index,
+								alphabet,
 								attribute_type_designation
 							);
 						},
@@ -636,7 +661,8 @@ fn process_css_attributes(
 							attribute_value = process_css(
 								&mut attribute_value,
 								selectors,
-								index
+								index,
+								alphabet
 							);
 						},
 
@@ -667,7 +693,8 @@ fn process_css_attributes(
 fn process_html_attributes(
 	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
-	index: &mut u32
+	index: &mut usize,
+	alphabet: &Vec<char>
 ) -> String {
 	return HTML_ATTRIBUTES.replace_all(
 		&file_string,
@@ -697,6 +724,7 @@ fn process_html_attributes(
 								&mut attribute_value,
 								selectors,
 								index,
+								alphabet,
 								attribute_type_designation
 							);
 						},
@@ -705,7 +733,8 @@ fn process_html_attributes(
 							attribute_value = process_css(
 								&mut attribute_value,
 								selectors,
-								index
+								index,
+								alphabet
 							);
 						},
 
@@ -738,7 +767,8 @@ fn process_html_attributes(
 fn process_string_of_tokens(
 	string: &mut String,
 	selectors: &mut HashMap<String, String>,
-	index: &mut u32,
+	index: &mut usize,
+	alphabet: &Vec<char>,
 	selector_type: &str
 ) -> String {
 	let prefix: String = match selector_type {
@@ -766,7 +796,8 @@ fn process_string_of_tokens(
 						token = &capture.at(1).unwrap()
 					),
 					selectors,
-					index
+					index,
+					alphabet
 				);
 			}
 		),
@@ -781,7 +812,8 @@ fn process_string_of_tokens(
 fn process_string_of_arguments(
 	string: &mut String,
 	selectors: &mut HashMap<String, String>,
-	index: &mut u32,
+	index: &mut usize,
+	alphabet: &Vec<char>,
 	selector_type: &str
 ) -> String {
 	let prefix: String = match selector_type {
@@ -809,7 +841,8 @@ fn process_string_of_arguments(
 						token = capture.at(1).unwrap()
 					),
 					selectors,
-					index
+					index,
+					alphabet
 				),
 				quote = quote_type
 			);

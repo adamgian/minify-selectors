@@ -29,11 +29,11 @@ struct Cli {
 	#[clap(short = 'o', long = "output")]
 	output: String,
 
-	// Index to start encoding from
+	/// Index to start encoding from
 	#[clap(long = "start-index")]
 	start_index: Option<usize>,
 
-	// Sequence of characters to use when encoding
+	/// Sequence of characters to use when encoding
 	#[clap(long)]
 	alphabet: Option<String>,
 }
@@ -61,11 +61,25 @@ fn minify_selectors() -> Result<(), Box<dyn Error>> {
 	// Set of selectors with its assigned base62 name
 	let mut selectors: HashMap<String, String> = HashMap::new();
 	// Counter of unique selectors
-	let mut selector_counter: u32 = 0;
+	let mut selector_counter: usize = match &args.start_index {
+		Some(index) => *index,
+		None => 0,
+	};
 
 	let mut source_dir = PathBuf::from(&args.source);
 	let mut source_glob = String::from(&args.source);
 	let output_dir = String::from(&args.output);
+
+	let alphabet = encode_selector::into_alphabet_set(
+		match &args.alphabet {
+			Some(alphabet) => alphabet,
+			None => concat!(
+				"0123456789",
+				"abcdefghijklmnopqrstuvwxyz",
+				"ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+			),
+		}
+	);
 
 	// If glob string is for a directory, append
 	// glob pattern to search for CSS, HTML and JS files.
@@ -75,8 +89,7 @@ fn minify_selectors() -> Result<(), Box<dyn Error>> {
 		} else {
 			source_glob.push_str("/**/*.{css,html,js}");
 		}
-	}
-	else if source_glob.ends_with("/*") {
+	} else if source_glob.ends_with("/*") {
 		source_dir = source_dir.parent().unwrap().to_path_buf();
 		source_glob.push_str(".{css,html,js}");
 	}
@@ -124,7 +137,8 @@ fn minify_selectors() -> Result<(), Box<dyn Error>> {
 					process_file(
 						file_path,
 						&mut selectors,
-						&mut selector_counter
+						&mut selector_counter,
+						&alphabet
 					)?
 				)?;
 			},
@@ -144,7 +158,8 @@ fn minify_selectors() -> Result<(), Box<dyn Error>> {
 fn process_file(
 	file_path: &Path,
 	selectors: &mut HashMap<String, String>,
-	index: &mut u32
+	index: &mut usize,
+	alphabet: &Vec<char>
 ) -> Result<String, std::io::Error> {
 	let file_extension = file_path.extension().and_then(OsStr::to_str).unwrap();
 	let mut file_contents = fs::read_to_string(file_path)?;
@@ -159,21 +174,24 @@ fn process_file(
 			file_contents = parse_selectors::from_css(
 				&mut file_contents,
 				selectors,
-				index
+				index,
+				alphabet
 			);
 		},
 		"html" => {
 			file_contents = parse_selectors::from_html(
 				&mut file_contents,
 				selectors,
-				index
+				index,
+				alphabet
 			);
 		},
 		"js" => {
 			file_contents = parse_selectors::from_js(
 				&mut file_contents,
 				selectors,
-				index
+				index,
+				alphabet
 			);
 		},
 		_ => {}

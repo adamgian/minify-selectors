@@ -57,7 +57,7 @@ const getPlatform = () => {
 	}
 
 	error(
-		`Unsupported platform: ${ type } ${ arch }.\nCurrently supported platforms are:\n\n${ cTable.getTable(SUPPORTED_PLATFORMS) }`
+		`Unsupported platform: ${ type } ${ arch }.\nCurrently supported platforms are:\n\n${ cTable.getTable(SUPPORTED_PLATFORMS) }\n\nPlease feel free to notify us by creating an issue here: ${ package.bugs.url }.`
 	);
 };
 

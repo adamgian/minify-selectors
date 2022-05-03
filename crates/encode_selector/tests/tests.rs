@@ -21,7 +21,7 @@ use encode_selector::*;
 
 #[test]
 fn index_to_base62_standard() {
-	let alphabet = encode_selector::into_alphabet_set(
+	let alphabet = into_alphabet_set(
 		&"0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	);
 
@@ -74,7 +74,7 @@ fn index_to_base62_standard() {
 
 #[test]
 fn index_to_base62_nums_last() {
-	let alphabet = encode_selector::into_alphabet_set(
+	let alphabet = into_alphabet_set(
 		&"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	);
 
@@ -133,7 +133,7 @@ fn index_to_base62_nums_last() {
 
 #[test]
 fn index_to_base62_nums_scattered() {
-	let alphabet = encode_selector::into_alphabet_set(
+	let alphabet = into_alphabet_set(
 		&"a0bc1d234ef5ghijklmn6opqr78s9tuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	);
 
@@ -178,8 +178,8 @@ fn index_to_base62_nums_scattered() {
 
 
 #[test]
-fn index_to_base64() {
-	let alphabet = encode_selector::into_alphabet_set(
+fn index_to_base64_custom() {
+	let alphabet = into_alphabet_set(
 		&"0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_"
 	);
 
@@ -210,4 +210,42 @@ fn index_to_base64() {
 	assert_eq!(to_radix(&216372, &alphabet), "a000".to_string());
 	assert_eq!(to_radix(&13847858, &alphabet), "Z__-".to_string());
 	assert_eq!(to_radix(&13847859, &alphabet), "Z___".to_string());
+}
+
+
+#[test]
+fn index_to_base26_latin_letters() {
+	let alphabet = into_alphabet_set(
+		&"abcdefghijklmnopqrstuvwxyz"
+	);
+
+	// 1 character length encoded selector names:
+	// - 26 valid combinations
+	assert_eq!(to_radix(&0, &alphabet), "a".to_string());
+	assert_eq!(to_radix(&1, &alphabet), "b".to_string());
+	assert_eq!(to_radix(&2, &alphabet), "c".to_string());
+	assert_eq!(to_radix(&10, &alphabet), "k".to_string());
+	assert_eq!(to_radix(&20, &alphabet), "u".to_string());
+	assert_eq!(to_radix(&25, &alphabet), "z".to_string());
+
+	// 2 character length encoded selector names:
+	// - 676 valid combinations
+	assert_eq!(to_radix(&26, &alphabet), "aa".to_string());
+	assert_eq!(to_radix(&36, &alphabet), "ak".to_string());
+	assert_eq!(to_radix(&46, &alphabet), "au".to_string());
+	assert_eq!(to_radix(&51, &alphabet), "az".to_string());
+	assert_eq!(to_radix(&52, &alphabet), "ba".to_string());
+	assert_eq!(to_radix(&701, &alphabet), "zz".to_string());
+
+	// 3 character length encoded selector names:
+	// - 17576 valid combinations
+	assert_eq!(to_radix(&702, &alphabet), "aaa".to_string());
+	assert_eq!(to_radix(&712, &alphabet), "aak".to_string());
+	assert_eq!(to_radix(&722, &alphabet), "aau".to_string());
+	assert_eq!(to_radix(&18277, &alphabet), "zzz".to_string());
+
+	// 4 character length encoded selector names:
+	// - 456976 valid combinations
+	assert_eq!(to_radix(&18278, &alphabet), "aaaa".to_string());
+	assert_eq!(to_radix(&475253, &alphabet), "zzzz".to_string());
 }
