@@ -59,7 +59,7 @@ for (let link of document.querySelectorAll('a.Bd')) {
 }
 ```
 
-For a full outline of capabilities and current limitations, see [parse_selectors info](crates/parse_selectors/info.md)
+For a full outline of capabilities and current limitations, see [parse_selectors/info.md](crates/parse_selectors/info.md)
 
 
 ## Usage
@@ -104,3 +104,5 @@ For a full outline of capabilities and current limitations, see [parse_selectors
 |:------|:-------------|
 | `--input` (or&nbsp;`-i`) | Directory or file to process. If a directory path is provided — any CSS, HTML and JS files in the given directory and sub-directories will be parsed. If only a filepath is provided — only the given file will be parsed. |
 | `--output` (or&nbsp;`-o`) | Directory to ouput processed files to. Setting the output path to be the same as the input path will overwrite existing files. |
+| `--alphabet` | Custom sequence of characters to use when encoding. <br><br>By default, selector names will be encoded using the following base 62 string: `"0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"` |
+| `--start-index` | Index to start incrementing and encoding from. <br><br>By default, this will begin from `0` (essentially `a` if using the default alphabet). |

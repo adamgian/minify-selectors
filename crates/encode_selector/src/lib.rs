@@ -12,13 +12,13 @@ lazy_static! {
 
 
 
-// Converts an ordinal into an encoded radix.
-//
-// Function parameters:
-// - ordinal (&usize) - (must be 0 or greater)
-// - alphabet (&str) - String sequence of characters in which to create
-//   a radix from. for example:
-//   "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+/// Converts an ordinal into an encoded radix.
+///
+/// Function parameters:
+/// - ordinal (&usize) - Integer to encode, must be 0 or greater.
+/// - alphabet (&Vec<char>) - String sequence of characters in which to create
+///   a radix from. Use into_alphabet_set() to create this vector from a
+///   processed string such as: "0123456789ABCDEF".
 pub fn to_radix(
 	ordinal: &usize,
 	alphabet: &Vec<char>
@@ -82,9 +82,8 @@ pub fn to_radix(
 }
 
 
-// Returns a vector of chars that doesn't not contain
-// more than one of each charactor or symbol.
-pub fn into_alphabet_set (alphabet: &str) -> Vec<char> {
+/// Returns a vector of chars that are all unique.
+pub fn into_alphabet_set(alphabet: &str) -> Vec<char> {
 	let mut alphabet_set: Vec<char> = Vec::new();
 
 	for char in alphabet.chars() {
