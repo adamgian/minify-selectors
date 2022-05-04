@@ -82,6 +82,8 @@ lazy_static! {
 	// i.e. [class="foo"][id="bar"]
 	static ref CSS_ATTRIBUTES: Regex = Regex::new(
 		r##"(?x)
+			\/\*[^*]*\*+(?>[^\/*][^*]*\*+)*\/
+			|
 			\[\s*+
 			(?<attribute>
 				[^\f\n\t\ >"'|^$*~=]++
@@ -599,8 +601,8 @@ fn process_css_selectors(
 		&file_string,
 		|capture: &Captures| {
 			// Check that capture group 2 exists,
-			// i.e. matched to a class/id name and not an attribute
-			// selector which does not have this group.
+			// i.e. matched to a class/id name and not an attribute selector,
+			// rule block or comments — which does not have this group.
 			if capture.at(2).is_some() {
 				return format!(
 					"{prefix}{identifier}",
@@ -613,8 +615,8 @@ fn process_css_selectors(
 					)
 				);
 			}
-			// Matched to an attribute selector,
-			// leave it as is.
+			// Matched to an attribute selector, rule block or comment.
+			// Leave it as is.
 			return capture.at(0).unwrap().to_owned();
 		}
 	);
@@ -630,6 +632,13 @@ fn process_css_attributes(
 	return CSS_ATTRIBUTES.replace_all(
 		&file_string,
 		|capture: &Captures| {
+			// Check that capture group 2 exists, if it doesn't it is
+			// matched to an attribute selector, rule block or comment.
+			// Leave it as is.
+			if capture.at(2).is_none() {
+				return capture.at(0).unwrap().to_owned();
+			}
+
 			let attribute_name: &str = capture.at(1).unwrap();
 			let mut attribute_value: String = capture.at(3).unwrap().to_string();
 
