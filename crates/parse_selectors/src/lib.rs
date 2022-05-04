@@ -355,8 +355,8 @@ fn get_encoded_selector(
 		},
 
 		false => {
-			*index += 1;
 			let encoded_selector: String = encode_selector::to_radix(index, alphabet);
+			*index += 1;
 
 			selectors.insert(
 				selector.to_owned(),

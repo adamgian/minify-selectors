@@ -6,7 +6,7 @@
 
 minify-selectors finds and encodes IDs and classes in selector rules.
 ```scss
-.\🗿 { … }         // 😢
+#foo { … }
 .foo { … }
 #FOO { … }
 #FOOBAR { … }
@@ -37,6 +37,14 @@ As long as the IDs and classes are valid as per https://www.w3.org/TR/selectors-
 	- `[^\0-\177]` ('nonascii') — other characters that are not part of ASCII.
 	- `{unicode}|\\[^\n\r\f0-9a-f]` ('escape') — escaping a character that is not a newline, return or unicode (which has it's own set of rules, see next point below). 
 	- `\\[0-9a-f]{1,6}(\r\n|[ \n\r\t\f])?` ('unicode') an unicode number (`\01F60E`) which is up to six hexadecimal characters long. Note: shorter unicode numbers can be terminated earlier by a space, newline, tab or form feed (`\265F `) rather than padding the leading digit(s) with zeros (`\00265F`) to reach the six character limit.
+
+> **Please note:**
+minify-selector currently does not support escaped or unicode characters in CSS selectors.
+
+```scss
+.\265F -baz { … }  /* 😢 */
+.🗿 { … }          /* 😢 */
+```
 
 ```scss
 .foo-bar { … }
@@ -153,14 +161,6 @@ minify-selectors will only work on attribute selectors with operators that can g
 [class=e] { … }
 [class~="r"] { … }
 .b[href$=".com.au"] { … }
-```
-
-> **Please note:**
-minify-selector currently does not support escaped or unicode characters in CSS selectors.
-
-```scss
-.\265F -baz { … }  /* 😢 */
-.\🗿 { … }         /* 😢 */
 ```
 
 > **Please note:**
