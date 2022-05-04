@@ -656,7 +656,6 @@ fn process_css_attributes(
 								attribute_type_designation
 							);
 						},
-
 						"selector" => {
 							attribute_value = process_css(
 								&mut attribute_value,
@@ -665,17 +664,19 @@ fn process_css_attributes(
 								alphabet
 							);
 						},
-
-						_ => {}
+						_ => {},
 					}
 
 					return format!(
 						"[{attribute}{operator}{quote}{value}{quote}{flag}]",
 						attribute = attribute_name,
 						operator = capture.at(2).unwrap(),
-						quote = capture.at(4).unwrap_or_else(|| { "'" }),
+						quote = capture.at(4).unwrap_or_else(|| { "" }),
 						value = attribute_value,
-						flag = capture.at(5).unwrap_or_else(|| { "" }),
+						flag = match capture.at(5) {
+							Some(f) => " ".to_string() + f,
+							None => "".to_string(),
+						},
 					);
 				},
 
