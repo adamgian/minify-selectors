@@ -116,7 +116,7 @@ lazy_static! {
 			)?
 			\s*+
 			(?<flag>
-				i | c
+				[IiSs]
 			)?
 			\s*+\]
 		"##
@@ -646,7 +646,7 @@ fn process_css_attributes(
 				true => {
 					// Do not process attribute selector if case-insensitive
 					// flag has been set.
-					if let Some("i") = capture.at(5) {
+					if let Some("i") | Some("I") = capture.at(5) {
 						return format!("{}", capture.at(0).unwrap());
 					}
 
