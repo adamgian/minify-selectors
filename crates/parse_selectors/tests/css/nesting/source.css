@@ -1,0 +1,107 @@
+/*
+ * Note this is not official CSS yet.
+ * See (W3C working draft): https://www.w3.org/TR/css-nesting-1/
+ */
+
+.foo {
+	color: blue;
+	& > .bar { color: red }
+}
+
+.foo {
+	color: blue;
+	&.bar { color: red }
+}
+
+.foo, .bar {
+	color: blue;
+	& + .baz, &.qux { color: red }
+}
+
+.foo {
+	color: blue;
+	& .bar & .baz & .qux { color: red }
+}
+
+.foo {
+	color: blue;
+	& { padding: 2ch }
+}
+
+.foo {
+	color: blue;
+	&& { padding: 2ch }
+}
+
+.error, #404 {
+	&:hover > .baz { color: red }
+}
+
+.foo {
+	&:is(.bar, &.baz) { color: red }
+}
+
+figure {
+	margin: 0;
+
+	& > figcaption {
+		background: hsl(0 0% 0% / 50%);
+
+		& > p {
+			font-size: .9rem;
+		}
+	}
+}
+
+
+.foo {
+	color: red;
+	@nest & > .bar {
+		color: blue;
+	}
+}
+
+.foo {
+	color: red;
+	@nest .parent & {
+		color: blue;
+	}
+}
+
+.foo {
+	color: red;
+	@nest :not(&) {
+		color: blue;
+	}
+}
+
+.foo {
+	color: blue;
+	@nest .bar & {
+		color: red;
+		&.baz {
+			color: green;
+		}
+	}
+}
+
+
+.foo {
+	display: grid;
+
+	@media (orientation: landscape) {
+		grid-auto-flow: column;
+	}
+}
+
+.foo {
+	display: grid;
+
+	@media (orientation: landscape) {
+		grid-auto-flow: column;
+
+		@media (min-inline-size > 1024px) {
+			max-inline-size: 1024px;
+		}
+	}
+}

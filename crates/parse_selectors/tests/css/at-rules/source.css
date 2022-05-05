@@ -1,0 +1,21 @@
+@media print {
+	.SELECTOR-1 {}
+	.SELECTOR-2 {}
+}
+
+@media screen and (resolution: 50.82dpcm) {
+	#SELECTOR-3 {}
+	.SELECTOR-4 {}
+}
+
+@supports (display: grid) {
+	.SELECTOR-5 {
+		color: #000;
+	}
+
+	@media (min-width: 900px) {
+		.SELECTOR-6 {
+			color: #fff;
+		}
+	}
+}

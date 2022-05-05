@@ -1,0 +1,107 @@
+/*
+ * Note this is not official CSS yet.
+ * See (W3C working draft): https://www.w3.org/TR/css-nesting-1/
+ */
+
+.a {
+	color: blue;
+	& > .b { color: red }
+}
+
+.a {
+	color: blue;
+	&.b { color: red }
+}
+
+.a, .b {
+	color: blue;
+	& + .c, &.d { color: red }
+}
+
+.a {
+	color: blue;
+	& .b & .c & .d { color: red }
+}
+
+.a {
+	color: blue;
+	& { padding: 2ch }
+}
+
+.a {
+	color: blue;
+	&& { padding: 2ch }
+}
+
+.e, #404 {
+	&:hover > .c { color: red }
+}
+
+.a {
+	&:is(.b, &.c) { color: red }
+}
+
+figure {
+	margin: 0;
+
+	& > figcaption {
+		background: hsl(0 0% 0% / 50%);
+
+		& > p {
+			font-size: .9rem;
+		}
+	}
+}
+
+
+.a {
+	color: red;
+	@nest & > .b {
+		color: blue;
+	}
+}
+
+.a {
+	color: red;
+	@nest .f & {
+		color: blue;
+	}
+}
+
+.a {
+	color: red;
+	@nest :not(&) {
+		color: blue;
+	}
+}
+
+.a {
+	color: blue;
+	@nest .b & {
+		color: red;
+		&.c {
+			color: green;
+		}
+	}
+}
+
+
+.a {
+	display: grid;
+
+	@media (orientation: landscape) {
+		grid-auto-flow: column;
+	}
+}
+
+.a {
+	display: grid;
+
+	@media (orientation: landscape) {
+		grid-auto-flow: column;
+
+		@media (min-inline-size > 1024px) {
+			max-inline-size: 1024px;
+		}
+	}
+}

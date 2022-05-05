@@ -1,0 +1,21 @@
+@media print {
+	.a {}
+	.b {}
+}
+
+@media screen and (resolution: 50.82dpcm) {
+	#c {}
+	.d {}
+}
+
+@supports (display: grid) {
+	.e {
+		color: #000;
+	}
+
+	@media (min-width: 900px) {
+		.f {
+			color: #fff;
+		}
+	}
+}

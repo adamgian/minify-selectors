@@ -1,0 +1,31 @@
+[class=a] {}
+[class="b"] {}
+[class='c'] {}
+[class~=d] {}
+[class~="e"] {}
+[class~='f'] {}
+
+[id=g] {}
+[id="h"] {}
+[id='i'] {}
+[id~=j] {}
+[id~="k"] {}
+[id~='l'] {}
+
+[class=SELECTOR-13 i] {}
+[class="SELECTOR-13" i] {}
+[class="SELECTOR-13"i] {}
+[class="SELECTOR-13" I] {}
+[class=m s] {}
+[class="m" s] {}
+[class="m" s] {}
+[class="m" S] {}
+[class="SELECTOR-14" x] {}
+
+[aria-describedby~='n'] {}
+[aria-labelledby~='o'] {}
+[for~='p'] {}
+[form~='q'] {}
+[headers~='r'] {}
+[itemref~='r'] {}
+[list~='s'] {}

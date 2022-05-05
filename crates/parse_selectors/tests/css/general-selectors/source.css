@@ -1,0 +1,40 @@
+.- { color: red }
+.-7 { color: red }
+.0 { color: red }
+.00 { color: red }
+.-- { color: red }
+.--1 { color: red }
+.--a { color: red }
+#- { color: red }
+#-7 { color: red }
+#0 { color: red }
+#00 { color: red }
+#-- { color: red }
+#--1 { color: red }
+#--a { color: red }
+
+
+.-_ { color: green }
+.-a { color: green }
+._ { color: green }
+.__ { color: green }
+._- { color: green }
+._7 { color: green }
+._a { color: green }
+.a { color: green }
+.A { color: green }
+.\265F -baz { color: yellow }
+.🗿 { color: yellow }
+.\🚕 { color: yellow }
+#-_ { color: green }
+#-a { color: green }
+#_ { color: green }
+#__ { color: green }
+#_- { color: green }
+#_7 { color: green }
+#_a { color: green }
+#a { color: green }
+#A { color: green }
+#\265F -baz { color: yellow }
+#🗿 { color: yellow }
+#\🚕 { color: yellow }
