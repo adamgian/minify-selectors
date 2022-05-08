@@ -2,8 +2,6 @@ use lazy_static::lazy_static;
 use onig::*;
 use std::collections::HashMap;
 
-use encode_selector;
-
 
 
 
@@ -312,10 +310,10 @@ lazy_static! {
 
 
 pub fn from_css(
-	file_string: &mut String,
+	file_string: &mut str,
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
-	alphabet: &Vec<char>
+	alphabet: &[char]
 ) -> String {
 	return process_css(
 		file_string,
@@ -326,10 +324,10 @@ pub fn from_css(
 }
 
 pub fn from_html(
-	file_string: &mut String,
+	file_string: &mut str,
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
-	alphabet: &Vec<char>
+	alphabet: &[char]
 ) -> String {
 	return process_html(
 		file_string,
@@ -340,10 +338,10 @@ pub fn from_html(
 }
 
 pub fn from_js(
-	file_string: &mut String,
+	file_string: &mut str,
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
-	alphabet: &Vec<char>
+	alphabet: &[char]
 ) -> String {
 	return process_js(
 		file_string,
@@ -363,7 +361,7 @@ fn get_encoded_selector(
 	selector: &str,
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
-	alphabet: &Vec<char>
+	alphabet: &[char]
 ) -> String {
 	match selectors.contains_key(selector) {
 		true => {
@@ -387,10 +385,10 @@ fn get_encoded_selector(
 }
 
 fn process_css(
-	file_string: &mut String,
+	file_string: &mut str,
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
-	alphabet: &Vec<char>
+	alphabet: &[char]
 ) -> String {
 	let mut css: String = process_css_selectors(
 		file_string,
@@ -411,14 +409,14 @@ fn process_css(
 
 /// Process HTML.
 fn process_html(
-	file_string: &mut String,
+	file_string: &mut str,
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
-	alphabet: &Vec<char>
+	alphabet: &[char]
 ) -> String {
 	// Initial step — go through <body> and parse attributes
 	let mut html: String = HTML_BODY.replace_all(
-		&file_string,
+		file_string,
 		|capture: &Captures| {
 			return format!(
 				"{tag_open}{styles}{tag_close}",
@@ -466,13 +464,13 @@ fn process_html(
 
 /// Process Javascript.
 fn process_js(
-	file_string: &mut String,
+	file_string: &mut str,
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
-	alphabet: &Vec<char>
+	alphabet: &[char]
 ) -> String {
 	return JS_ARGUMENTS.replace_all(
-		&file_string,
+		file_string,
 		|capture: &Captures| {
 			let mut replacement_value: String = capture.at(3).unwrap().to_string();
 
@@ -584,7 +582,7 @@ fn process_js(
 						// Attribute does not contain classes and/or ids.
 						// Leave it as is.
 						false => {
-							return format!("{}", capture.at(0).unwrap());
+							return capture.at(0).unwrap().to_string();
 						},
 					}
 				},
@@ -608,13 +606,13 @@ fn process_js(
 /// Process classes and IDs in CSS file/embed or as a
 /// CSS selector string.
 fn process_css_selectors(
-	file_string: &mut String,
+	file_string: &mut str,
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
-	alphabet: &Vec<char>
+	alphabet: &[char]
 ) -> String {
 	return CSS_SELECTORS.replace_all(
-		&file_string,
+		file_string,
 		|capture: &Captures| {
 			// Check that capture group 2 exists,
 			// i.e. matched to a class/id name and not an attribute selector,
@@ -624,7 +622,7 @@ fn process_css_selectors(
 					"{prefix}{identifier}",
 					prefix = &capture.at(1).unwrap(),
 					identifier = get_encoded_selector(
-						&capture.at(0).unwrap().to_owned(),
+						capture.at(0).unwrap(),
 						selectors,
 						index,
 						alphabet
@@ -640,13 +638,13 @@ fn process_css_selectors(
 
 // Process CSS attribute selectors.
 fn process_css_attributes(
-	file_string: &mut String,
+	file_string: &mut str,
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
-	alphabet: &Vec<char>
+	alphabet: &[char]
 ) -> String {
 	return CSS_ATTRIBUTES.replace_all(
-		&file_string,
+		file_string,
 		|capture: &Captures| {
 			// Check that capture group 2 exists, if it doesn't it is
 			// matched to an attribute selector, rule block or comment.
@@ -663,7 +661,7 @@ fn process_css_attributes(
 					// Do not process attribute selector if case-insensitive
 					// flag has been set.
 					if let Some("i") | Some("I") = capture.at(5) {
-						return format!("{}", capture.at(0).unwrap());
+						return capture.at(0).unwrap().to_string();
 					}
 
 					// Work out if value(s) are classes, ids or selectors.
@@ -696,7 +694,7 @@ fn process_css_attributes(
 						"[{attribute}{operator}{quote}{value}{quote}{flag}]",
 						attribute = attribute_name,
 						operator = capture.at(2).unwrap(),
-						quote = capture.at(4).unwrap_or_else(|| { "" }),
+						quote = capture.at(4).unwrap_or(""),
 						value = attribute_value,
 						flag = match capture.at(5) {
 							Some(f) => " ".to_string() + f,
@@ -708,7 +706,7 @@ fn process_css_attributes(
 				// Attribute does not contain classes and/or ids.
 				// Leave it as is.
 				false => {
-					return format!("{}", capture.at(0).unwrap());
+					return capture.at(0).unwrap().to_string();
 				},
 			}
 		}
@@ -717,16 +715,16 @@ fn process_css_attributes(
 
 /// Process HTML attributes.
 fn process_html_attributes(
-	file_string: &mut String,
+	file_string: &mut str,
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
-	alphabet: &Vec<char>
+	alphabet: &[char]
 ) -> String {
 	return HTML_ATTRIBUTES.replace_all(
-		&file_string,
+		file_string,
 		|capture: &Captures| {
 			let attribute_name: &str = capture.at(1).unwrap();
-			let attribute_quote: &str = capture.at(4).unwrap_or_else(|| { "" });
+			let attribute_quote: &str = capture.at(4).unwrap_or("");
 			let mut attribute_value: String = capture.at(3).unwrap().to_string();
 
 			// Attributes whitelist of which its
@@ -779,7 +777,7 @@ fn process_html_attributes(
 				// Attribute does not contain classes and/or ids.
 				// Leave it as is.
 				false => {
-					return format!("{}", capture.at(0).unwrap());
+					return capture.at(0).unwrap().to_string();
 				},
 			}
 
@@ -791,10 +789,10 @@ fn process_html_attributes(
 ///
 /// selector_type
 fn process_string_of_tokens(
-	string: &mut String,
+	string: &mut str,
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
-	alphabet: &Vec<char>,
+	alphabet: &[char],
 	selector_type: &str
 ) -> String {
 	let prefix: String = match selector_type {
@@ -804,7 +802,7 @@ fn process_string_of_tokens(
 	}.to_string();
 
 	// Handle strings that have quote delimiters included.
-	let quote_type: String = match string.chars().nth(0){
+	let quote_type: String = match string.chars().next(){
 		Some('\'') => { r#"'"# },
 		Some('\"') => { r#"""# },
 		_ => { "" }
@@ -813,7 +811,7 @@ fn process_string_of_tokens(
 	return format!(
 		"{quote}{tokens}{quote}",
 		tokens = STRING_DELIMITED_BY_SPACE.replace_all(
-			&string,
+			string,
 			|capture: &Captures| {
 				return get_encoded_selector(
 					&format!(
@@ -836,10 +834,10 @@ fn process_string_of_tokens(
 ///
 /// selector_type
 fn process_string_of_arguments(
-	string: &mut String,
+	string: &mut str,
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
-	alphabet: &Vec<char>,
+	alphabet: &[char],
 	selector_type: &str
 ) -> String {
 	let prefix: String = match selector_type {
@@ -849,10 +847,10 @@ fn process_string_of_arguments(
 	}.to_string();
 
 	return STRING_DELIMITED_BY_COMMA.replace_all(
-		&string,
+		string,
 		|capture: &Captures| {
 			// Need to put quote delimiters back around the argument value
-			let quote_type: String = match capture.at(0).unwrap().chars().nth(0){
+			let quote_type: String = match capture.at(0).unwrap().chars().next(){
 				Some('\'') => { r#"'"# },
 				Some('\"') => { r#"""# },
 				_ => { "" }

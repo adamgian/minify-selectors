@@ -12,6 +12,8 @@
 	"bin": "./build/run.js",
 	"scripts": {
 		"postinstall": "node ./build/install.js",
+		"lint:clippy": "cargo clippy -- -A clippy::needless_return",
+		"lint:rustfmt": "",
 		"test": "cargo test"
 	},
 	"repository": {

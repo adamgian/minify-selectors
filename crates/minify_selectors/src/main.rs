@@ -11,9 +11,6 @@ use std::{
 	time::Instant,
 };
 
-use parse_selectors;
-use encode_selector;
-
 
 
 
@@ -84,7 +81,7 @@ fn minify_selectors() -> Result<(), Box<dyn Error>> {
 	// If glob string is for a directory, append
 	// glob pattern to search for CSS, HTML and JS files.
 	if source_dir.is_dir() {
-		if source_glob.ends_with("/") {
+		if source_glob.ends_with('/') {
 			source_glob.push_str("**/*.{css,html,js}");
 		} else {
 			source_glob.push_str("/**/*.{css,html,js}");
@@ -159,7 +156,7 @@ fn process_file(
 	file_path: &Path,
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
-	alphabet: &Vec<char>
+	alphabet: &[char]
 ) -> Result<String, std::io::Error> {
 	let file_extension = file_path.extension().and_then(OsStr::to_str).unwrap();
 	let mut file_contents = fs::read_to_string(file_path)?;

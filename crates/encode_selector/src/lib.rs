@@ -21,13 +21,13 @@ lazy_static! {
 ///   processed string such as: "0123456789ABCDEF".
 pub fn to_radix(
 	ordinal: &usize,
-	alphabet: &Vec<char>
+	alphabet: &[char]
 ) -> String {
 	let invalid_char_positions: Vec<usize> = alphabet
 		.iter()
 		.enumerate()
 		.filter_map(|(index, char)| {
-			match INVALID_FIRST_CHARACTER.contains(&char) {
+			match INVALID_FIRST_CHARACTER.contains(char) {
 				true => Some(index),
 				false => None
 			}
