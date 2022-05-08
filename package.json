@@ -13,7 +13,7 @@
 	"scripts": {
 		"postinstall": "node ./build/install.js",
 		"lint:clippy": "cargo clippy -- -A clippy::needless_return",
-		"lint:rustfmt": "",
+		"lint:rustfmt": "cargo +nightly fmt --check",
 		"test": "cargo test"
 	},
 	"repository": {

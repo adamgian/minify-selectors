@@ -1,0 +1,8 @@
+blank_lines_upper_bound = 4
+combine_control_expr = false
+force_multiline_blocks = true
+group_imports = "StdExternalCrate"
+hard_tabs = true
+hex_literal_case = "Lower"
+match_block_trailing_comma = true
+wrap_comments = true
