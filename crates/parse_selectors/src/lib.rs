@@ -132,6 +132,7 @@ lazy_static! {
 				className
 				| querySelectorAll
 				| querySelector
+				| closest
 				| getElementById
 				| getElementsByClassName
 				| classList\s*+\.(?> add | remove | contains | replace | toggle )
@@ -477,7 +478,7 @@ fn process_js(
 			// Work out function call and its argument pattern:
 			match capture.at(1).unwrap() {
 				// Takes one argument, an CSS selector string.
-				"querySelector" | "querySelectorAll" => {
+				"querySelector" | "querySelectorAll" | "closest" => {
 					replacement_value = process_css(
 						&mut replacement_value,
 						selectors,
