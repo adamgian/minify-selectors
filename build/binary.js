@@ -38,6 +38,11 @@ const SUPPORTED_PLATFORMS = [
 		architecture: 'x64',
 		binary: 'macos-64',
 	},
+	{
+		type: 'Darwin',
+		architecture: 'arm64',
+		binary: 'macos-arm64',
+	},
 ];
 
 const error = (message) => {
