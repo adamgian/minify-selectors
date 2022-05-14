@@ -248,7 +248,7 @@ lazy_static! {
 		"##
 	).unwrap();
 
-	//
+	// Extract tokens — seperated by whitespace(s).
 	static ref STRING_DELIMITED_BY_SPACE: Regex = Regex::new(
 		r##"(?x)
 			(?<token>
@@ -257,14 +257,14 @@ lazy_static! {
 		"##
 	).unwrap();
 
-	//
+	// Extract function arguments.
 	static ref STRING_DELIMITED_BY_COMMA: Regex = Regex::new(
 		r##"(?x)
-			["']
+			["'`]
 			(?<token>
-				[^"']*+
+				[^"'`]*+
 			)
-			["']
+			["'`]
 		"##
 	).unwrap();
 
@@ -796,18 +796,19 @@ fn process_string_of_tokens(
 	alphabet: &[char],
 	selector_type: &str
 ) -> String {
-	let prefix: String = match selector_type {
-		"id" => { "#" },
+	let prefix: &str = match selector_type {
 		"class" => { "." },
-		_ => { "" }
-	}.to_string();
+		"id" => { "#" },
+		_ => { "" },
+	};
 
 	// Handle strings that have quote delimiters included.
-	let quote_type: String = match string.chars().next(){
-		Some('\'') => { r#"'"# },
-		Some('\"') => { r#"""# },
-		_ => { "" }
-	}.to_string();
+	let quote_type: &str = match string.chars().next(){
+		Some('\'') => { "'" },
+		Some('"') => { "\"" },
+		Some('`') => { "`" },
+		_ => { "" },
+	};
 
 	return format!(
 		"{quote}{tokens}{quote}",
@@ -826,7 +827,7 @@ fn process_string_of_tokens(
 				);
 			}
 		),
-		quote = quote_type
+		quote = quote_type,
 	);
 
 }
@@ -841,21 +842,22 @@ fn process_string_of_arguments(
 	alphabet: &[char],
 	selector_type: &str
 ) -> String {
-	let prefix: String = match selector_type {
-		"id" => { "#" },
+	let prefix: &str = match selector_type {
 		"class" => { "." },
-		_ => { "" }
-	}.to_string();
+		"id" => { "#" },
+		_ => { "" },
+	};
 
 	return STRING_DELIMITED_BY_COMMA.replace_all(
 		string,
 		|capture: &Captures| {
 			// Need to put quote delimiters back around the argument value
-			let quote_type: String = match capture.at(0).unwrap().chars().next(){
-				Some('\'') => { r#"'"# },
-				Some('\"') => { r#"""# },
-				_ => { "" }
-			}.to_string();
+			let quote_type: &str = match capture.at(0).unwrap().chars().next(){
+				Some('\'') => { "'" },
+				Some('"') => { "\"" },
+				Some('`') => { "`" },
+				_ => { "" },
+			};
 
 			return format!(
 				"{quote}{argument}{quote}",
@@ -869,7 +871,7 @@ fn process_string_of_arguments(
 					index,
 					alphabet
 				),
-				quote = quote_type
+				quote = quote_type,
 			);
 		}
 	);
