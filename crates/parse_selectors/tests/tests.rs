@@ -156,6 +156,17 @@ fn js_files() {
 			&alphabet
 		)
 	);
+
+	// querySelectorAll()
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("query-selector-all/output.js")).unwrap(),
+		parse_selectors::from_js(
+			&mut fs::read_to_string(dir.clone().join("query-selector-all/source.js")).unwrap(),
+			&mut HashMap::<String, String>::new(),
+			&mut usize::from(false),
+			&alphabet
+		)
+	);
 }
 
 #[test]

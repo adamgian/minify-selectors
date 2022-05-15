@@ -89,7 +89,9 @@ lazy_static! {
 			(?<operator>
 				[~]?=
 			)
-			["']?
+			(?<quote>
+				(?:\\?["'])?
+			)
 			(?<value>
 				-?
 				(?>
@@ -97,7 +99,7 @@ lazy_static! {
 					| [^\0-\177]
 					| (?>
 						\\[0-9A-Fa-f]{1,6}(?>\r\n|[ \n\r\t\f])?
-						| \\[^\n\r\f0-9A-Fa-f]
+						| \\[^\n\r\f0-9A-Fa-f"']
 					)
 				)
 				(?>
@@ -105,17 +107,15 @@ lazy_static! {
 					| [^\0-\177]
 					| (?>
 						\\[0-9A-Fa-f]{1,6}(?>\r\n|[ \n\r\t\f])?
-						| \\[^\n\r\f0-9A-Fa-f]
+						| \\[^\n\r\f0-9A-Fa-f"']
 					)
 				)*
 			)
-			(?<quote>
-				["']
-			)?
-			\s*+
+			(\\?["'])?
 			(?<flag>
-				[IiSs]
-			)?
+				\s*+
+				[IiSs]?
+			)
 			\s*+\]
 		"##
 	).unwrap();
@@ -655,13 +655,15 @@ fn process_css_attributes(
 			}
 
 			let attribute_name: &str = capture.at(1).unwrap();
-			let mut attribute_value: String = capture.at(3).unwrap().to_string();
+			let attribute_quote_type: &str = capture.at(3).unwrap_or("");
+			let attribute_flag: &str = capture.at(5).unwrap_or("");
+			let mut attribute_value = capture.at(4).unwrap().to_string();
 
 			match ATTRIBUTES_WHITELIST.contains_key(attribute_name) {
 				true => {
 					// Do not process attribute selector if case-insensitive
 					// flag has been set.
-					if let Some("i") | Some("I") = capture.at(5) {
+					if attribute_flag.to_lowercase().ends_with("i") {
 						return capture.at(0).unwrap().to_string();
 					}
 
@@ -695,12 +697,9 @@ fn process_css_attributes(
 						"[{attribute}{operator}{quote}{value}{quote}{flag}]",
 						attribute = attribute_name,
 						operator = capture.at(2).unwrap(),
-						quote = capture.at(4).unwrap_or(""),
+						quote = attribute_quote_type,
 						value = attribute_value,
-						flag = match capture.at(5) {
-							Some(f) => " ".to_string() + f,
-							None => "".to_string(),
-						},
+						flag = attribute_flag,
 					);
 				},
 
