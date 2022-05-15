@@ -81,7 +81,81 @@ fn css_files() {
 
 #[test]
 fn js_files() {
-	//
+	let dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+		.join("tests/js/");
+	let alphabet: Vec<char> = encode_selector::into_alphabet_set(
+		concat!(
+			"0123456789",
+			"abcdefghijklmnopqrstuvwxyz",
+			"ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+		)
+	);
+
+	// classList.add()
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("class-list-add/output.js")).unwrap(),
+		parse_selectors::from_js(
+			&mut fs::read_to_string(dir.clone().join("class-list-add/source.js")).unwrap(),
+			&mut HashMap::<String, String>::new(),
+			&mut usize::from(false),
+			&alphabet
+		)
+	);
+
+	// classList.contains()
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("class-list-contains/output.js")).unwrap(),
+		parse_selectors::from_js(
+			&mut fs::read_to_string(dir.clone().join("class-list-contains/source.js")).unwrap(),
+			&mut HashMap::<String, String>::new(),
+			&mut usize::from(false),
+			&alphabet
+		)
+	);
+
+	// classList.remove()
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("class-list-remove/output.js")).unwrap(),
+		parse_selectors::from_js(
+			&mut fs::read_to_string(dir.clone().join("class-list-remove/source.js")).unwrap(),
+			&mut HashMap::<String, String>::new(),
+			&mut usize::from(false),
+			&alphabet
+		)
+	);
+
+	// classList.replace()
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("class-list-replace/output.js")).unwrap(),
+		parse_selectors::from_js(
+			&mut fs::read_to_string(dir.clone().join("class-list-replace/source.js")).unwrap(),
+			&mut HashMap::<String, String>::new(),
+			&mut usize::from(false),
+			&alphabet
+		)
+	);
+
+	// className
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("class-name/output.js")).unwrap(),
+		parse_selectors::from_js(
+			&mut fs::read_to_string(dir.clone().join("class-name/source.js")).unwrap(),
+			&mut HashMap::<String, String>::new(),
+			&mut usize::from(false),
+			&alphabet
+		)
+	);
+
+	// querySelector()
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("query-selector/output.js")).unwrap(),
+		parse_selectors::from_js(
+			&mut fs::read_to_string(dir.clone().join("query-selector/source.js")).unwrap(),
+			&mut HashMap::<String, String>::new(),
+			&mut usize::from(false),
+			&alphabet
+		)
+	);
 }
 
 #[test]
