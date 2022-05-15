@@ -146,6 +146,28 @@ fn js_files() {
 		)
 	);
 
+	// getElementById()
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("get-element-by-id/output.js")).unwrap(),
+		parse_selectors::from_js(
+			&mut fs::read_to_string(dir.clone().join("get-element-by-id/source.js")).unwrap(),
+			&mut HashMap::<String, String>::new(),
+			&mut usize::from(false),
+			&alphabet
+		)
+	);
+
+	// getElementsByClassName()
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("get-elements-by-class-name/output.js")).unwrap(),
+		parse_selectors::from_js(
+			&mut fs::read_to_string(dir.clone().join("get-elements-by-class-name/source.js")).unwrap(),
+			&mut HashMap::<String, String>::new(),
+			&mut usize::from(false),
+			&alphabet
+		)
+	);
+
 	// querySelector()
 	assert_eq!(
 		fs::read_to_string(dir.clone().join("query-selector/output.js")).unwrap(),

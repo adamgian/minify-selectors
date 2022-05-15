@@ -7,12 +7,10 @@ document.getElementsByClassName( `SELECTOR-6` );
 document.getElementsByClassName("SELECTOR-7 SELECTOR-1");
 document.getElementsByClassName('SELECTOR-8 SELECTOR-1');
 document.getElementsByClassName(`SELECTOR-9 SELECTOR-1`);
-document.getElementsByClassName("SELECTOR-10 > SELECTOR-1");
-document.getElementsByClassName('SELECTOR-11 > SELECTOR-1');
-document.getElementsByClassName(`SELECTOR-12 > SELECTOR-1`);
-document.getElementsByClassName("SELECTOR-10 + SELECTOR-1");
-document.getElementsByClassName('SELECTOR-11 + SELECTOR-1');
-document.getElementsByClassName(`SELECTOR-12 + SELECTOR-1`);
-document.getElementsByClassName("SELECTOR-10 ~ SELECTOR-1");
-document.getElementsByClassName('SELECTOR-11 ~ SELECTOR-1');
-document.getElementsByClassName(`SELECTOR-12 ~ SELECTOR-1`);
+document.getElementsByClassName(
+	"SELECTOR-10"
+);
+document
+	.getElementsByClassName(
+		"SELECTOR-11"
+	);
