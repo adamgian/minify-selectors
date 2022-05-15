@@ -477,9 +477,10 @@ fn process_js(
 		file_string,
 		|capture: &Captures| {
 			let mut replacement_value: String = capture.at(3).unwrap().to_string();
+			let function: &str = capture.at(1).unwrap();
 
 			// Work out function call and its argument pattern:
-			match capture.at(1).unwrap() {
+			match function {
 				// Takes one argument, an CSS selector string.
 				"querySelector" | "querySelectorAll" | "closest" => {
 					replacement_value = process_css(
@@ -512,22 +513,6 @@ fn process_js(
 						index,
 						alphabet,
 						"id"
-					);
-				},
-
-				// Takes one or more arguments, each argument is for
-				// an individual class name (no period prefixed).
-				"classList.add"
-				| "classList.replace"
-				| "classList.remove"
-				| "classList.contains"
-				| "classList.toggle" => {
-					replacement_value = process_string_of_arguments(
-						&mut replacement_value,
-						selectors,
-						index,
-						alphabet,
-						"class"
 					);
 				},
 
@@ -591,12 +576,24 @@ fn process_js(
 					}
 				},
 
+				// Takes one or more arguments, each argument is for
+				// an individual class name (no period prefixed).
+				_ if function.contains("classList") => {
+					replacement_value = process_string_of_arguments(
+						&mut replacement_value,
+						selectors,
+						index,
+						alphabet,
+						"class"
+					);
+				},
+
 				_ => {},
 			}
 
 			return format!(
 				".{function}{join}{arguments}",
-				function = capture.at(1).unwrap(),
+				function = function,
 				join = capture.at(2).unwrap(),
 				arguments = replacement_value
 			);
