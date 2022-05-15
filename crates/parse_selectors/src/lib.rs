@@ -786,17 +786,23 @@ fn process_html_attributes(
 	);
 }
 
+/// Process string with tokens delimited by whitespaces.
 ///
-///
-/// selector_type
+/// Notes:
+///  - As STRING_DELIMITED_BY_SPACE regex is simple - only
+///    grouping non whitespace characters together - any quote
+///    delimiters will need to be trimmed and added back on
+///    afterwards.
+///  - context is neseccary in order to determine what the
+///    token(s) should be processed as (e.g. class or id).
 fn process_string_of_tokens(
-	string: &mut str,
+	string: &mut String,
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
 	alphabet: &[char],
-	selector_type: &str
+	context: &str
 ) -> String {
-	let prefix: &str = match selector_type {
+	let prefix: &str = match context {
 		"class" => { "." },
 		"id" => { "#" },
 		_ => { "" },
@@ -809,6 +815,12 @@ fn process_string_of_tokens(
 		Some('`') => { "`" },
 		_ => { "" },
 	};
+
+	// Trim quotes (if any) from value capture group.
+	if !quote_type.is_empty() {
+		string.pop();
+		string.remove(0);
+	}
 
 	return format!(
 		"{quote}{tokens}{quote}",
@@ -832,17 +844,19 @@ fn process_string_of_tokens(
 
 }
 
+/// Process function arguments, delimited by commas.
 ///
-///
-/// selector_type
+/// Notes:
+///  - context is neseccary in order to determine what the
+///    token(s) should be processed as (e.g. class or id).
 fn process_string_of_arguments(
 	string: &mut str,
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
 	alphabet: &[char],
-	selector_type: &str
+	context: &str
 ) -> String {
-	let prefix: &str = match selector_type {
+	let prefix: &str = match context {
 		"class" => { "." },
 		"id" => { "#" },
 		_ => { "" },
