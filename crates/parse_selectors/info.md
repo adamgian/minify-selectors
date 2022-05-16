@@ -187,6 +187,7 @@ baz.classList.contains('baz');
 baz.classList.replace('baz', 'foo');
 baz.classList.toggle('baz', foo > bar);
 baz.className += "foo";
+baz.className = "bar";
 ```
 
 ```js
@@ -198,6 +199,7 @@ baz.classList.contains('r');
 baz.classList.replace('r', 'b');
 baz.classList.toggle('r', b > e);
 baz.className += "b";
+baz.className = "e";
 ```
 
 ### IDs

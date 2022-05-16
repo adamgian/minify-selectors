@@ -29,3 +29,7 @@
 [headers~='SELECTOR-19'] {}
 [itemref~='SELECTOR-19'] {}
 [list~='SELECTOR-20'] {}
+
+[class^="SELECTOR-21"]
+[class$="SELECTOR-22"]
+[class*="SELECTOR-23"]

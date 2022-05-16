@@ -146,6 +146,17 @@ fn js_files() {
 		)
 	);
 
+	// closest()
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("closest/output.js")).unwrap(),
+		parse_selectors::from_js(
+			&mut fs::read_to_string(dir.clone().join("closest/source.js")).unwrap(),
+			&mut HashMap::<String, String>::new(),
+			&mut usize::from(false),
+			&alphabet
+		)
+	);
+
 	// getElementById()
 	assert_eq!(
 		fs::read_to_string(dir.clone().join("get-element-by-id/output.js")).unwrap(),
@@ -184,6 +195,17 @@ fn js_files() {
 		fs::read_to_string(dir.clone().join("query-selector-all/output.js")).unwrap(),
 		parse_selectors::from_js(
 			&mut fs::read_to_string(dir.clone().join("query-selector-all/source.js")).unwrap(),
+			&mut HashMap::<String, String>::new(),
+			&mut usize::from(false),
+			&alphabet
+		)
+	);
+
+	// setAttribute()
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("set-attribute/output.js")).unwrap(),
+		parse_selectors::from_js(
+			&mut fs::read_to_string(dir.clone().join("set-attribute/source.js")).unwrap(),
 			&mut HashMap::<String, String>::new(),
 			&mut usize::from(false),
 			&alphabet

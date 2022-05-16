@@ -1,7 +1,13 @@
-a.classList.remove('a');
-b.classList.remove('b', 'c', 'd');
-c.classList.remove("e", 'f', `g`);
-d.classList.remove(
-	'h',
-	'i',
+a.classList.remove("a");
+b.classList.remove('b');
+c.classList.remove(`c`);
+d.classList.remove('d', 'c', 'b');
+e.classList.remove("e", 'a', `b`);
+f.classList.remove(
+	'f',
+	'a',
 );
+g.classList.remove( 'g' , 'd' , 'b' );
+h.classList.remove(  'h'  ,  'd'  ,  'g'  );
+i.classList.remove( 'i', 'd', 'g' );
+j.classList.remove( 'j', 'k', 'l' );

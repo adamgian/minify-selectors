@@ -150,21 +150,21 @@ lazy_static! {
 							`
 							(?:
 								[^`\\] | \\.
-							)+
+							)*
 							[^)]`
 						)
 						| (?:
 							"
 							(?:
 								[^"\\] | \\.
-							)+
+							)*
 							[^)]"
 						)
 						| (?:
 							'
 							(?:
 								[^'\\] | \\.
-							)+
+							)*
 							[^)]'
 						)
 					)
@@ -474,15 +474,15 @@ fn process_js(
 	return JS_ARGUMENTS.replace_all(
 		file_string,
 		|capture: &Captures| {
-			let mut replacement_value: String = capture.at(3).unwrap().to_string();
+			let mut replacement_args: String = capture.at(3).unwrap().to_string();
 			let function: &str = capture.at(1).unwrap();
 
 			// Work out function call and its argument pattern:
 			match function {
 				// Takes one argument, an CSS selector string.
 				"querySelector" | "querySelectorAll" | "closest" => {
-					replacement_value = process_css(
-						&mut replacement_value,
+					replacement_args = process_css(
+						&mut replacement_args,
 						selectors,
 						index,
 						alphabet
@@ -494,8 +494,8 @@ fn process_js(
 				"getElementsByClassName"
 				// or property will be operated on with a string of classes.
 				| "className" => {
-					replacement_value = process_string_of_tokens(
-						&mut replacement_value,
+					replacement_args = process_string_of_tokens(
+						&mut replacement_args,
 						selectors,
 						index,
 						alphabet,
@@ -505,8 +505,8 @@ fn process_js(
 
 				// Takes one argument, an ID (no hash prefixed).
 				"getElementById" => {
-					replacement_value = process_string_of_tokens(
-						&mut replacement_value,
+					replacement_args = process_string_of_tokens(
+						&mut replacement_args,
 						selectors,
 						index,
 						alphabet,
@@ -517,68 +517,72 @@ fn process_js(
 				// Takes two arguments: attribute name and value,
 				// process value if attribute is whitelisted.
 				"setAttribute" => {
-					let attribute_name: &str = STRING_DELIMITED_BY_COMMA
-						.captures(&replacement_value)
+					// Go over the (two) function arguments
+					let mut function_args = STRING_DELIMITED_BY_COMMA
+						.captures_iter(&replacement_args);
+
+					// Check first arg in function, without the string delimiters
+					// and then trimming any whitespace off ends.
+					let attribute_name: &str = function_args
+						.next()
 						.unwrap()
-						.at(0)
-						.unwrap();
+						.at(1)
+						.unwrap()
+						.trim();
 
-					match ATTRIBUTES_WHITELIST.contains_key(attribute_name) {
-						true => {
-							let attribute_type_designation: &str = ATTRIBUTES_WHITELIST
-								.get(attribute_name)
-								.unwrap();
+					// Check first argument is an known attribute which its value will have
+					// classses or an id. If it is not, leave value as is (second argument).
+					if ATTRIBUTES_WHITELIST.contains_key(attribute_name) {
 
-							replacement_value = STRING_DELIMITED_BY_COMMA.replace_all(
-								&replacement_value,
-								|capture: &Captures| {
-									let current_value: &str = capture.at(1).unwrap();
+						let mut attribute_value: String = function_args
+							.next()
+							.unwrap()
+							.at(1)
+							.unwrap()
+							.to_string();
 
-									if current_value == attribute_name {
-										return current_value.to_string();
-									}
+						let attribute_type_designation: &str = ATTRIBUTES_WHITELIST
+							.get(attribute_name)
+							.unwrap();
 
-									match attribute_type_designation {
-										"id" | "class" => {
-											return process_string_of_tokens(
-												&mut current_value.to_string(),
-												selectors,
-												index,
-												alphabet,
-												attribute_type_designation
-											);
-										},
+						let replacement_value = match attribute_type_designation {
+							"id" | "class" => {
+								process_string_of_tokens(
+									&mut attribute_value,
+									selectors,
+									index,
+									alphabet,
+									attribute_type_designation
+								)
+							},
 
-										"selector" => {
-											return process_css(
-												&mut current_value.to_string(),
-												selectors,
-												index,
-												alphabet
-											);
-										},
+							"selector" => {
+								process_css(
+									&mut attribute_value,
+									selectors,
+									index,
+									alphabet
+								)
+							},
 
-										_ => {
-											return current_value.to_string();
-										}
-									}
-								}
-							);
-						},
+							_ => {
+								attribute_value.clone()
+							},
+						};
 
-						// Attribute does not contain classes and/or ids.
-						// Leave it as is.
-						false => {
-							return capture.at(0).unwrap().to_string();
-						},
+						replacement_args = replacement_args.replace(
+							&attribute_value,
+							&replacement_value,
+						);
+
 					}
 				},
 
 				// Takes one or more arguments, each argument is for
 				// an individual class name (no period prefixed).
 				_ if function.contains("classList") => {
-					replacement_value = process_string_of_arguments(
-						&mut replacement_value,
+					replacement_args = process_string_of_arguments(
+						&mut replacement_args,
 						selectors,
 						index,
 						alphabet,
@@ -593,7 +597,7 @@ fn process_js(
 				".{function}{join}{arguments}",
 				function = function,
 				join = capture.at(2).unwrap(),
-				arguments = replacement_value
+				arguments = replacement_args
 			);
 		}
 	);
