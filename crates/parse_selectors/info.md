@@ -174,6 +174,8 @@ Operators other than exact match (`|=`, `^=`, `$=`, `*=`) and case-insensitive m
 ```
 
 
+
+
 ## JS
 
 ### Classes
@@ -207,12 +209,18 @@ baz.className = "e";
 ```js
 document.getElementById('foo');
 bar.setAttribute('id', 'bar');
-input.setAttribute('for', 'foo');
+baz.setAttribute('for', 'foo');
+baz.setAttribute('form', 'foo');
+baz.setAttribute('list', 'foo');
+baz.setAttribute('headers', 'foo');
 ```
 ```js
 document.getElementById('a');
 bar.setAttribute('id', 'e');
-input.setAttribute('for', 'a');
+baz.setAttribute('for', 'a');
+baz.setAttribute('form', 'a');
+baz.setAttribute('list', 'a');
+baz.setAttribute('headers', 'a');
 ```
 
 ### Selector strings
@@ -231,7 +239,7 @@ document.querySelector('p.r:disabled');
 ```
 
 > **Please note:**
-minify-selectors will not be able to detect class or ID names that are in variables or in strings.
+minify-selectors will not be able to detect class or ID names that are in variables or in strings. Will be resolved with [#11](https://github.com/adamgian/minify-selectors/issues/11).
 
 ```js
 // 😢
@@ -241,6 +249,9 @@ document.getElementById(foo);
 // 😢
 bar.innerHtml = `<button class="btn btn-danger" id="${foo}"></button>`;
 ```
+
+
+
 
 ## HTML
 
@@ -255,7 +266,7 @@ bar.innerHtml = `<button class="btn btn-danger" id="${foo}"></button>`;
 <label for="a"></label>
 ```
 
-minify-selectors supports all native HTML attibutes that contain IDs.
+minify-selectors supports all native HTML attibutes that contain IDs — `id`, `aria-describedby`, `aria-labelledby`, `for`, `form`, `headers`, `itemref` and `list`.
 
 ```html
 <a href="#" aria-labelledby="foo"></a>
@@ -275,7 +286,15 @@ minify-selectors supports all native HTML attibutes that contain IDs.
 ```
 
 > **Please note:**
-Custom attributes are currently not supported.
+Anchor links are currently not supported. Will be resolved with [#17](https://github.com/adamgian/minify-selectors/issues/17).
+
+```html
+<!-- 😢 -->
+<a href="#foo">Go to foo</a>
+```
+
+> **Please note:**
+Custom attributes are currently not supported. [#11](https://github.com/adamgian/minify-selectors/issues/11) and [#12](https://github.com/adamgian/minify-selectors/issues/12) will be ways to resolve this in future.
 
 ```html
 <!-- 😢 -->

@@ -1,6 +1,8 @@
 # minify-selectors
 
-Post-processor that minifies classes and IDs selector names in CSS, HTML and Javascript files. Each unique identifier — and any subsequent occurances — is converted to an ultracompact CSS valid selector name.
+Post-processor that minifies classes and IDs selector names in CSS, HTML and Javascript files. Each unique identifier, and any subsequent occurances, is converted to an ultracompact CSS valid selector name.
+
+Wrings out that little bit more out of your payload sizes and off file parse times. Additionally could be used to add a certain degree of obfuscation to your selector names and stylesheets.
 
 > **Please note:**
 minify-selectors only supports regular CSS, HTML and JS files. minify-selectors should be one of the final steps in your build process — SASS/SCSS, LESS, Typescript, JQuery, Handlebars, etc. should be compiled or transpiled first into its respective vanilla form.
@@ -59,7 +61,7 @@ for (let link of document.querySelectorAll('a.Bd')) {
 }
 ```
 
-For a full outline of capabilities and current limitations, see [parse_selectors/info.md](crates/parse_selectors/info.md)
+For a full outline of capabilities and current limitations, see [parse_selectors/info.md](crates/parse_selectors/info.md).
 
 
 ## Usage
