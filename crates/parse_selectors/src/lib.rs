@@ -127,6 +127,10 @@ lazy_static! {
 	// input (between the parens) for further processing.
 	static ref JS_ARGUMENTS: Regex = Regex::new(
 		r##"(?x)
+			\/\*[^*]*\*+(?>[^\/*][^*]*\*+)*\/
+			|
+			\/\/[^\n\r]*
+			|
 			\.
 			(?<function>
 				className
@@ -209,6 +213,8 @@ lazy_static! {
 	// Will need additional processing to consider 'whitelisted'
 	// attributes and separate out the values.
 	//
+	// Capture HTML comments to prevent false positive matches
+	//
 	// See: https://www.w3.org/TR/2018/SPSD-html5-20180327/syntax.html#attributes-0
 	//
 	// 1. Attribute name - consists of one of more characters.
@@ -234,6 +240,14 @@ lazy_static! {
 	//        a whitespace character before them.
 	static ref HTML_ATTRIBUTES: Regex = Regex::new(
 		r##"(?x)
+			<!--.*?-->
+			|
+			<code[^>]*>
+				(?:
+					. | \s
+				)*?
+			<\/code>
+			|
 			(?<attribute>
 				[^\s\x00\/>"'=]+
 			)
@@ -474,6 +488,12 @@ fn process_js(
 	return JS_ARGUMENTS.replace_all(
 		file_string,
 		|capture: &Captures| {
+			// Matched string is a multiline or single line comment
+			// i.e. it does not have any further capture groups
+			if capture.at(1).is_none() {
+				return capture.at(0).unwrap().to_string();
+			}
+
 			let mut replacement_args: String = capture.at(3).unwrap().to_string();
 			let function: &str = capture.at(1).unwrap();
 
@@ -725,6 +745,35 @@ fn process_html_attributes(
 	return HTML_ATTRIBUTES.replace_all(
 		file_string,
 		|capture: &Captures| {
+			// Matched string is a <code> element or a HTML comment.
+			if capture.at(1).is_none() {
+				return match capture.at(0).unwrap().starts_with("<code") {
+					// HTML comment, leave as is.
+					false => capture.at(0).unwrap().to_string(),
+
+					// <code> element.
+					// Check for attributes to encode on the opening tag.
+					true => {
+						let mut code_element = capture.at(0)
+							.unwrap()
+							.strip_prefix("<code")
+							.unwrap()
+							.splitn(2, '>');
+
+						format!(
+							"<code{attributes}>{inner_html}",
+							attributes = process_html_attributes(
+								&mut code_element.next().unwrap().to_string(),
+								selectors,
+								index,
+								alphabet,
+							),
+							inner_html = code_element.next().unwrap(),
+						)
+					},
+				}
+			}
+
 			let attribute_name: &str = capture.at(1).unwrap();
 			let attribute_quote: &str = capture.at(4).unwrap_or("");
 			let mut attribute_value: String = capture.at(3).unwrap().to_string();
