@@ -179,6 +179,39 @@ fn js_files() {
 		)
 	);
 
+	// innerHTML()
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("inner-html/output.js")).unwrap(),
+		parse_selectors::from_js(
+			&mut fs::read_to_string(dir.clone().join("inner-html/source.js")).unwrap(),
+			&mut HashMap::<String, String>::new(),
+			&mut usize::from(false),
+			&alphabet
+		)
+	);
+
+	// insertAdjacentHTML()
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("insert-adjacent-html/output.js")).unwrap(),
+		parse_selectors::from_js(
+			&mut fs::read_to_string(dir.clone().join("insert-adjacent-html/source.js")).unwrap(),
+			&mut HashMap::<String, String>::new(),
+			&mut usize::from(false),
+			&alphabet
+		)
+	);
+
+	// outerHTML()
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("outer-html/output.js")).unwrap(),
+		parse_selectors::from_js(
+			&mut fs::read_to_string(dir.clone().join("outer-html/source.js")).unwrap(),
+			&mut HashMap::<String, String>::new(),
+			&mut usize::from(false),
+			&alphabet
+		)
+	);
+
 	// querySelector()
 	assert_eq!(
 		fs::read_to_string(dir.clone().join("query-selector/output.js")).unwrap(),

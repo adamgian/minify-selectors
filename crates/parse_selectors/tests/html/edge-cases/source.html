@@ -4,14 +4,56 @@
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title>Document</title>
+
+		<style>
+			/* comment about .foo > .bar */
+			.foo > .bar {}
+			@media print {
+				.baz {}
+			}
+		</style>
+
+		<script>
+			/*
+			 * comment about foo.bar < foo.baz
+			 *
+			 * document.classList.add('baz')
+			 */
+			if (foo.bar < foo.baz) {
+				// document.classList.add('baz');
+				document.classList.add('baz');
+			}
+		</script>
 	</head>
 
 	<body>
 		<!-- .foo.bar -->
-		<!-- class="a" -->
-		<!-- <div class="a"></div> -->
+		<!-- class="foo" -->
+		<!-- <div class="foo"></div> -->
 		<!-- document.querySelector('foo') -->
-		<div class="a b"></div>
 
+		<code>
+			/* comment about .foo > .bar */
+			.foo > .bar {}
+			@media print {
+				.baz {}
+			}
+		</code>
+
+		<code>
+			/*
+			 * comment about foo.bar < foo.baz
+			 *
+			 * document.classList.add('baz')
+			 */
+			if (foo.bar < foo.baz) {
+				// document.classList.add('baz');
+				document.classList.add('baz');
+			}
+		</code>
+
+		<code id="foo" class="foo bar">
+			&lt;div class="foo"&gt;&lt;/div&gt;
+		</code>
 	</body>
 </html>
