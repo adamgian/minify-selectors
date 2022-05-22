@@ -383,26 +383,26 @@ lazy_static! {
 
 
 pub fn from_css(
-	file_string: &mut str,
+	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
 	alphabet: &[char]
-) -> String {
-	return process_css(
+) {
+	process_css(
 		file_string,
 		selectors,
 		index,
 		alphabet
-	);
+	)
 }
 
 pub fn from_html(
-	file_string: &mut str,
+	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
 	alphabet: &[char]
-) -> String {
-	return process_html(
+) {
+	process_html(
 		file_string,
 		selectors,
 		index,
@@ -411,12 +411,12 @@ pub fn from_html(
 }
 
 pub fn from_js(
-	file_string: &mut str,
+	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
 	alphabet: &[char]
-) -> String {
-	return process_js(
+) {
+	process_js(
 		file_string,
 		selectors,
 		index,
@@ -452,52 +452,53 @@ fn get_encoded_selector(
 				encoded_selector.clone()
 			);
 
-			return encoded_selector;
+			encoded_selector
 		}
 	}
 }
 
 fn process_css(
-	file_string: &mut str,
+	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
 	alphabet: &[char]
-) -> String {
-	let mut css: String = process_css_selectors(
+) {
+	process_css_selectors(
 		file_string,
 		selectors,
 		index,
 		alphabet
 	);
 
-	css = process_css_attributes(
-		&mut css,
+	process_css_attributes(
+		file_string,
 		selectors,
 		index,
 		alphabet
 	);
-
-	return css;
 }
 
 /// Process HTML.
 fn process_html(
-	file_string: &mut str,
+	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
 	alphabet: &[char]
-) -> String {
+) {
 	// Initial step — go through <body> and parse attributes
 	let mut html: String = HTML_BODY.replace_all(
 		file_string,
 		|capture: &Captures| {
-			println!("{}", capture.at(0).unwrap());
+			let mut body = capture.at(0).unwrap().to_owned();
+
 			process_html_attributes(
-				&mut capture.at(0).unwrap().to_owned(),
+				&mut body,
 				selectors,
 				index,
 				alphabet
-			)
+			);
+
+			body
 		}
 	);
 
@@ -506,53 +507,55 @@ fn process_html(
 	html = HTML_STYLE_ELEMENT.replace_all(
 		&html,
 		|capture: &Captures| {
+			let mut embedded_style = capture.at(2).unwrap().to_owned();
+
+			process_css(
+				&mut embedded_style,
+				selectors,
+				index,
+				alphabet
+			);
+
 			return format!(
 				"{tag_open}{styles}{tag_close}",
 				tag_open = capture.at(1).unwrap(),
-				styles = process_css(
-					&mut capture.at(2).unwrap().to_owned(),
-					selectors,
-					index,
-					alphabet
-				),
+				styles = embedded_style,
 				tag_close = capture.at(3).unwrap()
 			);
 		}
 	);
 
 	// Processing any embedded js
-	html = process_js(
+	process_js(
 		&mut html,
 		selectors,
 		index,
 		alphabet
 	);
 
-	return html;
+	*file_string = html;
 }
 
 /// Process Javascript.
 fn process_js(
-	file_string: &mut str,
+	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
 	alphabet: &[char]
-) -> String {
-	let mut js: String = process_js_arguments(
+) {
+	process_js_arguments(
 		file_string,
 		selectors,
 		index,
 		alphabet,
 	);
 
-	js = process_js_properties(
-		&mut js,
+	process_js_properties(
+		file_string,
 		selectors,
 		index,
 		alphabet,
 	);
-
-	return js;
 }
 
 
@@ -561,12 +564,12 @@ fn process_js(
 /// Process classes and IDs in CSS file/embed or as a
 /// CSS selector string.
 fn process_css_selectors(
-	file_string: &mut str,
+	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
 	alphabet: &[char]
-) -> String {
-	return CSS_SELECTORS.replace_all(
+) {
+	*file_string = CSS_SELECTORS.replace_all(
 		file_string,
 		|capture: &Captures| {
 			// Check that capture group 2 exists,
@@ -593,12 +596,12 @@ fn process_css_selectors(
 
 // Process CSS attribute selectors.
 fn process_css_attributes(
-	file_string: &mut str,
+	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
 	alphabet: &[char]
-) -> String {
-	return CSS_ATTRIBUTES.replace_all(
+) {
+	*file_string = CSS_ATTRIBUTES.replace_all(
 		file_string,
 		|capture: &Captures| {
 			// Check that capture group 2 exists, if it doesn't it is
@@ -613,68 +616,65 @@ fn process_css_attributes(
 			let attribute_flag: &str = capture.at(5).unwrap_or("");
 			let mut attribute_value = capture.at(4).unwrap().to_string();
 
-			match ATTRIBUTES_WHITELIST.contains_key(attribute_name) {
-				true => {
-					// Do not process attribute selector if case-insensitive
-					// flag has been set.
-					if attribute_flag.to_lowercase().ends_with("i") {
-						return capture.at(0).unwrap().to_string();
-					}
 
-					// Work out if value(s) are classes, ids or selectors.
-					let attribute_type_designation: &str = ATTRIBUTES_WHITELIST
-						.get(capture.at(1).unwrap())
-						.unwrap();
+			if ATTRIBUTES_WHITELIST.contains_key(attribute_name) {
+				// Do not process attribute selector if case-insensitive
+				// flag has been set.
+				if attribute_flag.to_lowercase().ends_with('i') {
+					return capture.at(0).unwrap().to_string();
+				}
 
-					match attribute_type_designation {
-						"id" | "class" => {
-							attribute_value = process_string_of_tokens(
-								&mut attribute_value,
-								selectors,
-								index,
-								alphabet,
-								attribute_type_designation
-							);
-						},
-						"selector" => {
-							attribute_value = process_css(
-								&mut attribute_value,
-								selectors,
-								index,
-								alphabet
-							);
-						},
-						_ => {},
-					}
+				// Work out if value(s) are classes, ids or selectors.
+				let attribute_type_designation: &str = ATTRIBUTES_WHITELIST
+					.get(attribute_name)
+					.unwrap();
 
-					return format!(
-						"[{attribute}{operator}{quote}{value}{quote}{flag}]",
-						attribute = attribute_name,
-						operator = capture.at(2).unwrap(),
-						quote = attribute_quote_type,
-						value = attribute_value,
-						flag = attribute_flag,
-					);
-				},
-
+				match attribute_type_designation {
+					"id" | "class" => {
+						process_string_of_tokens(
+							&mut attribute_value,
+							selectors,
+							index,
+							alphabet,
+							attribute_type_designation
+						);
+					},
+					"selector" => {
+						process_css(
+							&mut attribute_value,
+							selectors,
+							index,
+							alphabet
+						);
+					},
+					_ => {},
+				}
+			} else {
 				// Attribute does not contain classes and/or ids.
 				// Leave it as is.
-				false => {
-					return capture.at(0).unwrap().to_string();
-				},
+				return capture.at(0).unwrap().to_string();
 			}
+
+			format!(
+				"[{attribute}{operator}{quote}{value}{quote}{flag}]",
+				attribute = attribute_name,
+				operator = capture.at(2).unwrap(),
+				quote = attribute_quote_type,
+				value = attribute_value,
+				flag = attribute_flag,
+			)
 		}
 	);
 }
 
 /// Process HTML attributes.
 fn process_html_attributes(
-	file_string: &mut str,
+	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
 	alphabet: &[char]
-) -> String {
-	return HTML_ATTRIBUTES.replace_all(
+) {
+	*file_string = HTML_ATTRIBUTES.replace_all(
 		file_string,
 		|capture: &Captures| {
 			// Matched string is a <code> element or a HTML comment.
@@ -692,14 +692,18 @@ fn process_html_attributes(
 							.unwrap()
 							.splitn(2, '>');
 
+						//FIXME
+						let mut attributes = code_element.next().unwrap().to_string();
+						process_html_attributes(
+							&mut attributes,
+							selectors,
+							index,
+							alphabet,
+						);
+
 						format!(
 							"<code{attributes}>{inner_html}",
-							attributes = process_html_attributes(
-								&mut code_element.next().unwrap().to_string(),
-								selectors,
-								index,
-								alphabet,
-							),
+							attributes = attributes,
 							inner_html = code_element.next().unwrap(),
 						)
 					},
@@ -730,7 +734,7 @@ fn process_html_attributes(
 
 					match attribute_type_designation {
 						"id" | "class" => {
-							attribute_value = process_string_of_tokens(
+							process_string_of_tokens(
 								&mut attribute_value,
 								selectors,
 								index,
@@ -740,7 +744,7 @@ fn process_html_attributes(
 						},
 
 						"selector" => {
-							attribute_value = process_css(
+							process_css(
 								&mut attribute_value,
 								selectors,
 								index,
@@ -748,7 +752,9 @@ fn process_html_attributes(
 							);
 						},
 
-						_ => {}
+						_ => {
+							return attribute_value;
+						}
 					}
 
 					return format!(
@@ -773,12 +779,12 @@ fn process_html_attributes(
 
 /// Process JS function arguments.
 fn process_js_arguments(
-	file_string: &mut str,
+	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
 	alphabet: &[char]
-) -> String {
-	JS_ARGUMENTS.replace_all(
+) {
+	*file_string = JS_ARGUMENTS.replace_all(
 		file_string,
 		|capture: &Captures| {
 			// Matched string is a multiline or single line comment
@@ -794,7 +800,7 @@ fn process_js_arguments(
 			match function {
 				// Takes one argument, an CSS selector string.
 				"querySelector" | "querySelectorAll" | "closest" => {
-					replacement_args = process_css(
+					process_css(
 						&mut replacement_args,
 						selectors,
 						index,
@@ -805,7 +811,7 @@ fn process_js_arguments(
 				// Takes one argument, a string of classes (no period prefixed)
 				// separated by spaces (if more than one) —
 				"getElementsByClassName" => {
-					replacement_args = process_string_of_tokens(
+					process_string_of_tokens(
 						&mut replacement_args,
 						selectors,
 						index,
@@ -816,7 +822,7 @@ fn process_js_arguments(
 
 				// Takes one argument, an ID (no hash prefixed).
 				"getElementById" => {
-					replacement_args = process_string_of_tokens(
+					process_string_of_tokens(
 						&mut replacement_args,
 						selectors,
 						index,
@@ -845,39 +851,40 @@ fn process_js_arguments(
 					// classses or an id. If it is not, leave value as is (second argument).
 					if ATTRIBUTES_WHITELIST.contains_key(attribute_name) {
 
-						let mut attribute_value: String = function_args
+						let attribute_value: String = function_args
 							.next()
 							.unwrap()
 							.at(1)
 							.unwrap()
 							.to_string();
+						let mut replacement_value = attribute_value.clone();
 
 						let attribute_type_designation: &str = ATTRIBUTES_WHITELIST
 							.get(attribute_name)
 							.unwrap();
 
-						let replacement_value = match attribute_type_designation {
+						match attribute_type_designation {
 							"id" | "class" => {
 								process_string_of_tokens(
-									&mut attribute_value,
+									&mut replacement_value,
 									selectors,
 									index,
 									alphabet,
 									attribute_type_designation
-								)
+								);
 							},
 
 							"selector" => {
 								process_css(
-									&mut attribute_value,
+									&mut replacement_value,
 									selectors,
 									index,
 									alphabet
-								)
+								);
 							},
 
 							_ => {
-								attribute_value.clone()
+								return replacement_value;
 							},
 						};
 
@@ -892,7 +899,7 @@ fn process_js_arguments(
 				// Takes two arguments: position and html,
 				// we are only interested in the latter argument.
 				"insertAdjacentHTML" => {
-					let mut html: String = STRING_DELIMITED_BY_COMMA
+					let html: String = STRING_DELIMITED_BY_COMMA
 						.captures_iter(&replacement_args)
 						.last()
 						.unwrap()
@@ -900,15 +907,17 @@ fn process_js_arguments(
 						.unwrap()
 						.to_string();
 
-					let replacement_html = match html.contains("</body>") {
+					let mut replacement_html = html.clone();
+
+					match html.contains("</body>") {
 						true => process_html(
-							&mut html,
+							&mut replacement_html,
 							selectors,
 							index,
 							alphabet
 						),
 						false => process_html_attributes(
-							&mut html,
+							&mut replacement_html,
 							selectors,
 							index,
 							alphabet
@@ -924,7 +933,7 @@ fn process_js_arguments(
 				// Takes one or more arguments, each argument is for
 				// an individual class name (no period prefixed).
 				_ if function.contains("classList") => {
-					replacement_args = process_string_of_arguments(
+					process_string_of_arguments(
 						&mut replacement_args,
 						selectors,
 						index,
@@ -943,18 +952,18 @@ fn process_js_arguments(
 				arguments = replacement_args
 			);
 		}
-	)
+	);
 }
 
 /// Process JS property operation values.
 fn process_js_properties(
-	file_string: &mut str,
+	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
 	alphabet: &[char]
-) -> String {
-	JS_PROPERTIES.replace_all(
-		&file_string,
+) {
+	*file_string = JS_PROPERTIES.replace_all(
+		file_string,
 		|capture: &Captures| {
 			// Matched string is a multiline or single line comment
 			// i.e. it does not have any further capture groups
@@ -967,38 +976,42 @@ fn process_js_properties(
 
 			match property_name {
 				"className" => {
+					process_string_of_tokens(
+						&mut property_value,
+						selectors,
+						index,
+						alphabet,
+						"class"
+					);
 					return format!(
 						".{name}{operator}{value}",
 						name = property_name,
 						operator = capture.at(2).unwrap(),
-						value = process_string_of_tokens(
-							&mut property_value,
-							selectors,
-							index,
-							alphabet,
-							"class"
-						),
+						value = property_value,
 					);
 				},
 				"innerHTML" | "outerHTML" => {
+					if property_value.contains("</body>") {
+						process_html(
+							&mut property_value,
+							selectors,
+							index,
+							alphabet
+						);
+					} else {
+						process_html_attributes(
+							&mut property_value,
+							selectors,
+							index,
+							alphabet
+						);
+					}
+
 					return format!(
 						".{name}{operator}{value}",
 						name = property_name,
 						operator = capture.at(2).unwrap(),
-						value = match property_value.contains("</body>") {
-							true => process_html(
-								&mut property_value,
-								selectors,
-								index,
-								alphabet
-							),
-							false => process_html_attributes(
-								&mut property_value,
-								selectors,
-								index,
-								alphabet
-							),
-						}
+						value = property_value,
 					);
 				},
 				_ => {},
@@ -1006,7 +1019,7 @@ fn process_js_properties(
 
 			return capture.at(0).unwrap().to_string();
 		}
-	)
+	);
 }
 
 /// Process string with tokens delimited by whitespaces.
@@ -1024,7 +1037,7 @@ fn process_string_of_tokens(
 	index: &mut usize,
 	alphabet: &[char],
 	context: &str
-) -> String {
+) {
 	let prefix: &str = match context {
 		"class" => { "." },
 		"id" => { "#" },
@@ -1045,7 +1058,7 @@ fn process_string_of_tokens(
 		string.remove(0);
 	}
 
-	return format!(
+	*string = format!(
 		"{quote}{tokens}{quote}",
 		tokens = STRING_DELIMITED_BY_SPACE.replace_all(
 			string,
@@ -1072,19 +1085,19 @@ fn process_string_of_tokens(
 ///  - context is neseccary in order to determine what the
 ///    token(s) should be processed as (e.g. class or id).
 fn process_string_of_arguments(
-	string: &mut str,
+	string: &mut String,
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
 	alphabet: &[char],
 	context: &str
-) -> String {
+) {
 	let prefix: &str = match context {
 		"class" => { "." },
 		"id" => { "#" },
 		_ => { "" },
 	};
 
-	return STRING_DELIMITED_BY_COMMA.replace_all(
+	*string = STRING_DELIMITED_BY_COMMA.replace_all(
 		string,
 		|capture: &Captures| {
 			// Need to put quote delimiters back around the argument value

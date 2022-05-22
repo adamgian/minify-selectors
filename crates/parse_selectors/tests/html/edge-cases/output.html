@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Document</title>
+
+		<style>
+			/* comment about .foo > .bar */
+			.b > .c {}
+			@media print {
+				.d {}
+			}
+		</style>
+
+		<script>
+			/*
+			 * comment about foo.bar < foo.baz
+			 *
+			 * document.classList.add('baz')
+			 */
+			if (foo.bar < foo.baz) {
+				// document.classList.add('baz');
+				document.classList.add('d');
+			}
+		</script>
+	</head>
+
+	<body>
+		<!-- .foo.bar -->
+		<!-- class="foo" -->
+		<!-- <div class="foo"></div> -->
+		<!-- document.querySelector('foo') -->
+
+		<code>
+			/* comment about .foo > .bar */
+			.foo > .bar {}
+			@media print {
+				.baz {}
+			}
+		</code>
+
+		<code>
+			/*
+			 * comment about foo.bar < foo.baz
+			 *
+			 * document.classList.add('baz')
+			 */
+			if (foo.bar < foo.baz) {
+				// document.classList.add('baz');
+				document.classList.add('d');
+			}
+		</code>
+
+		<code id="a" class="b c">
+			&lt;div class="foo"&gt;&lt;/div&gt;
+		</code>
+	</body>
+</html>

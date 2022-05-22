@@ -30,6 +30,9 @@
 [itemref~='SELECTOR-19'] {}
 [list~='SELECTOR-20'] {}
 
-[class^="SELECTOR-21"]
-[class$="SELECTOR-22"]
-[class*="SELECTOR-23"]
+[class^="SELECTOR-21"],
+[class$="SELECTOR-22"],
+[class*="SELECTOR-23"] {}
+
+.SELECTOR-24 {}
+[data-toggle="SELECTOR-25"] {}

@@ -78,7 +78,7 @@ pub fn to_radix(
 		assigned_index = (assigned_index - remainder).wrapping_div(base);
 	}
 
-	return encoded_selector;
+	encoded_selector
 }
 
 
@@ -92,5 +92,5 @@ pub fn into_alphabet_set(alphabet: &str) -> Vec<char> {
 		}
 	}
 
-	return alphabet_set;
+	alphabet_set
 }

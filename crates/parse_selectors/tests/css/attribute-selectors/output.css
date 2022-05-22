@@ -1,35 +1,38 @@
-[class=a] {}
-[class="b"] {}
-[class='c'] {}
-[class~=d] {}
-[class~="e"] {}
-[class~='f'] {}
+[class=b] {}
+[class="c"] {}
+[class='d'] {}
+[class~=e] {}
+[class~="f"] {}
+[class~='g'] {}
 
-[id=g] {}
-[id="h"] {}
-[id='i'] {}
-[id~=j] {}
-[id~="k"] {}
-[id~='l'] {}
+[id=h] {}
+[id="i"] {}
+[id='j'] {}
+[id~=k] {}
+[id~="l"] {}
+[id~='m'] {}
 
 [class=SELECTOR-13 i] {}
 [class="SELECTOR-13" i] {}
 [class="SELECTOR-13"i] {}
 [class="SELECTOR-13" I] {}
-[class=m s] {}
-[class="m" s] {}
-[class="m"s] {}
-[class="m" S] {}
+[class=n s] {}
+[class="n" s] {}
+[class="n"s] {}
+[class="n" S] {}
 [class="SELECTOR-14" x] {}
 
-[aria-describedby~='n'] {}
-[aria-labelledby~='o'] {}
-[for~='p'] {}
-[form~='q'] {}
-[headers~='r'] {}
-[itemref~='r'] {}
-[list~='s'] {}
+[aria-describedby~='o'] {}
+[aria-labelledby~='p'] {}
+[for~='q'] {}
+[form~='r'] {}
+[headers~='s'] {}
+[itemref~='s'] {}
+[list~='t'] {}
 
-[class^="SELECTOR-21"]
-[class$="SELECTOR-22"]
-[class*="SELECTOR-23"]
+[class^="SELECTOR-21"],
+[class$="SELECTOR-22"],
+[class*="SELECTOR-23"] {}
+
+.a {}
+[data-toggle="SELECTOR-25"] {}

@@ -149,7 +149,7 @@ fn minify_selectors() -> Result<(), Box<dyn Error>> {
 		stopwatch.elapsed()
 	);
 
-	return Ok(());
+	Ok(())
 }
 
 fn process_file(
@@ -168,7 +168,7 @@ fn process_file(
 
 	match file_extension {
 		"css" => {
-			file_contents = parse_selectors::from_css(
+			parse_selectors::from_css(
 				&mut file_contents,
 				selectors,
 				index,
@@ -176,7 +176,7 @@ fn process_file(
 			);
 		},
 		"html" => {
-			file_contents = parse_selectors::from_html(
+			parse_selectors::from_html(
 				&mut file_contents,
 				selectors,
 				index,
@@ -184,7 +184,7 @@ fn process_file(
 			);
 		},
 		"js" => {
-			file_contents = parse_selectors::from_js(
+			parse_selectors::from_js(
 				&mut file_contents,
 				selectors,
 				index,
@@ -194,5 +194,5 @@ fn process_file(
 		_ => {}
 	}
 
-	return Ok(file_contents);
+	Ok(file_contents)
 }
