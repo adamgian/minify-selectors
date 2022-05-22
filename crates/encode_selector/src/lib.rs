@@ -1,4 +1,5 @@
 use lazy_static::lazy_static;
+use onig::*;
 
 
 
@@ -7,6 +8,20 @@ lazy_static! {
 	static ref INVALID_FIRST_CHARACTER: Vec<char> = vec![
 		'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '_',
 	];
+
+	// Invalid characters in a selector name are:
+	// -  \0-\54: null to comma
+	// -  \56: period (.)
+	// -  \57: slash (/)
+	// -  \72-\100: colon (:) to at (@)
+	// -  \133-\136: left square bracket ([) to  caret (^)
+	// -  \140: backtick (`)
+	// -  \173-\177: left brace ({) to delete
+	static ref INVALID_CHARACTERS: Regex = Regex::new(
+		r##"(?x)
+			[\0-\54\56\57\72-\100\133-\136\140\173-\177]
+		"##
+	).unwrap();
 }
 
 
@@ -29,7 +44,7 @@ pub fn to_radix(
 		.filter_map(|(index, char)| {
 			match INVALID_FIRST_CHARACTER.contains(char) {
 				true => Some(index),
-				false => None
+				false => None,
 			}
 		})
 		.collect();
@@ -82,11 +97,15 @@ pub fn to_radix(
 }
 
 
-/// Returns a vector of chars that are all unique.
+/// Returns a sanitised vector of chars that are all unique.
 pub fn into_alphabet_set(alphabet: &str) -> Vec<char> {
 	let mut alphabet_set: Vec<char> = Vec::new();
 
-	for char in alphabet.chars() {
+	// Sanitise alphabet, remove any invalid characters
+	let sanitised_alphabet = INVALID_CHARACTERS.replace_all(alphabet, "");
+
+	// Removing any duplicate characters.
+	for char in sanitised_alphabet.chars() {
 		if !alphabet_set.contains(&char) {
 			alphabet_set.push(char);
 		}
