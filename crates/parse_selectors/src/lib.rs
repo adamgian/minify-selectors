@@ -686,16 +686,17 @@ fn process_html_attributes(
 					// <code> element.
 					// Check for attributes to encode on the opening tag.
 					true => {
-						let mut code_element = capture.at(0)
+						let code_element = capture.at(0)
 							.unwrap()
 							.strip_prefix("<code")
 							.unwrap()
-							.splitn(2, '>');
+							.split_once('>')
+							.unwrap();
 
-						//FIXME
-						let mut attributes = code_element.next().unwrap().to_string();
+						let mut code_tag_attributes = code_element.0.to_string();
+
 						process_html_attributes(
-							&mut attributes,
+							&mut code_tag_attributes,
 							selectors,
 							index,
 							alphabet,
@@ -703,8 +704,8 @@ fn process_html_attributes(
 
 						format!(
 							"<code{attributes}>{inner_html}",
-							attributes = attributes,
-							inner_html = code_element.next().unwrap(),
+							attributes = code_tag_attributes,
+							inner_html = code_element.1,
 						)
 					},
 				}
