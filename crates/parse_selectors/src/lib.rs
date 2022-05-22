@@ -297,13 +297,20 @@ lazy_static! {
 				\s*=\s*
 			)
 			(?<value>
-				[^\s\/\\<>"'=]+
-				| \\?"(?:[^\/\\<>"=] | \\[^"'])+
-				| \\?'(?:[^\/\\<>'=] | \\[^"'])+
+				[^\s\\<>"'=]+
+				| \\?"(?:[^\\<>"=] | \\[^"'])+
+				| \\?'(?:[^\\<>'=] | \\[^"'])+
 			)
 			(?<quote>
 				(?:\\?["'])?
 			)
+		"##
+	).unwrap();
+
+	// Extract ID from anchor links.
+	static ref HREF_ANCHOR_LINKS: Regex = Regex::new(
+		r##"(?x)
+			\# (?<anchor>[^#])*+$
 		"##
 	).unwrap();
 
@@ -376,6 +383,9 @@ lazy_static! {
 		// <input list="foo">
 		// <datalist id="foo"></datalist>
 		(String::from("list"), String::from("id")),
+
+		// <a href="/#foo"></a>
+		(String::from("href"), String::from("anchor")),
 	]);
 }
 
@@ -753,9 +763,18 @@ fn process_html_attributes(
 							);
 						},
 
+						"anchor" => {
+							process_anchor_links(
+								&mut attribute_value,
+								selectors,
+								index,
+								alphabet
+							);
+						},
+
 						_ => {
-							return attribute_value;
-						}
+							return capture.at(0).unwrap().to_string();
+						},
 					}
 
 					return format!(
@@ -1123,6 +1142,29 @@ fn process_string_of_arguments(
 				),
 				quote = quote_type,
 			);
+		}
+	);
+}
+
+// Process target IDs in anchor link URLs.
+fn process_anchor_links(
+	string: &mut String,
+	selectors: &mut HashMap<String, String>,
+	index: &mut usize,
+	alphabet: &[char]
+) {
+	*string = HREF_ANCHOR_LINKS.replace(
+		string,
+		|capture: &Captures| {
+			format!(
+				"#{}",
+				get_encoded_selector(
+					&capture.at(0).unwrap().to_owned(),
+					selectors,
+					index,
+					alphabet
+				)
+			)
 		}
 	);
 }
