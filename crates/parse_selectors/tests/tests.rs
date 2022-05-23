@@ -142,10 +142,22 @@ fn html_files() {
 	let dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
 		.join("tests/html/");
 
+	// Anchor links
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("anchor-links/output.html")).unwrap(),
+		process_file("html", &dir.clone().join("anchor-links/source.html")),
+	);
+
 	// Attributes
 	assert_eq!(
 		fs::read_to_string(dir.clone().join("attributes/output.html")).unwrap(),
 		process_file("html", &dir.clone().join("attributes/source.html")),
+	);
+
+	// Body only
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("body-only/output.html")).unwrap(),
+		process_file("html", &dir.clone().join("body-only/source.html")),
 	);
 
 	// Edge cases

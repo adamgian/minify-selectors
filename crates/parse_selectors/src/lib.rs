@@ -235,17 +235,17 @@ lazy_static! {
 		"##
 	).unwrap();
 
-	// Extract <body> from HTML files.
-	static ref HTML_BODY: Regex = Regex::new(
+	// Extract instances of <script></script> from HTML files.
+	static ref HTML_SCRIPT_ELEMENT: Regex = Regex::new(
 		r##"(?x)
 			(?<tag_open>
-				<body[^>]*>
+				<script[^>]*>
 			)
-			(?<body>
+			(?<script>
 				(?:.|\n|\r)*?
 			)
 			(?<tag_close>
-				<\/body>
+				<\/script>
 			)
 		"##
 	).unwrap();
@@ -255,7 +255,9 @@ lazy_static! {
 	// Will need additional processing to consider 'whitelisted'
 	// attributes and separate out the values.
 	//
-	// Capture HTML comments to prevent false positive matches
+	// Capture HTML comments, <code>, <script> and <style> elements
+	// to prevent false positive matches (i.e. prevent regex from
+	// matching into deeper capture groups).
 	//
 	// See: https://www.w3.org/TR/2018/SPSD-html5-20180327/syntax.html#attributes-0
 	//
@@ -283,12 +285,10 @@ lazy_static! {
 	static ref HTML_ATTRIBUTES: Regex = Regex::new(
 		r##"(?x)
 			<!--.*?-->
-			|
-			<code[^>]*>
-				(?:
-					. | \s
-				)*?
-			<\/code>
+			| <head[^>]*>(?:.|\s)*?<\/head>
+			| <style[^>]*>(?:.|\s)*?<\/style>
+			| <code[^>]*>(?:.|\s)*?<\/code>
+			| <script[^>]*>(?:.|\s)*?<\/script>
 			|
 			(?<attribute>
 				[^\s\x00\/>"'=]+
@@ -448,9 +448,9 @@ fn get_encoded_selector(
 ) -> String {
 	match selectors.contains_key(selector) {
 		true => {
-			return selectors
+			selectors
 				.get_key_value(selector)
-				.unwrap().1.to_string();
+				.unwrap().1.to_string()
 		},
 
 		false => {
@@ -495,29 +495,42 @@ fn process_html(
 	index: &mut usize,
 	alphabet: &[char]
 ) {
-	// Initial step — go through <body> and parse attributes
-	let mut html: String = HTML_BODY.replace_all(
+	process_html_attributes(
+		file_string,
+		selectors,
+		index,
+		alphabet
+	);
+
+	// Processing any embedded scripts
+	// Create subset string(s) to process <script> embeds
+	*file_string = HTML_SCRIPT_ELEMENT.replace_all(
 		file_string,
 		|capture: &Captures| {
-			let mut body = capture.at(0).unwrap().to_owned();
+			let mut embedded_script = capture.at(2).unwrap().to_string();
 
-			process_html_attributes(
-				&mut body,
+			process_js(
+				&mut embedded_script,
 				selectors,
 				index,
 				alphabet
 			);
 
-			body
+			format!(
+				"{tag_open}{script}{tag_close}",
+				tag_open = capture.at(1).unwrap(),
+				script = embedded_script,
+				tag_close = capture.at(3).unwrap()
+			)
 		}
 	);
 
 	// Processing any embedded styles
 	// Create subset string(s) to process <style> embeds
-	html = HTML_STYLE_ELEMENT.replace_all(
-		&html,
+	*file_string = HTML_STYLE_ELEMENT.replace_all(
+		file_string,
 		|capture: &Captures| {
-			let mut embedded_style = capture.at(2).unwrap().to_owned();
+			let mut embedded_style = capture.at(2).unwrap().to_string();
 
 			process_css(
 				&mut embedded_style,
@@ -526,24 +539,14 @@ fn process_html(
 				alphabet
 			);
 
-			return format!(
+			format!(
 				"{tag_open}{styles}{tag_close}",
 				tag_open = capture.at(1).unwrap(),
 				styles = embedded_style,
 				tag_close = capture.at(3).unwrap()
-			);
+			)
 		}
 	);
-
-	// Processing any embedded js
-	process_js(
-		&mut html,
-		selectors,
-		index,
-		alphabet
-	);
-
-	*file_string = html;
 }
 
 /// Process Javascript.
@@ -599,7 +602,7 @@ fn process_css_selectors(
 			}
 			// Matched to an attribute selector, rule block or comment.
 			// Leave it as is.
-			return capture.at(0).unwrap().to_owned();
+			capture.at(0).unwrap().to_owned()
 		}
 	);
 }
@@ -687,10 +690,11 @@ fn process_html_attributes(
 	*file_string = HTML_ATTRIBUTES.replace_all(
 		file_string,
 		|capture: &Captures| {
-			// Matched string is a <code> element or a HTML comment.
+			// Matched string is a <code>/<script>/<style> element
+			// or a HTML comment.
 			if capture.at(1).is_none() {
 				return match capture.at(0).unwrap().starts_with("<code") {
-					// HTML comment, leave as is.
+					// <script>/<style> element or HTML comment, leave as is.
 					false => capture.at(0).unwrap().to_string(),
 
 					// <code> element.
@@ -1159,7 +1163,7 @@ fn process_anchor_links(
 			format!(
 				"#{}",
 				get_encoded_selector(
-					&capture.at(0).unwrap().to_owned(),
+					&capture.at(0).unwrap(),
 					selectors,
 					index,
 					alphabet
