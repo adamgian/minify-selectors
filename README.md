@@ -126,9 +126,45 @@ For a full outline of capabilities and current limitations, see [parse_selectors
 
 ## Options
 
-| Flag  | Description  |
-|:------|:-------------|
-| `--input` (or&nbsp;`-i`) | Directory or file to process. If a directory path is provided — any CSS, HTML and JS files in the given directory and sub-directories will be parsed. If only a filepath is provided — only the given file will be parsed. |
-| `--output` (or&nbsp;`-o`) | Directory to ouput processed files to. Setting the output path to be the same as the input path will overwrite existing files. |
-| `--alphabet` | Custom sequence of characters to use when encoding. <br><br>By default, selector names will be encoded using the following base 62 string: `"0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"` |
-| `--start-index` | Index to start incrementing and encoding from. <br><br>By default, this will begin from `0` (essentially `a` if using the default alphabet). |
+<table>
+	<thead>
+		<tr>
+			<th align="left">Flag</th>
+			<th align="left">Description</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td valign="top">
+				<code lang="shell">--input</code>&nbsp;(or&nbsp;<code lang="shell">-i</code>)
+			</td>
+			<td>
+				Directory or file to process. If a directory path is provided — any CSS, HTML and JS files in the given directory and sub-directories will be parsed. If only a filepath is provided — only the given file will be parsed.
+			</td>
+		</tr>
+		<tr>
+			<td valign="top">
+				<code lang="shell">--output</code>&nbsp;(or&nbsp;<code lang="shell">-o</code>)
+			</td>
+			<td>
+				Directory to ouput processed files to. Setting the output path to be the same as the input path will overwrite existing files.
+			</td>
+		</tr>
+		<tr>
+			<td valign="top">
+				<code lang="shell">--alphabet</code>
+			</td>
+			<td>
+				Custom sequence of characters to use when encoding. <br><br>By default, selector names will be encoded using the following base 62 string: <code>`"0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"`</code>
+			</td>
+		</tr>
+		<tr>
+			<td valign="top">
+				<code lang="shell">--start-index</code>
+			</td>
+			<td>
+				Index to start incrementing and encoding from. <br><br>By default, this will begin from <code>`0`</code> (essentially <code>`a`</code> if using the default alphabet).
+			</td>
+		</tr>
+	</tbody>
+</table>
