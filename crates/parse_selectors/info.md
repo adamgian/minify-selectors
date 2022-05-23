@@ -4,87 +4,113 @@
 
 ### Classes and IDs names
 
-minify-selectors finds and encodes IDs and classes in selector rules.
-```scss
-#foo { … }
-.foo { … }
-#FOO { … }
-#FOOBAR { … }
-.bar { … }
-.FooBar { … }
-```
-
-```scss
-#a { … }
-.b { … }
-#c { … }
-#d { … }
-.e { … }
-.f { … }
-```
-
-As long as the IDs and classes are valid as per https://www.w3.org/TR/selectors-3/#lex, minify-selectors will be able to pick them up to encode.
+minify-selectors finds and encodes IDs and classes in selector rules. As long as the IDs and classes are valid as per https://www.w3.org/TR/selectors-3/#lex, minify-selectors will be able to pick them up to encode.
 
 1. Starts with `#` or `.`.
 2. Then optionally can be followed by a `-`.
 3. Then a 'nmstart' character, which is any one of:
 	- `[a-z]` — lowercase and uppercase Latin alphabet.
 	- `[^\0-\177]` ('nonascii') — other characters that are not part of ASCII.
-	- `{unicode}|\\[^\n\r\f0-9a-f]` ('escape') — escaping a character that is not a newline, return or unicode (which has it's own set of rules, see next point below). 
+	- `{unicode}|\\[^\n\r\f0-9a-f]` ('escape') — escaping a character that is not a newline, return or unicode (which has it's own set of rules, see next point below).
 	- `\\[0-9a-f]{1,6}(\r\n|[ \n\r\t\f])?` ('unicode') an unicode number (`\01F60E`) which is up to six hexadecimal characters long. Note: shorter unicode numbers can be terminated earlier by a space, newline, tab or form feed (`\265F `) rather than padding the leading digit(s) with zeros (`\00265F`) to reach the six character limit.
 4. Finally none, one or multiple 'nmchar' characters, these are:
 	- `[_a-z0-9-]` — lowercase and uppercase Latin alphabet, underscore and dash.
 	- `[^\0-\177]` ('nonascii') — other characters that are not part of ASCII.
-	- `{unicode}|\\[^\n\r\f0-9a-f]` ('escape') — escaping a character that is not a newline, return or unicode (which has it's own set of rules, see next point below). 
+	- `{unicode}|\\[^\n\r\f0-9a-f]` ('escape') — escaping a character that is not a newline, return or unicode (which has it's own set of rules, see next point below).
 	- `\\[0-9a-f]{1,6}(\r\n|[ \n\r\t\f])?` ('unicode') an unicode number (`\01F60E`) which is up to six hexadecimal characters long. Note: shorter unicode numbers can be terminated earlier by a space, newline, tab or form feed (`\265F `) rather than padding the leading digit(s) with zeros (`\00265F`) to reach the six character limit.
 
-> **Please note:**
-minify-selector currently does not support escaped or unicode characters in CSS selectors.
+<br>
 
-```scss
-.\265F -baz { … }  /* 😢 */
-.🗿 { … }          /* 😢 */
-```
+CSS selector names are case-sensitive.
 
-```scss
-.foo-bar { … }
+<table>
+<tr><td><p><sub>Source:</sub></p>
+<pre lang="scss">
+#foo { … }                                   ‎
+.foo { … }
+#FOO { … }
+#FOO { … }
+#FOOBAR { … }
+.bar { … }
+.FooBar { … }
+</pre>
+</td><td><p><sub>Output:</sub></p>
+<pre lang="scss">
+#a { … }                                     ‎
+.b { … }
+#c { … }
+#c { … }
+#d { … }
+.e { … }
+.f { … }
+</pre>
+</td></tr>
+</table>
+
+As long as the selector name is valid (see above), minify-selectors will process it.
+
+<table>
+<tr><td><p><sub>Source:</sub></p>
+<pre lang="scss">
+.foo-bar { … }                               ‎
 .foo_bar { … }
 .fooBar  { … }
 .a { … }
 .-foo { … }
 ._baz { … }
-```
-
-```scss
-.g { … }
+</pre>
+</td><td><p><sub>Output:</sub></p>
+<pre lang="scss">
+.g { … }                                     ‎
 .h { … }
 .i { … }
 .j { … }
 .k { … }
 .l { … }
-```
+</pre>
+</td></tr>
+</table><br>
+
+> **Please note:**
+> minify-selector currently does not support escaped or unicode characters in CSS selectors.
+>
+> ```scss
+> /* 😢 */
+> .\265F -baz { … }
+> .🗿 { … }
+> ```
+
+<br>
 
 Naming conventions such as BEM are no problem for minify-selectors.
-```scss
-.foo__bar { … }
+
+<table>
+<tr><td><p><sub>Source:</sub></p>
+<pre lang="scss">
+.foo__bar { … }                              ‎
 .foo--bar { … }
 .foo-bar--baz { … }
 .foo__bar--baz { … }
 .foo-bar__bar--baz { … }
-```
-
-```scss
-.m { … }
+</pre>
+</td><td><p><sub>Output:</sub></p>
+<pre lang="scss">
+.m { … }                                     ‎
 .n { … }
 .o { … }
 .p { … }
 .q { … }
-```
+</pre>
+</td></tr>
+</table>
+
 
 ### Chaining and combinations
 
-```scss
-div.foo { … }
+<table>
+<tr><td><p><sub>Source:</sub></p>
+<pre lang="scss">
+div.foo { … }                                ‎
 .foo.foo { … }
 .foo.bar { … }
 .foo * { … }
@@ -93,10 +119,10 @@ div.foo { … }
 .foo > .bar { … }
 .foo + .bar { … }
 .foo ~ .bar { … }
-```
-
-```scss
-div.b { … }
+</pre>
+</td><td><p><sub>Output:</sub></p>
+<pre lang="scss">
+div.b { … }                                  ‎
 .b.b { … }
 .b.e { … }
 .b * { … }
@@ -105,12 +131,17 @@ div.b { … }
 .b > .e { … }
 .b + .e { … }
 .b ~ .e { … }
-```
+</pre>
+</td></tr>
+</table>
+
 
 ### Pseudo-classes and elements
 
-```scss
-.foo:link { … }
+<table>
+<tr><td><p><sub>Source:</sub></p>
+<pre lang="scss">
+.foo:link { … }                              ‎
 .foo:visited { … }
 .foo:hover { … }
 .foo:active { … }
@@ -120,10 +151,10 @@ div.b { … }
 :where(.foo, .baz) .bar { … }
 .foo::after { … }
 .foo::before { … }
-```
-
-```scss
-.b:link { … }
+</pre>
+</td><td><p><sub>Output:</sub></p>
+<pre lang="scss">
+.b:link { … }                                ‎
 .b:visited { … }
 .b:hover { … }
 .b:active { … }
@@ -133,14 +164,19 @@ div.b { … }
 :where(.b, .r) .e { … }
 .b::after { … }
 .b::before { … }
-```
+</pre>
+</td></tr>
+</table>
+
 
 ### Attribute selectors
 
 minify-selectors will only work on attribute selectors with operators that can guarantee a match — such as `=` (value equals exactly) or `~=` (contains word match).
 
-```scss
-.foo[disabled] { … }
+<table>
+<tr><td><p><sub>Source:</sub></p>
+<pre lang="scss">
+.foo[disabled] { … }                         ‎
 [id="foo"] { … }
 [id='foo'] { … }
 [id=foo] { … }
@@ -149,10 +185,10 @@ minify-selectors will only work on attribute selectors with operators that can g
 [class=bar] { … }
 [class~="baz"] { … }
 .foo[href$=".com.au"] { … }
-```
-
-```scss
-.b[disabled] { … }
+</pre>
+</td><td><p><sub>Output:</sub></p>
+<pre lang="scss">
+.b[disabled] { … }                           ‎
 [id="b"] { … }
 [id='b'] { … }
 [id=b] { … }
@@ -161,17 +197,31 @@ minify-selectors will only work on attribute selectors with operators that can g
 [class=e] { … }
 [class~="r"] { … }
 .b[href$=".com.au"] { … }
-```
+</pre>
+</td></tr>
+</table><br>
 
 > **Please note:**
-Operators other than exact match (`|=`, `^=`, `$=`, `*=`) and case-insensitive matches `[class="Foo" i]` are not supported.
+> Operators that do not match by string or word (`|=`, `^=`, `$=`, `*=`) and case-insensitive matches (`[class="Foo" i]`) are not supported.
+>
+> ```scss
+> /* 😢 */
+> [class|="foo"] { … }
+> [class^="foo"] { … }
+> [class$="foo"] { … }
+> [class*="foo"] { … }
+> [class="foo" i] { … }
+> ```
 
-```scss
-[class^="foo"] { … }   /* 😢 */
-[class$="foo"] { … }   /* 😢 */
-[class*="foo"] { … }   /* 😢 */
-[class="foo" i] { … }  /* 😢 */
-```
+> **Please note:**
+> As any non-valid flag in CSS rules are ignored, minify-selectors does not process it.
+>
+> ```scss
+> /* 😢 */
+> [class="foo" x] { … }
+> ```
+
+<br>
 
 
 
@@ -180,8 +230,10 @@ Operators other than exact match (`|=`, `^=`, `$=`, `*=`) and case-insensitive m
 
 ### Classes
 
-```js
-document.getElementsByClassName('foo');
+<table>
+<tr><td><p><sub>Source:</sub></p>
+<pre lang="js">
+document.getElementsByClassName('foo');      ‎
 bar.setAttribute('class', 'bar');
 baz.classList.add('foo', 'bar', 'baz');
 baz.classList.remove('foo', 'bar');
@@ -190,114 +242,167 @@ baz.classList.replace('baz', 'foo');
 baz.classList.toggle('baz', foo > bar);
 baz.className += "foo";
 baz.className = "bar";
-```
-
-```js
-document.getElementsByClassName('b');
+</pre>
+</td><td><p><sub>Output:</sub></p>
+<pre lang="js">
+document.getElementsByClassName('b');        ‎
 bar.setAttribute('class', 'e');
 baz.classList.add('b', 'e', 'r');
 baz.classList.remove('b', 'e');
 baz.classList.contains('r');
 baz.classList.replace('r', 'b');
-baz.classList.toggle('r', b > e);
+baz.classList.toggle('r', foo > bar);
 baz.className += "b";
 baz.className = "e";
-```
+</pre>
+</td></tr>
+</table>
+
 
 ### IDs
 
-```js
-document.getElementById('foo');
+<table>
+<tr><td><p><sub>Source:</sub></p>
+<pre lang="js">
+document.getElementById('foo');              ‎
 bar.setAttribute('id', 'bar');
 baz.setAttribute('for', 'foo');
 baz.setAttribute('form', 'foo');
 baz.setAttribute('list', 'foo');
 baz.setAttribute('headers', 'foo');
-```
-```js
-document.getElementById('a');
+</pre>
+</td><td><p><sub>Output:</sub></p>
+<pre lang="js">
+document.getElementById('a');                ‎
 bar.setAttribute('id', 'e');
 baz.setAttribute('for', 'a');
 baz.setAttribute('form', 'a');
 baz.setAttribute('list', 'a');
 baz.setAttribute('headers', 'a');
-```
+</pre>
+</td></tr>
+</table>
+
 
 ### Selector strings
 
-```js
-document.querySelector('#foo');
+<table>
+<tr><td><p><sub>Source:</sub></p>
+<pre lang="js">
+document.querySelector('#foo');              ‎
 document.querySelector('.foo > .bar');
 document.querySelectorAll('.foo');
 document.querySelector('p.baz:disabled');
-```
-```js
-document.querySelector('#a');
+</pre>
+</td><td><p><sub>Output:</sub></p>
+<pre lang="js">
+document.querySelector('#a');                ‎
 document.querySelector('.b > .e');
 document.querySelectorAll('.b');
 document.querySelector('p.r:disabled');
-```
+</pre>
+</td></tr>
+</table>
+
+<br>
 
 > **Please note:**
-minify-selectors will not be able to detect class or ID names that are in variables or in strings. Will be resolved with [#11](https://github.com/adamgian/minify-selectors/issues/11).
+> minify-selectors will not be able to detect class or ID names that are in variables or in > strings. Will be resolved with [#11](https://github.com/adamgian/minify-selectors/issues/11).
+>
+> ```js
+> // 😢
+> let foo = "foo";
+> document.getElementById(foo);
+>
+> // 😢
+> bar.innerHtml = `<button class="btn btn-danger" id="${foo}"></button>`;
+> ```
 
-```js
-// 😢
-let foo = "foo";
-document.getElementById(foo);
+> **Please note:**
+> minify-selectors currently does not support parsing of selector names in expressions and logic within the function arguments. [#15](https://github.com/adamgian/minify-selectors/issues/15) can resolve to a certain extent and can [#11](https://github.com/adamgian/minify-selectors/issues/11) offers a work-around for this issue.
+>
+> ```js
+> // 😢
+> foo.classList.add(foo > bar ? "foo" : "bar");
+> foo.classList.add(isFoo() ?? "foo");
+> foo.classList.add(isFoo && "foo");
+> ```
 
-// 😢
-bar.innerHtml = `<button class="btn btn-danger" id="${foo}"></button>`;
-```
+<br>
 
 
 
 
 ## HTML
 
-```html
-<input id="foo" type="text">
-<div class="foo bar"></div>
-<label for="foo"></label>
-```
-```html
-<input id="a" type="text">
-<div class="b e"></div>
-<label for="a"></label>
-```
+<table>
+<tr><td><p><sub>Source:</sub></p>
+<pre lang="html">
+&lt;input id="foo" type="text">                 ‎
+&lt;div class="foo bar">&lt;/div>
+&lt;label for="foo">&lt;/label>
+</pre>
+</td><td><p><sub>Output:</sub></p>
+<pre lang="html">
+&lt;input id="a" type="text">                   ‎
+&lt;div class="b e">&lt;/div>
+&lt;label for="a">&lt;/label>
+</pre>
+</td></tr>
+</table>
 
 minify-selectors supports all native HTML attibutes that contain IDs — `id`, `aria-describedby`, `aria-labelledby`, `for`, `form`, `headers`, `itemref` and `list`.
 
-```html
-<a href="#" aria-labelledby="foo"></a>
-<a href="#" aria-describedby="foo"></a>
-<input form="foo">
-<input list="foo">
-<td headers="foo"></td>
-<div itemref="foo bar"></div>
-```
-```html
-<a href="#" aria-labelledby="a"></a>
-<a href="#" aria-describedby="a"></a>
-<input form="a">
-<input list="a">
-<td headers="a"></td>
-<div itemref="a e"></div>
-```
+<table>
+<tr><td><p><sub>Source:</sub></p>
+<pre lang="html">
+&lt;a href="#" aria-labelledby="foo">&lt;/a>       ‎
+&lt;a href="#" aria-describedby="foo">&lt;/a>
+&lt;input form="foo">
+&lt;input list="foo">
+&lt;td headers="foo">&lt;/td>
+&lt;div itemref="foo bar">&lt;/div>
+</pre>
+</td><td><p><sub>Output:</sub></p>
+<pre lang="html">
+&lt;a href="#" aria-labelledby="a">&lt;/a>         ‎
+&lt;a href="#" aria-describedby="a">&lt;/a>
+&lt;input form="a">
+&lt;input list="a">
+&lt;td headers="a">&lt;/td>
+&lt;div itemref="a e">&lt;/div>
+</pre>
+</td></tr>
+</table>
+
+
+Target IDs in anchor links are also handled.
+
+<table>
+<tr><td><p><sub>Source:</sub></p>
+<pre lang="html">
+&lt;a href="#foo">&lt;/a>                          ‎
+&lt;a href="/#bar">&lt;/a>
+&lt;a href="faq/#baz">&lt;/a>
+&lt;a href="https://example.com/foo/#bar">&lt;/a>
+</pre>
+</td><td><p><sub>Output:</sub></p>
+<pre lang="html">
+&lt;a href="#a">&lt;/a>                            ‎
+&lt;a href="/#e">&lt;/a>
+&lt;a href="faq/#s">&lt;/a>
+&lt;a href="https://example.com/foo/#e">&lt;/a>
+</pre>
+</td></tr>
+</table>
+
+<br>
 
 > **Please note:**
-Anchor links are currently not supported. Will be resolved with [#17](https://github.com/adamgian/minify-selectors/issues/17).
-
-```html
-<!-- 😢 -->
-<a href="#foo">Go to foo</a>
-```
-
-> **Please note:**
-Custom attributes are currently not supported. [#11](https://github.com/adamgian/minify-selectors/issues/11) and [#12](https://github.com/adamgian/minify-selectors/issues/12) will be ways to resolve this in future.
-
-```html
-<!-- 😢 -->
-<button data-toggle="modal" data-target="#modal-confirm-order-delete">
-</button>
-```
+> Custom attributes are currently not supported. [#11](https://github.com/adamgian/minify-selectors/issues/11) and [#12](https://github.com/adamgian/minify-selectors/issues/12) will be ways to resolve this in future.
+>
+> ```html
+> <!-- 😢 -->
+> <button data-toggle="modal" data-target="#modal-confirm-order-delete">
+> </button>
+> ```

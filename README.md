@@ -8,58 +8,82 @@ Wrings out that little bit more out of your payload sizes and shave off a wee bi
 minify-selectors only supports regular CSS, HTML and JS files. minify-selectors should be one of the final steps in your build process — SASS/SCSS, LESS, Typescript, JQuery, Handlebars, etc. should be compiled or transpiled first into its respective vanilla form.
 
 
+
 ## Examples
 
 ### CSS
-```css
-[id='page--default'] { … }
+
+<table>
+<tr><td><p><sub>Source:</sub></p>
+<pre lang="scss">
+[id='page--default'] { … }                               ‎
 .sidebar, .site-nav { … }
 .sidebar .search:focus-within { … }
 .sidebar--expanded a.is-active { … }
-```
-
-```css
-[id='a'], { … }
+</pre>
+</td><td><p><sub>Output:</sub></p>
+<pre lang="scss">
+[id='a'], { … }                                          ‎
 .b, .c { … }
 .b .d:focus-within { … }
-.e a.d { … }
-```
+.e a.f { … }
+</pre>
+</td></tr>
+</table>
+
 
 ### HTML
-```html
-<body id="page--default">
-    <nav class="site-nav">
-        <div class="search has-content">
-            <label for="site-search" class="text--muted text--center">…</label>
-            <input type="text" id="site-search" class="form-input--single form-input--lg border--thick">
-        </div>
-    </nav>
-</body>
-```
 
-```html
-<body id="a">
-    <nav class="c">
-        <div class="d a1">
-            <label for="y" class="F j">…</label>
-            <input type="text" id="y" class="A9 t Av">
-        </div>
-    </nav>
-</body>
-```
+<table>
+<tr><td><p><sub>Source:</sub></p>
+<pre lang="html">
+&lt;body id="page--default">
+  &lt;nav class="site-nav">
+    &lt;div class="search has-content">
+      &lt;label for="site-search" class="text--muted text--c
+        enter">
+        Search app
+      &lt;/label>
+      &lt;input type="text" id="site-search" class="form-inp
+        ut--single form-input--lg border--thick">
+    &lt;/div>
+  &lt;/nav>
+&lt;/body>
+</pre>
+</td><td valign="top"><p><sub>Output:</sub></p>
+<pre lang="html">
+&lt;body id="a">                                            ‎
+  &lt;nav class="c">
+    &lt;div class="d a1">
+      &lt;label for="y" class="F j">
+        Search app
+      &lt;/label>
+      &lt;input type="text" id="y" class="A9 t Av">
+    &lt;/div>
+  &lt;/nav>
+&lt;/body>
+</pre>
+</td></tr>
+</table>
+
 
 ### JS
-```js
-for (let link of document.querySelectorAll('a.anchor')) {
-    link.classList.remove('is-active');
-}
-```
 
-```js
-for (let link of document.querySelectorAll('a.Bd')) {
-    link.classList.remove('d');
+<table>
+<tr><td><p><sub>Source:</sub></p>
+<pre lang="js">
+for (let link of document.querySelectorAll('a.anchor')) {‎
+  link.classList.remove('is-active');
 }
-```
+</pre>
+</td><td><p><sub>Output:</sub></p>
+<pre lang="js">
+for (let link of document.querySelectorAll('a.Bd')) {    ‎
+  link.classList.remove('f');
+}
+</pre>
+</td></tr>
+</table>
 
 For a full outline of capabilities and current limitations, see [parse_selectors/info.md](crates/parse_selectors/info.md).
 
