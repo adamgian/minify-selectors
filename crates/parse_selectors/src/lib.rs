@@ -314,11 +314,28 @@ lazy_static! {
 		"##
 	).unwrap();
 
-	// Extract tokens — seperated by whitespace(s).
+	// Extract tokens (that are valid selector names) — seperated
+	// by whitespace(s).
 	static ref STRING_DELIMITED_BY_SPACE: Regex = Regex::new(
 		r##"(?x)
 			(?<token>
-				[^\s]++
+				-?
+				(?>
+					[A-Za-z_]
+					| [^\0-\177]
+					| (?>
+						\\[0-9A-Fa-f]{1,6}(?>\r\n|[ \n\r\t\f])?
+						| \\[^\n\r\f0-9A-Fa-f]
+					)
+				)
+				(?>
+					[\w\-]
+					| [^\0-\177]
+					| (?>
+						\\[0-9A-Fa-f]{1,6}(?>\r\n|[ \n\r\t\f])?
+						| \\[^\n\r\f0-9A-Fa-f]
+					)
+				)*
 			)
 		"##
 	).unwrap();
