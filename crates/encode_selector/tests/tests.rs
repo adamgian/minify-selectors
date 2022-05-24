@@ -249,3 +249,12 @@ fn index_to_base26_latin_letters() {
 	assert_eq!("aaaa".to_string(), to_radix(&18278, &alphabet));
 	assert_eq!("zzzz".to_string(), to_radix(&475253, &alphabet));
 }
+
+
+#[test]
+fn alphabet_sanitisation() {
+	assert_eq!(
+		into_alphabet_set(&"`~!@#$%^&*()_-+=<>?[]{}|abc"),
+		['_', '-', 'a', 'b', 'c']
+	);
+}
