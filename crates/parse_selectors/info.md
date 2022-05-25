@@ -1,8 +1,8 @@
 # parse_selectors
 
-## CSS
+## Selector names
 
-### Classes and IDs names
+### What constitutes a valid identifier?
 
 minify-selectors finds and encodes IDs and classes in selector rules. As long as the IDs and classes are valid as per https://www.w3.org/TR/selectors-3/#lex, minify-selectors will be able to pick them up to encode.
 
@@ -20,6 +20,23 @@ minify-selectors finds and encodes IDs and classes in selector rules. As long as
 	- `\\[0-9a-f]{1,6}(\r\n|[ \n\r\t\f])?` ('unicode') an unicode number (`\01F60E`) which is up to six hexadecimal characters long. Note: shorter unicode numbers can be terminated earlier by a space, newline, tab or form feed (`\265F `) rather than padding the leading digit(s) with zeros (`\00265F`) to reach the six character limit.
 
 <br>
+
+
+
+
+## CSS file and embedded style support
+
+> **Please note:**
+> minify-selector currently does not properly support escaped or unicode characters in CSS selectors. See [#10](https://github.com/adamgian/minify-selectors/issues/10).
+>
+> ```scss
+> /* 😢 */
+> .\265F -baz { … }
+> .🗿 { … }
+> ```
+
+
+### Selector naming
 
 CSS selector names are case-sensitive.
 
@@ -47,7 +64,7 @@ CSS selector names are case-sensitive.
 </td></tr>
 </table>
 
-As long as the selector name is valid (see above), minify-selectors will process it.
+As long as the selector name is valid (see above section: "What constitutes a valid identifier?"), minify-selectors will process it.
 
 <table>
 <tr><td><p><sub>Source:</sub></p>
@@ -69,18 +86,7 @@ As long as the selector name is valid (see above), minify-selectors will process
 .l { … }
 </pre>
 </td></tr>
-</table><br>
-
-> **Please note:**
-> minify-selector currently does not support escaped or unicode characters in CSS selectors.
->
-> ```scss
-> /* 😢 */
-> .\265F -baz { … }
-> .🗿 { … }
-> ```
-
-<br>
+</table>
 
 Naming conventions such as BEM are no problem for minify-selectors.
 
@@ -171,6 +177,27 @@ div.b { … }                                  ‎
 
 ### Attribute selectors
 
+> **Please note:**
+> Operators that do not match by string or word (`|=`, `^=`, `$=`, `*=`) and case-insensitive matches (`[class="Foo" i]`) are not supported.
+>
+> ```scss
+> /* 😢 */
+> [class|="foo"] { … }
+> [class^="foo"] { … }
+> [class$="foo"] { … }
+> [class*="foo"] { … }
+> [class="foo" i] { … }
+> ```
+
+> **Please note:**
+> As any non-valid flag in CSS rules are not valid and ignored by browsers, minify-selectors does not bother to process it.
+>
+> ```scss
+> /* 😢 */
+> [class="foo" x] { … }
+> [class="foo" ?] { … }
+> ```
+
 minify-selectors will only work on attribute selectors with operators that can guarantee a match — such as `=` (value equals exactly) or `~=` (contains word match).
 
 <table>
@@ -201,32 +228,35 @@ minify-selectors will only work on attribute selectors with operators that can g
 </td></tr>
 </table><br>
 
-> **Please note:**
-> Operators that do not match by string or word (`|=`, `^=`, `$=`, `*=`) and case-insensitive matches (`[class="Foo" i]`) are not supported.
->
-> ```scss
-> /* 😢 */
-> [class|="foo"] { … }
-> [class^="foo"] { … }
-> [class$="foo"] { … }
-> [class*="foo"] { … }
-> [class="foo" i] { … }
-> ```
-
-> **Please note:**
-> As any non-valid flag in CSS rules are ignored, minify-selectors does not process it.
->
-> ```scss
-> /* 😢 */
-> [class="foo" x] { … }
-> ```
-
 <br>
 
 
 
 
 ## JS
+
+> **Please note:**
+> minify-selectors will not be able to detect class or ID names that are in variables or in > strings. Will be resolved with [#11](https://github.com/adamgian/minify-selectors/issues/11).
+>
+> ```js
+> // 😢
+> let foo = "foo";
+> document.getElementById(foo);
+>
+> // 😢
+> bar.innerHtml = `<button class="btn btn-danger" id="${foo}"></button>`;
+> ```
+
+> **Please note:**
+> minify-selectors currently does not support parsing of selector names in expressions and logic within the function arguments. [#15](https://github.com/adamgian/minify-selectors/issues/15) can resolve to a certain extent and can [#11](https://github.com/adamgian/minify-selectors/issues/11) offers a work-around for this issue.
+>
+> ```js
+> // 😢
+> foo.classList.add(foo > bar ? "foo" : "bar");
+> foo.classList.add(isFoo() ?? "foo");
+> foo.classList.add(isFoo && "foo");
+> ```
+
 
 ### Classes
 
@@ -306,34 +336,20 @@ document.querySelector('p.r:disabled');
 
 <br>
 
-> **Please note:**
-> minify-selectors will not be able to detect class or ID names that are in variables or in > strings. Will be resolved with [#11](https://github.com/adamgian/minify-selectors/issues/11).
->
-> ```js
-> // 😢
-> let foo = "foo";
-> document.getElementById(foo);
->
-> // 😢
-> bar.innerHtml = `<button class="btn btn-danger" id="${foo}"></button>`;
-> ```
-
-> **Please note:**
-> minify-selectors currently does not support parsing of selector names in expressions and logic within the function arguments. [#15](https://github.com/adamgian/minify-selectors/issues/15) can resolve to a certain extent and can [#11](https://github.com/adamgian/minify-selectors/issues/11) offers a work-around for this issue.
->
-> ```js
-> // 😢
-> foo.classList.add(foo > bar ? "foo" : "bar");
-> foo.classList.add(isFoo() ?? "foo");
-> foo.classList.add(isFoo && "foo");
-> ```
-
-<br>
-
 
 
 
 ## HTML
+
+> **Please note:**
+> Custom attributes are currently not supported. [#11](https://github.com/adamgian/minify-selectors/issues/11) and [#12](https://github.com/adamgian/minify-selectors/issues/12) will be ways to resolve this in future.
+>
+> ```html
+> <!-- 😢 -->
+> <button data-toggle="modal" data-target="#modal-confirm-order-delete">
+> </button>
+> ```
+<br>
 
 <table>
 <tr><td><p><sub>Source:</sub></p>
@@ -395,14 +411,3 @@ Target IDs in anchor links are also handled.
 </pre>
 </td></tr>
 </table>
-
-<br>
-
-> **Please note:**
-> Custom attributes are currently not supported. [#11](https://github.com/adamgian/minify-selectors/issues/11) and [#12](https://github.com/adamgian/minify-selectors/issues/12) will be ways to resolve this in future.
->
-> ```html
-> <!-- 😢 -->
-> <button data-toggle="modal" data-target="#modal-confirm-order-delete">
-> </button>
-> ```

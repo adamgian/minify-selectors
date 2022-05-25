@@ -30,7 +30,7 @@
 
 
 # v0.9.15
-<sub>16 May 2022</sub>
+<sub>17 May 2022</sub>
 
 ### Fixes
 - Rewrite parsing logic for `setAttribute()`
@@ -47,7 +47,7 @@
 
 
 # v0.9.8
-<sub>14 May 2022</sub>
+<sub>13 May 2022</sub>
 
 ### Updates:
 - Add build for macOS 64-bit arm platforms
