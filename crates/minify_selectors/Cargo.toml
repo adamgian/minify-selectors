@@ -1,8 +1,14 @@
 [package]
 authors = ["Adam Gian <contact@adamgian.com>"]
+categories = [ "command-line-utilities", "development-tools::build-utils", "web-programming" ]
+description = "Post-processor that minifies classes and IDs in CSS, HTML and Javascript files."
 edition = "2021"
+homepage = "https://github.com/adamgian/minify-selectors#readme"
+keywords = [ "CSS", "JS", "HTML", "minify", "selectors", "minifier", "cli" ]
 license = "Apache-2.0"
 name = "minify_selectors"
+readme = "README.md"
+repository = "git+https://github.com/adamgian/minify-selectors.git"
 version = "0.11.3"
 
 

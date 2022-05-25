@@ -24,7 +24,7 @@ minify-selectors finds and encodes IDs and classes in selector rules. As long as
 
 
 
-## CSS file and embedded style support
+## CSS files and embedded styles support
 
 > **Please note:**
 > minify-selector currently does not properly support escaped or unicode characters in CSS selectors. See [#10](https://github.com/adamgian/minify-selectors/issues/10).
@@ -188,8 +188,7 @@ div.b { … }                                  ‎
 > [class*="foo"] { … }
 > [class="foo" i] { … }
 > ```
-
-> **Please note:**
+>
 > As any non-valid flag in CSS rules are not valid and ignored by browsers, minify-selectors does not bother to process it.
 >
 > ```scss
@@ -198,7 +197,7 @@ div.b { … }                                  ‎
 > [class="foo" ?] { … }
 > ```
 
-minify-selectors will only work on attribute selectors with operators that can guarantee a match — such as `=` (value equals exactly) or `~=` (contains word match).
+minify-selectors will work on attribute selectors with operators that guarantee a match — such as `=` (attribute value equals exactly) or `~=` (attribute value contains matching word).
 
 <table>
 <tr><td><p><sub>Source:</sub></p>
@@ -233,10 +232,10 @@ minify-selectors will only work on attribute selectors with operators that can g
 
 
 
-## JS
+## JS files and embedded scripts support
 
 > **Please note:**
-> minify-selectors will not be able to detect class or ID names that are in variables or in > strings. Will be resolved with [#11](https://github.com/adamgian/minify-selectors/issues/11).
+> minify-selectors will not be able to detect class or ID names that are in variables or in strings. Will be resolved with [#11](https://github.com/adamgian/minify-selectors/issues/11).
 >
 > ```js
 > // 😢
@@ -246,8 +245,7 @@ minify-selectors will only work on attribute selectors with operators that can g
 > // 😢
 > bar.innerHtml = `<button class="btn btn-danger" id="${foo}"></button>`;
 > ```
-
-> **Please note:**
+>
 > minify-selectors currently does not support parsing of selector names in expressions and logic within the function arguments. [#15](https://github.com/adamgian/minify-selectors/issues/15) can resolve to a certain extent and can [#11](https://github.com/adamgian/minify-selectors/issues/11) offers a work-around for this issue.
 >
 > ```js
@@ -339,7 +337,7 @@ document.querySelector('p.r:disabled');
 
 
 
-## HTML
+## HTML support
 
 > **Please note:**
 > Custom attributes are currently not supported. [#11](https://github.com/adamgian/minify-selectors/issues/11) and [#12](https://github.com/adamgian/minify-selectors/issues/12) will be ways to resolve this in future.
