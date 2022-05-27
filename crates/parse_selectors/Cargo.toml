@@ -1,7 +1,12 @@
 [package]
 authors = ["Adam Gian <contact@adamgian.com>"]
+description = "minify-selectors' API"
 edition = "2021"
+homepage = "https://github.com/adamgian/minify-selectors/crates/parse_selectors/info.md"
+keywords = [ "CSS", "selectors", "minifier", "API" ]
+license = "Apache-2.0"
 name = "parse_selectors"
+repository = "https://github.com/adamgian/minify-selectors.git"
 version = "0.9.2"
 
 
@@ -9,4 +14,4 @@ version = "0.9.2"
 lazy_static = "1.4.0"
 onig = "6.3.1"
 
-encode_selector = { path = "../encode_selector" }
+encode_selector = { version = "0.3.3", path = "../encode_selector" }

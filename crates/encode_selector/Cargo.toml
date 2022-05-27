@@ -1,7 +1,12 @@
 [package]
 authors = ["Adam Gian <contact@adamgian.com>"]
+description = "Encode an integer index into a selector valid radix using the passed in alphabet."
 edition = "2021"
+homepage = "https://github.com/adamgian/minify-selectors#readme"
+keywords = [ "radix" ]
+license = "Apache-2.0"
 name = "encode_selector"
+repository = "https://github.com/adamgian/minify-selectors.git"
 version = "0.3.3"
 
 

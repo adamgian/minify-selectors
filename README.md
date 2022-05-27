@@ -2,7 +2,7 @@
 
 Post-processor that minifies classes and IDs selector names in CSS, HTML and Javascript files. Each unique selector, and any subsequent occurances elsewhere, is converted into an ultracompact name.
 
-Wrings out that little bit more out of your payload sizes and shave off a wee bit off file parse times. Additionally adds a certain degree of obfuscation to your selector names and stylesheets.
+Wring out that little bit more out of your payload sizes and shave a wee bit off file parse times. Additionally adds a certain degree of obfuscation to your selector names and stylesheets.
 
 <br>
 
@@ -11,7 +11,7 @@ Wrings out that little bit more out of your payload sizes and shave off a wee bi
 
 ## Examples
 
-### CSS
+### CSS (file or embedded style)
 
 <table>
 <tr><td><p><sub>Source:</sub></p>
@@ -27,6 +27,25 @@ Wrings out that little bit more out of your payload sizes and shave off a wee bi
 .b, .c { … }
 .b .d:focus-within { … }
 .e a.f { … }
+</pre>
+</td></tr>
+</table>
+
+
+### JS (file or embedded script)
+
+<table>
+<tr><td><p><sub>Source:</sub></p>
+<pre lang="js">
+for (let link of document.querySelectorAll('a.anchor')) {‎
+  link.classList.remove('is-active');
+}
+</pre>
+</td><td><p><sub>Output:</sub></p>
+<pre lang="js">
+for (let link of document.querySelectorAll('a.Bd')) {    ‎
+  link.classList.remove('f');
+}
 </pre>
 </td></tr>
 </table>
@@ -66,25 +85,6 @@ Wrings out that little bit more out of your payload sizes and shave off a wee bi
 </td></tr>
 </table>
 
-
-### JS
-
-<table>
-<tr><td><p><sub>Source:</sub></p>
-<pre lang="js">
-for (let link of document.querySelectorAll('a.anchor')) {‎
-  link.classList.remove('is-active');
-}
-</pre>
-</td><td><p><sub>Output:</sub></p>
-<pre lang="js">
-for (let link of document.querySelectorAll('a.Bd')) {    ‎
-  link.classList.remove('f');
-}
-</pre>
-</td></tr>
-</table>
-
 For a full outline of capabilities and current limitations, see [parse_selectors/info.md](crates/parse_selectors/info.md).
 
 <br>
@@ -97,11 +97,11 @@ For a full outline of capabilities and current limitations, see [parse_selectors
 > **Please note:**
 minify-selectors only supports regular CSS, HTML and JS files. minify-selectors should be one of the final steps in your build process — SASS/SCSS, LESS, Typescript, JQuery, Handlebars, etc. should be compiled or transpiled first into its respective vanilla form.
 
-### CLI
+### Running as CLI tool
 
-1. Install from npm:
+1. Install via homebrew:
 	```shell
-	npm i -g minify-selectors
+	brew tap adamgian/minify-selectors && brew install minify-selectors
 	```
 
 2. Run in command line:
@@ -109,14 +109,14 @@ minify-selectors only supports regular CSS, HTML and JS files. minify-selectors 
 	minify-selectors --input "example/dir/src" --output "example/dir/dist"
 	```
 
-### npm scripts
+### Via npm and npm scripts
 
-1. Install from npm:
+1. Install via npm:
 	```shell
 	npm i minify-selectors
 	```
 
-2. Include minify-selectors in your package.json scripts:
+2. Include minify-selectors in your package.json 'scripts' property:
 	```json
 	"scripts": {
 	  "build": "npm run build:webpack && npm run build:minify-selectors",
@@ -125,7 +125,7 @@ minify-selectors only supports regular CSS, HTML and JS files. minify-selectors 
 	},
 	```
 
-2. Run npm script:
+2. Run npm script, for example:
 	```shell
 	npm run build
 	```
@@ -151,7 +151,7 @@ minify-selectors only supports regular CSS, HTML and JS files. minify-selectors 
 				<code lang="shell">--input</code> (or <code lang="shell">-i</code>)
 			</td>
 			<td>
-				Directory or file to process. If a directory path is provided — any CSS, HTML and JS files in the given directory and sub-directories will be parsed. If only a filepath is provided — only the given file will be parsed.
+				Directory to process. Any CSS, HTML and JS files in the given directory and sub-directories will be parsed.
 			</td>
 		</tr>
 		<tr>
@@ -167,7 +167,8 @@ minify-selectors only supports regular CSS, HTML and JS files. minify-selectors 
 				<code lang="shell">--alphabet</code>
 			</td>
 			<td>
-				Custom sequence of characters to use when encoding. <br><br>By default, selector names will be encoded using the following base 62 string: <code>0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ</code>
+				String sequence of characters to use when encoding.
+				<br><br>Default: <code>"0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"</code>
 			</td>
 		</tr>
 		<tr>
@@ -175,7 +176,8 @@ minify-selectors only supports regular CSS, HTML and JS files. minify-selectors 
 				<code lang="shell">--start-index</code>
 			</td>
 			<td>
-				Index to start incrementing and encoding from. <br><br>By default, this will begin from <code>`0`</code> (essentially <code>`a`</code> if using the default alphabet).
+				Index to start incrementing and encoding from.
+				<br><br>Default: <code>0</code>
 			</td>
 		</tr>
 	</tbody>

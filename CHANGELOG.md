@@ -4,7 +4,7 @@
 ### Fixes
 - Address regression in npm configuration and subsequently the 'binary-install' dependency
 - More robust regex pattern for string delimited by space, match only tokens that are valid selector names
-- When processing HTML files, only try to parse JS inside `<script>` tags
+- When processing HTML files, only parse JS inside `<script>` tags
 - Move HTML `<code>` and comments 'filters' to the regex-level, HTML attributes regex extended to also 'ignore' `<head>`, `<script>` and `<style>` elements
 
 <br>
