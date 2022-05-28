@@ -6,6 +6,28 @@ use std::collections::HashMap;
 
 
 lazy_static! {
+	// Extracts specially marked selectors placeholders from files.
+	//
+	// Matches:
+	// -  <<class=bar>>
+	// -  <<id=foo>>
+	// -  <<selector=#baz>>
+	// -  <<url=http://example.com/#foo>>
+	//
+	// Account for whitespaces after the opening delimiter (<<), before
+	// the closing delimiter (>>) and on either side of the 'operator' (=).
+	static ref SELECTOR_PLACEHOLDERS: Regex = Regex::new(
+		r##"(?x)
+			<<\s*
+			(?<context>
+				class | id | selector | url
+			)
+			\s*=\s*
+			(?<value>[^>]*)
+			>>
+		"##
+	).unwrap();
+
 	// Extracts classes and IDs from selector rules in
 	// stylesheets and embedded styles.
 	//
@@ -255,9 +277,9 @@ lazy_static! {
 	// Will need additional processing to consider 'whitelisted'
 	// attributes and separate out the values.
 	//
-	// Capture HTML comments, <code>, <script> and <style> elements
-	// to prevent false positive matches (i.e. prevent regex from
-	// matching into deeper capture groups).
+	// Capture selector placeholders, HTML comments, <code>, <script> and
+	// <style> elements to prevent false positive matches (i.e. prevent
+	// regex from matching into deeper capture groups).
 	//
 	// See: https://www.w3.org/TR/2018/SPSD-html5-20180327/syntax.html#attributes-0
 	//
@@ -289,6 +311,7 @@ lazy_static! {
 			| <style[^>]*>(?:.|\s)*?<\/style>
 			| <code[^>]*>(?:.|\s)*?<\/code>
 			| <script[^>]*>(?:.|\s)*?<\/script>
+			| <<\s*(?:class | id | selector | url)\s*=\s*(?:[^>]*)>>
 			|
 			(?<attribute>
 				[^\s\x00\/>"'=]+
@@ -503,6 +526,13 @@ fn process_css(
 		index,
 		alphabet
 	);
+
+	process_selector_placeholders(
+		file_string,
+		selectors,
+		index,
+		alphabet
+	);
 }
 
 /// Process HTML.
@@ -564,6 +594,13 @@ fn process_html(
 			)
 		}
 	);
+
+	process_selector_placeholders(
+		file_string,
+		selectors,
+		index,
+		alphabet
+	);
 }
 
 /// Process Javascript.
@@ -586,10 +623,64 @@ fn process_js(
 		index,
 		alphabet,
 	);
+
+	process_selector_placeholders(
+		file_string,
+		selectors,
+		index,
+		alphabet
+	);
 }
 
 
 
+
+/// Process selector placeholders.
+fn process_selector_placeholders(
+	file_string: &mut String,
+	selectors: &mut HashMap<String, String>,
+	index: &mut usize,
+	alphabet: &[char]
+) {
+	*file_string = SELECTOR_PLACEHOLDERS.replace_all(
+		file_string,
+		|capture: &Captures| {
+			let mut placeholder_value = capture.at(2).unwrap().to_string();
+
+			match capture.at(1) {
+				Some("class") | Some("id") => {
+					process_string_of_tokens(
+						&mut placeholder_value,
+						selectors,
+						index,
+						alphabet,
+						capture.at(1).unwrap()
+					);
+				},
+				Some("selector") => {
+					process_css(
+						&mut placeholder_value,
+						selectors,
+						index,
+						alphabet
+					);
+				},
+				Some("url") => {
+					process_anchor_links(
+						&mut placeholder_value,
+						selectors,
+						index,
+						alphabet
+					);
+				},
+				// Shouldn't ever match this
+				Some(&_) | None => {},
+			}
+
+			placeholder_value
+		}
+	);
+}
 
 /// Process classes and IDs in CSS file/embed or as a
 /// CSS selector string.
@@ -1180,7 +1271,7 @@ fn process_anchor_links(
 			format!(
 				"#{}",
 				get_encoded_selector(
-					&capture.at(0).unwrap(),
+					capture.at(0).unwrap(),
 					selectors,
 					index,
 					alphabet

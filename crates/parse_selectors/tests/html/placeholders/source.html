@@ -1,0 +1,20 @@
+<!-- <<id=SELECTOR-1>> -->
+<button type="button" data-toggle="modal" data-target="<<selector=#SELECTOR-1>>"></button>
+<component data-classes="<<class=SELECTOR-2 SELECTOR-3>>"></component>
+<code>
+// See: << url = http://example.com/#SELECTOR-4 >>
+</code>
+
+<style>
+	.SELECTOR-5::after {
+		content: "<< url = http://example.com/#SELECTOR-4 >>";
+	}
+</style>
+
+<script>
+	foo.classList.add(() => {
+		if (foo) return "<<class = SELECTOR-6>>";
+		else if (bar) return "<<class = SELECTOR-7 SELECTOR-6>>";
+		else if (baz) return "<< class=SELECTOR-8 >>";
+	});
+</script>

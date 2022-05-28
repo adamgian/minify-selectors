@@ -1,3 +1,14 @@
+# v1.0.0 (Unreleased)
+<sub>TBD</sub>
+
+### Updates
+- Parse and encode selector placeholders (#11)
+
+<br>
+
+
+
+
 # v0.11.3
 <sub>25 May 2022</sub>
 

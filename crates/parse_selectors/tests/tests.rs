@@ -165,6 +165,12 @@ fn html_files() {
 		fs::read_to_string(dir.clone().join("edge-cases/output.html")).unwrap(),
 		process_file("html", &dir.clone().join("edge-cases/source.html")),
 	);
+
+	// Placeholders
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("placeholders/output.html")).unwrap(),
+		process_file("html", &dir.clone().join("placeholders/source.html")),
+	);
 }
 
 
