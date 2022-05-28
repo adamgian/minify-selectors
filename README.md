@@ -1,8 +1,19 @@
+[1]: https://github.com/adamgian/minify-selectors/releases/latest
+[2]: https://img.shields.io/npm/v/minify-selectors?color=blue&label=Latest%20release
+[3]: https://www.apache.org/licenses/LICENSE-2.0
+[4]: https://img.shields.io/badge/License-Apache%202.0-green.svg
+
+[![Latest release version][2]][1]
+&nbsp;[![Apache 2.0 license][4]][3]
+
+
+
+
 # minify-selectors
 
-Post-processor that minifies classes and IDs selector names in CSS, HTML and Javascript files. Each unique selector, and any subsequent occurances elsewhere, is converted into an ultracompact name.
+Post-processor that minifies classes and IDs selector names in CSS, HTML and Javascript files. Each unique selector, and any subsequent occurances elsewhere, is converted into an ultracompact one.
 
-Wring out that little bit more out of your payload sizes and shave a wee bit off file parse times. Additionally adds a certain degree of obfuscation to your selector names and stylesheets.
+Enhance your front-end assets and build optimisations pipeline — wring even more out from your payload sizes. Additionally, can offer a certain degree of obfuscation to your code.
 
 <br>
 
@@ -14,48 +25,48 @@ Wring out that little bit more out of your payload sizes and shave a wee bit off
 ### CSS (file or embedded style)
 
 <table>
-<tr><td><p><sub>Source:</sub></p>
-<pre lang="scss">
+	<tr><td><p><sub>Source:</sub></p>
+		<pre lang="scss">
 [id='page--default'] { … }                               ‎
 .sidebar, .site-nav { … }
 .sidebar .search:focus-within { … }
 .sidebar--expanded a.is-active { … }
-</pre>
-</td><td><p><sub>Output:</sub></p>
-<pre lang="scss">
+		</pre>
+	</td><td><p><sub>Output:</sub></p>
+		<pre lang="scss">
 [id='a'], { … }                                          ‎
 .b, .c { … }
 .b .d:focus-within { … }
 .e a.f { … }
-</pre>
-</td></tr>
+		</pre>
+	</td></tr>
 </table>
 
 
 ### JS (file or embedded script)
 
 <table>
-<tr><td><p><sub>Source:</sub></p>
-<pre lang="js">
+	<tr><td><p><sub>Source:</sub></p>
+		<pre lang="js">
 for (let link of document.querySelectorAll('a.anchor')) {‎
   link.classList.remove('is-active');
 }
-</pre>
-</td><td><p><sub>Output:</sub></p>
-<pre lang="js">
+		</pre>
+	</td><td><p><sub>Output:</sub></p>
+		<pre lang="js">
 for (let link of document.querySelectorAll('a.Bd')) {    ‎
   link.classList.remove('f');
 }
-</pre>
-</td></tr>
+		</pre>
+	</td></tr>
 </table>
 
 
 ### HTML
 
 <table>
-<tr><td><p><sub>Source:</sub></p>
-<pre lang="html">
+	<tr><td><p><sub>Source:</sub></p>
+		<pre lang="html">
 &lt;body id="page--default">
   &lt;nav class="site-nav">
     &lt;div class="search has-content">
@@ -68,9 +79,9 @@ for (let link of document.querySelectorAll('a.Bd')) {    ‎
     &lt;/div>
   &lt;/nav>
 &lt;/body>
-</pre>
-</td><td valign="top"><p><sub>Output:</sub></p>
-<pre lang="html">
+		</pre>
+	</td><td valign="top"><p><sub>Output:</sub></p>
+		<pre lang="html">
 &lt;body id="a">                                            ‎
   &lt;nav class="c">
     &lt;div class="d a1">
@@ -81,8 +92,8 @@ for (let link of document.querySelectorAll('a.Bd')) {    ‎
     &lt;/div>
   &lt;/nav>
 &lt;/body>
-</pre>
-</td></tr>
+		</pre>
+	</td></tr>
 </table>
 
 For a full outline of capabilities and current limitations, see [parse_selectors/info.md](crates/parse_selectors/info.md).
@@ -125,7 +136,7 @@ minify-selectors only supports regular CSS, HTML and JS files. minify-selectors 
 	},
 	```
 
-2. Run npm script, for example:
+2. Run npm script command, for example:
 	```shell
 	npm run build
 	```
