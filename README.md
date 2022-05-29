@@ -3,8 +3,8 @@
 [3]: https://www.apache.org/licenses/LICENSE-2.0
 [4]: https://img.shields.io/badge/License-Apache%202.0-green.svg
 
-[![Latest release version][2]][1]
-&nbsp;[![Apache 2.0 license][4]][3]
+[![Latest release version][2]][1]&nbsp;
+[![Apache 2.0 license][4]][3]
 
 
 
@@ -108,18 +108,6 @@ For a full outline of capabilities and current limitations, see [parse_selectors
 > **Please note:**
 minify-selectors only supports regular CSS, HTML and JS files. minify-selectors should be one of the final steps in your build process — SASS/SCSS, LESS, Typescript, JQuery, Handlebars, etc. should be compiled or transpiled first into its respective vanilla form.
 
-### Running as CLI tool
-
-1. Install via homebrew:
-	```shell
-	brew tap adamgian/minify-selectors && brew install minify-selectors
-	```
-
-2. Run in command line:
-	```shell
-	minify-selectors --input "example/dir/src" --output "example/dir/dist"
-	```
-
 ### Via npm and npm scripts
 
 1. Install via npm:
@@ -136,9 +124,21 @@ minify-selectors only supports regular CSS, HTML and JS files. minify-selectors 
 	},
 	```
 
-2. Run npm script command, for example:
+3. Run npm script command, for example:
 	```shell
 	npm run build
+	```
+
+### Running as CLI tool
+
+1. Install via homebrew:
+	```shell
+	brew tap adamgian/minify-selectors && brew install minify-selectors
+	```
+
+2. Run in command line:
+	```shell
+	minify-selectors --input "example/dir/src" --output "example/dir/dist"
 	```
 
 <br>

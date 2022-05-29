@@ -142,8 +142,8 @@ lazy_static! {
 		"##
 	).unwrap();
 
-	// Extracts arguments from functions that take
-	// classes, IDs or a CSS selector string.
+	// Extracts arguments from functions that take classes, IDs,
+	// URL (which may have a target ID) or a CSS selector string.
 	//
 	// Objective is to capture a string of the function
 	// input (between the parens) for further processing.
@@ -153,16 +153,15 @@ lazy_static! {
 			|
 			\/\/[^\n\r]*
 			|
-			\.
 			(?<function>
-				insertAdjacentHTML
-				| querySelectorAll
-				| querySelector
-				| closest
-				| getElementById
-				| getElementsByClassName
-				| classList\s*+\.(?> add | remove | contains | replace | toggle )
-				| setAttribute
+				\.insertAdjacentHTML
+				| \.querySelectorAll
+				| \.querySelector
+				| \.closest
+				| \.getElementById
+				| \.getElementsByClassName
+				| \.classList\s*+\.(?> add | remove | contains | replace | toggle )
+				| \.setAttribute
 			)
 			(?<join>
 				\(\s*+
@@ -200,18 +199,20 @@ lazy_static! {
 		"##
 	).unwrap();
 
-	// Extract value from JS property operations.
+	// Extract the string value from JS property operations.
 	static ref JS_PROPERTIES : Regex = Regex::new(
 		r##"(?x)
 			\/\*[^*]*\*+(?>[^\/*][^*]*\*+)*\/
 			|
 			\/\/[^\n\r]*
 			|
-			\.
 			(?<function>
-				className
-				| innerHTML
-				| outerHTML
+				window.location.hash
+				| window.location.href
+				| window.location
+				| \.className
+				| \.innerHTML
+				| \.outerHTML
 			)
 			(?<join>
 				\s*+[=+\-!<>]{1,3}\s*+
@@ -331,9 +332,9 @@ lazy_static! {
 	).unwrap();
 
 	// Extract ID from anchor links.
-	static ref HREF_ANCHOR_LINKS: Regex = Regex::new(
+	static ref INTERNAL_ANCHOR_TARGET_ID: Regex = Regex::new(
 		r##"(?x)
-			\# (?<anchor>[^#])*+$
+			(?<anchor>\#[^#]*)$
 		"##
 	).unwrap();
 
@@ -931,7 +932,7 @@ fn process_js_arguments(
 			// Work out function call and its argument pattern:
 			match function {
 				// Takes one argument, an CSS selector string.
-				"querySelector" | "querySelectorAll" | "closest" => {
+				".querySelector" | ".querySelectorAll" | ".closest" => {
 					process_css(
 						&mut replacement_args,
 						selectors,
@@ -942,7 +943,7 @@ fn process_js_arguments(
 
 				// Takes one argument, a string of classes (no period prefixed)
 				// separated by spaces (if more than one) —
-				"getElementsByClassName" => {
+				".getElementsByClassName" => {
 					process_string_of_tokens(
 						&mut replacement_args,
 						selectors,
@@ -953,7 +954,7 @@ fn process_js_arguments(
 				},
 
 				// Takes one argument, an ID (no hash prefixed).
-				"getElementById" => {
+				".getElementById" => {
 					process_string_of_tokens(
 						&mut replacement_args,
 						selectors,
@@ -965,7 +966,7 @@ fn process_js_arguments(
 
 				// Takes two arguments: attribute name and value,
 				// process value if attribute is whitelisted.
-				"setAttribute" => {
+				".setAttribute" => {
 					// Go over the (two) function arguments
 					let mut function_args = STRING_DELIMITED_BY_COMMA
 						.captures_iter(&replacement_args);
@@ -1030,7 +1031,7 @@ fn process_js_arguments(
 
 				// Takes two arguments: position and html,
 				// we are only interested in the latter argument.
-				"insertAdjacentHTML" => {
+				".insertAdjacentHTML" => {
 					let html: String = STRING_DELIMITED_BY_COMMA
 						.captures_iter(&replacement_args)
 						.last()
@@ -1064,7 +1065,7 @@ fn process_js_arguments(
 
 				// Takes one or more arguments, each argument is for
 				// an individual class name (no period prefixed).
-				_ if function.contains("classList") => {
+				_ if function.contains(".classList") => {
 					process_string_of_arguments(
 						&mut replacement_args,
 						selectors,
@@ -1078,7 +1079,7 @@ fn process_js_arguments(
 			}
 
 			return format!(
-				".{function}{join}{arguments}",
+				"{function}{join}{arguments}",
 				function = function,
 				join = capture.at(2).unwrap(),
 				arguments = replacement_args
@@ -1106,8 +1107,10 @@ fn process_js_properties(
 			let mut property_value: String = capture.at(3).unwrap().to_string();
 			let property_name: &str = capture.at(1).unwrap();
 
+			println!("{}", property_value);
+
 			match property_name {
-				"className" => {
+				".className" => {
 					process_string_of_tokens(
 						&mut property_value,
 						selectors,
@@ -1115,14 +1118,8 @@ fn process_js_properties(
 						alphabet,
 						"class"
 					);
-					return format!(
-						".{name}{operator}{value}",
-						name = property_name,
-						operator = capture.at(2).unwrap(),
-						value = property_value,
-					);
 				},
-				"innerHTML" | "outerHTML" => {
+				".innerHTML" | ".outerHTML" => {
 					if property_value.contains("</body>") {
 						process_html(
 							&mut property_value,
@@ -1138,18 +1135,26 @@ fn process_js_properties(
 							alphabet
 						);
 					}
-
-					return format!(
-						".{name}{operator}{value}",
-						name = property_name,
-						operator = capture.at(2).unwrap(),
-						value = property_value,
+				},
+				"window.location.hash"
+				| "window.location.href"
+				| "window.location" => {
+					process_anchor_links(
+						&mut property_value,
+						selectors,
+						index,
+						alphabet
 					);
 				},
 				_ => {},
 			}
 
-			return capture.at(0).unwrap().to_string();
+			format!(
+				"{name}{operator}{value}",
+				name = property_name,
+				operator = capture.at(2).unwrap(),
+				value = property_value,
+			)
 		}
 	);
 }
@@ -1265,18 +1270,36 @@ fn process_anchor_links(
 	index: &mut usize,
 	alphabet: &[char]
 ) {
-	*string = HREF_ANCHOR_LINKS.replace(
-		string,
-		|capture: &Captures| {
-			format!(
-				"#{}",
-				get_encoded_selector(
-					capture.at(0).unwrap(),
-					selectors,
-					index,
-					alphabet
+	// Handle strings that have quote delimiters included.
+	let quote_type: &str = match string.chars().next(){
+		Some('\'') => { "'" },
+		Some('"') => { "\"" },
+		Some('`') => { "`" },
+		_ => { "" },
+	};
+
+	// Trim quotes (if any).
+	if !quote_type.is_empty() {
+		string.pop();
+		string.remove(0);
+	}
+
+	*string = format!(
+		"{quote}{url}{quote}",
+		url = INTERNAL_ANCHOR_TARGET_ID.replace(
+			string,
+			|capture: &Captures| {
+				format!(
+					"#{}",
+					get_encoded_selector(
+						capture.at(1).unwrap(),
+						selectors,
+						index,
+						alphabet
+					)
 				)
-			)
-		}
+			}
+		),
+		quote = quote_type,
 	);
 }
