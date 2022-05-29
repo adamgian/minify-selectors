@@ -2,7 +2,12 @@
 <sub>TBD</sub>
 
 ### Updates
-- Parse and encode selector placeholders (#11)
+- Parse and encode selector placeholders [#11](https://github.com/adamgian/minify-selectors/issues/11)
+- Add support for JS Location interface proprties: `window.location.hash`, 'window.location.href' and `window.location`
+
+### Fixes
+- Only encode target IDs for relative URLs (i.e. without the protocol)
+- Strip string delimiters (if any) from URL values before parsing
 
 <br>
 

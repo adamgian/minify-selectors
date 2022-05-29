@@ -332,9 +332,15 @@ lazy_static! {
 	).unwrap();
 
 	// Extract ID from anchor links.
+	//
+	// Only URLs without the protocol will have the inner first
+	// and second named capture groups (url and target_id).
 	static ref INTERNAL_ANCHOR_TARGET_ID: Regex = Regex::new(
 		r##"(?x)
-			(?<anchor>\#[^#]*)$
+			^https?:\/\/.*$
+			|
+			^(?<url>[^#]*)
+			(?<target_id>\#[^#]*)$
 		"##
 	).unwrap();
 
@@ -646,7 +652,7 @@ fn process_selector_placeholders(
 	*file_string = SELECTOR_PLACEHOLDERS.replace_all(
 		file_string,
 		|capture: &Captures| {
-			let mut placeholder_value = capture.at(2).unwrap().to_string();
+			let mut placeholder_value = capture.at(2).unwrap().trim().to_string();
 
 			match capture.at(1) {
 				Some("class") | Some("id") => {
@@ -1289,14 +1295,19 @@ fn process_anchor_links(
 		url = INTERNAL_ANCHOR_TARGET_ID.replace(
 			string,
 			|capture: &Captures| {
+				if capture.at(1).is_none() {
+					return capture.at(0).unwrap().to_string();
+				}
+
 				format!(
-					"#{}",
-					get_encoded_selector(
-						capture.at(1).unwrap(),
+					"{url}#{target_id}",
+					url = capture.at(1).unwrap_or(""),
+					target_id = get_encoded_selector(
+						capture.at(2).unwrap(),
 						selectors,
 						index,
 						alphabet
-					)
+					),
 				)
 			}
 		),

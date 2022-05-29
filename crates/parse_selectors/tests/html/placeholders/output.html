@@ -2,12 +2,13 @@
 <button type="button" data-toggle="modal" data-target="#f"></button>
 <component data-classes="g h"></component>
 <code>
-// See: http://example.com/#e
+// See: http://example.com/#about
+// See: files/#e
 </code>
 
 <style>
 	.d::after {
-		content: "http://example.com/#e";
+		content: "./files/#e";
 	}
 </style>
 
@@ -15,6 +16,6 @@
 	foo.classList.add(() => {
 		if (foo) return "a";
 		else if (bar) return "b a";
-		else if (baz) return "c ";
+		else if (baz) return "c";
 	});
 </script>
