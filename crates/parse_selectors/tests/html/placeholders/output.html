@@ -1,21 +1,27 @@
-<!-- f -->
-<button type="button" data-toggle="modal" data-target="#f"></button>
-<component data-classes="g h"></component>
+<!-- i -->
+<button type="button" data-toggle="modal" data-target="#i"></button>
+<component id="help" data-classes="j k"></component>
 <code>
 // See: http://example.com/#about
-// See: files/#e
+// See: files/#h
 </code>
 
 <style>
-	.d::after {
-		content: "./files/#e";
+	.g::after {
+		content: "./files/#h";
 	}
+
+	#help {}
 </style>
 
 <script>
-	foo.classList.add(() => {
-		if (foo) return "a";
-		else if (bar) return "b a";
-		else if (baz) return "c";
+	a.classList.add(() => {
+		if (foo) return "d";
+		else if (bar) return "e d";
+		else if (baz) return "f";
 	});
+	document.getElementById('<<a= b >>');
+	document.getElementById('<< a = b >>');
+	document.querySelector('#help');
+	b.classList.add('is-active', 'c');
 </script>

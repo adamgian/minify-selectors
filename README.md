@@ -13,7 +13,7 @@
 
 Post-processor that minifies classes and IDs selector names in CSS, HTML and Javascript files. Each unique selector, and any subsequent occurances elsewhere, is converted into an ultracompact one.
 
-Enhance your front-end assets and build optimisations pipeline — wring even more out from your payload sizes. Additionally, can offer a certain degree of obfuscation to your code.
+Enhance your front-end assets and build optimisations pipeline — wring even more out from your already minified and optimised payload sizes. Additionally, can offer a certain degree of obfuscation to your code.
 
 <br>
 
@@ -25,48 +25,59 @@ Enhance your front-end assets and build optimisations pipeline — wring even mo
 ### CSS (file or embedded style)
 
 <table>
-	<tr><td><p><sub>Source:</sub></p>
-		<pre lang="scss">
+	<tr>
+		<td>
+			<p><sub>Source:</sub></p>
+			<pre lang="scss">
 [id='page--default'] { … }                               ‎
 .sidebar, .site-nav { … }
 .sidebar .search:focus-within { … }
-.sidebar--expanded a.is-active { … }
-		</pre>
-	</td><td><p><sub>Output:</sub></p>
-		<pre lang="scss">
+.sidebar--expanded a.is-active { … }<!--
+			--></pre>
+		</td>
+		<td>
+			<p><sub>Output:</sub></p>
+			<pre lang="scss">
 [id='a'], { … }                                          ‎
 .b, .c { … }
 .b .d:focus-within { … }
-.e a.f { … }
-		</pre>
-	</td></tr>
+.e a.f { … }<!--
+			--></pre>
+		</td>
+	</tr>
 </table>
 
 
 ### JS (file or embedded script)
 
 <table>
-	<tr><td><p><sub>Source:</sub></p>
+	<tr>
+		<td><p><sub>Source:</sub></p>
 		<pre lang="js">
 for (let link of document.querySelectorAll('a.anchor')) {‎
   link.classList.remove('is-active');
-}
-		</pre>
-	</td><td><p><sub>Output:</sub></p>
-		<pre lang="js">
+}<!--
+			--></pre>
+		</td>
+		<td>
+			<p><sub>Output:</sub></p>
+			<pre lang="js">
 for (let link of document.querySelectorAll('a.Bd')) {    ‎
   link.classList.remove('f');
-}
-		</pre>
-	</td></tr>
+}<!--
+			--></pre>
+		</td>
+	</tr>
 </table>
 
 
 ### HTML
 
 <table>
-	<tr><td><p><sub>Source:</sub></p>
-		<pre lang="html">
+	<tr>
+		<td>
+			<p><sub>Source:</sub></p>
+			<pre lang="html">
 &lt;body id="page--default">
   &lt;nav class="site-nav">
     &lt;div class="search has-content">
@@ -78,10 +89,12 @@ for (let link of document.querySelectorAll('a.Bd')) {    ‎
         ut--single form-input--lg border--thick">
     &lt;/div>
   &lt;/nav>
-&lt;/body>
-		</pre>
-	</td><td valign="top"><p><sub>Output:</sub></p>
-		<pre lang="html">
+&lt;/body><!--
+			--></pre>
+		</td>
+		<td valign="top">
+			<p><sub>Output:</sub></p>
+			<pre lang="html">
 &lt;body id="a">                                            ‎
   &lt;nav class="c">
     &lt;div class="d a1">
@@ -91,9 +104,10 @@ for (let link of document.querySelectorAll('a.Bd')) {    ‎
       &lt;input type="text" id="y" class="A9 t Av">
     &lt;/div>
   &lt;/nav>
-&lt;/body>
-		</pre>
-	</td></tr>
+&lt;/body><!--
+			--></pre>
+		</td>
+	</tr>
 </table>
 
 For a full outline of capabilities and current limitations, see [parse_selectors/info.md](crates/parse_selectors/info.md).

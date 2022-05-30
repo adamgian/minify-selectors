@@ -12,7 +12,8 @@ lazy_static! {
 	// -  <<class=bar>>
 	// -  <<id=foo>>
 	// -  <<selector=#baz>>
-	// -  <<url=http://example.com/#foo>>
+	// -  <<url=/#foo>>
+	// -  <<ignore=#help>>
 	//
 	// Account for whitespaces after the opening delimiter (<<), before
 	// the closing delimiter (>>) and on either side of the 'operator' (=).
@@ -20,7 +21,7 @@ lazy_static! {
 		r##"(?x)
 			<<\s*
 			(?<context>
-				class | id | selector | url
+				class | id | selector | url | ignore
 			)
 			\s*=\s*
 			(?<value>[^>]*)
@@ -59,6 +60,7 @@ lazy_static! {
 	// -  This regex will 'ignore'/blackout attibutes selectors completely
 	//    to avoid any false positives.
 	// -  Multiline comments are 'ignored'/blacked out.
+	// -  Placeholders are ignored.
 	static ref CSS_SELECTORS: Regex = Regex::new(
 		r##"(?x)
 			{
@@ -72,6 +74,8 @@ lazy_static! {
 			\]
 			|
 			\/\*[^*]*\*+(?>[^\/*][^*]*\*+)*\/
+			|
+			<<\s*(?:class | id | selector | url | ignore)\s*=\s*(?:[^>]*)>>
 			|
 			(?<type>[\#\.])
 			(?<name>
@@ -278,9 +282,9 @@ lazy_static! {
 	// Will need additional processing to consider 'whitelisted'
 	// attributes and separate out the values.
 	//
-	// Capture selector placeholders, HTML comments, <code>, <script> and
-	// <style> elements to prevent false positive matches (i.e. prevent
-	// regex from matching into deeper capture groups).
+	// Capture HTML comments, <code>, <script> and <style> elements to prevent
+	// false positive matches (i.e. prevent regex from matching into deeper
+	// capture groups).
 	//
 	// See: https://www.w3.org/TR/2018/SPSD-html5-20180327/syntax.html#attributes-0
 	//
@@ -312,7 +316,6 @@ lazy_static! {
 			| <style[^>]*>(?:.|\s)*?<\/style>
 			| <code[^>]*>(?:.|\s)*?<\/code>
 			| <script[^>]*>(?:.|\s)*?<\/script>
-			| <<\s*(?:class | id | selector | url)\s*=\s*(?:[^>]*)>>
 			|
 			(?<attribute>
 				[^\s\x00\/>"'=]+
@@ -680,8 +683,14 @@ fn process_selector_placeholders(
 						alphabet
 					);
 				},
-				// Shouldn't ever match this
-				Some(&_) | None => {},
+				// No need to do anything here, the value capture group
+				// will replace the entire match.
+				Some("ignore") => {},
+				// Shouldn't ever match the following, regex should only
+				// match the above text.
+				Some(&_) | None => {
+					placeholder_value = capture.at(0).unwrap().to_string();
+				},
 			}
 
 			placeholder_value
@@ -1070,7 +1079,7 @@ fn process_js_arguments(
 				},
 
 				// Takes one or more arguments, each argument is for
-				// an individual class name (no period prefixed).
+				// an individual class name (no period prefix).
 				_ if function.contains(".classList") => {
 					process_string_of_arguments(
 						&mut replacement_args,
@@ -1206,6 +1215,12 @@ fn process_string_of_tokens(
 		tokens = STRING_DELIMITED_BY_SPACE.replace_all(
 			string,
 			|capture: &Captures| {
+				// Check if token is a placeholder,
+				// It should be handled with process_selector_placeholders().
+				if SELECTOR_PLACEHOLDERS.find(capture.at(0).unwrap()).is_some() {
+					return capture.at(0).unwrap().to_string();
+				}
+
 				return get_encoded_selector(
 					&format!(
 						"{prefix}{token}",
@@ -1243,6 +1258,12 @@ fn process_string_of_arguments(
 	*string = STRING_DELIMITED_BY_COMMA.replace_all(
 		string,
 		|capture: &Captures| {
+			// Check if argument is a placeholder,
+			// It should be handled with process_selector_placeholders().
+			if SELECTOR_PLACEHOLDERS.find(capture.at(0).unwrap()).is_some() {
+				return capture.at(0).unwrap().to_string();
+			}
+
 			// Need to put quote delimiters back around the argument value
 			let quote_type: &str = match capture.at(0).unwrap().chars().next(){
 				Some('\'') => { "'" },
