@@ -1,0 +1,36 @@
+<!-- g #g #k -->
+<button type="button" data-toggle="modal" data-target="#g"></button>
+<div id="foo" class="foo a b"></div>
+<component data-classes="b h foo"></component>
+<code>
+// See: http://example.com/#g
+// See: files/#j
+</code>
+
+<style>
+	#g {}
+	.b, .h, .foo {}
+
+	.i::after {
+		content: "./path/#j";
+	}
+
+	.i::before {
+		content: "./path/#foo";
+	}
+
+	#bar {}
+	[id="bar"] {}
+</style>
+
+<script>
+	a.classList.add(() => {
+		if (foo) return "d";
+		else if (bar) return "e d";
+		else if (baz) return "f";
+	});
+	document.getElementById('baz');
+	document.getElementsByClassName('foo');
+	document.querySelector('#baz');
+	b.classList.add('is-active', 'c');
+</script>

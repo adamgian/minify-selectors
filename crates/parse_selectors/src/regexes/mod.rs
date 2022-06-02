@@ -3,28 +3,46 @@ use onig::*;
 
 
 
+
 lazy_static! {
 
-	// Extracts specially marked selectors placeholders from files.
+	// Extracts specially marked selectors. Selectors have a
+	// minify-selectors specific prefix.
 	//
-	// Matches:
-	// -  <<class=bar>>
-	// -  <<id=foo>>
-	// -  <<selector=#baz>>
-	// -  <<url=/#foo>>
-	// -  <<ignore=#help>>
-	//
-	// Account for whitespaces after the opening delimiter (<<), before
-	// the closing delimiter (>>) and on either side of the 'operator' (=).
-	pub static ref SELECTOR_PLACEHOLDERS: Regex = Regex::new(
+	// Example usage and matches:
+	// -  __class--foo
+	// -  __id--foo
+	// -  #__ignore--bar, .__ignore--bar and __ignore--bar
+	// -  #__--baz and .__--baz
+	pub static ref PREFIXED_SELECTORS: Regex = Regex::new(
 		r##"(?x)
-			<<\s*
-			(?<context>
-				class | id | selector | url | ignore
+			(?:
+				(?<type>[\#\.]?)
+				__
+				(?<context>
+					(?:class | id | ignore)?
+				)
+				--
 			)
-			\s*=\s*
-			(?<value>[^>]*)
-			>>
+			(?<name>
+				-?
+				(?>
+					[A-Za-z_]
+					| [^\0-\177]
+					| (?>
+						\\[0-9A-Fa-f]{1,6}(?>\r\n|[ \n\r\t\f])?
+						| \\[^\n\r\f0-9A-Fa-f]
+					)
+				)
+				(?>
+					[\w\-]
+					| [^\0-\177]
+					| (?>
+						\\[0-9A-Fa-f]{1,6}(?>\r\n|[ \n\r\t\f])?
+						| \\[^\n\r\f0-9A-Fa-f]
+					)
+				)*
+			)
 		"##
 	).unwrap();
 
@@ -59,7 +77,8 @@ lazy_static! {
 	// -  This regex will 'ignore'/blackout attibutes selectors completely
 	//    to avoid any false positives.
 	// -  Multiline comments are 'ignored'/blacked out.
-	// -  Placeholders are ignored.
+	// -  minify-selector specific prefixed selectors are ignored, to prevent
+	//    it being encoded twice.
 	pub static ref CSS_SELECTORS: Regex = Regex::new(
 		r##"(?x)
 			{
@@ -74,7 +93,7 @@ lazy_static! {
 			|
 			\/\*[^*]*\*+(?>[^\/*][^*]*\*+)*\/
 			|
-			<<\s*(?:class | id | selector | url | ignore)\s*=\s*(?:[^>]*)>>
+			[\#\.]?__(?:class | id | ignore)?--
 			|
 			(?<type>[\#\.])
 			(?<name>

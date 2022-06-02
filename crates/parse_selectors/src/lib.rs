@@ -148,7 +148,7 @@ fn process_css(
 		alphabet
 	);
 
-	process_selector_placeholders(
+	process_prefixed_selectors(
 		file_string,
 		selectors,
 		index,
@@ -216,7 +216,7 @@ fn process_html(
 		}
 	);
 
-	process_selector_placeholders(
+	process_prefixed_selectors(
 		file_string,
 		selectors,
 		index,
@@ -245,7 +245,7 @@ fn process_js(
 		alphabet,
 	);
 
-	process_selector_placeholders(
+	process_prefixed_selectors(
 		file_string,
 		selectors,
 		index,
@@ -256,51 +256,63 @@ fn process_js(
 
 
 
-/// Process selector placeholders.
-fn process_selector_placeholders(
+/// Process minify-selectors specific prefixed selectors.
+fn process_prefixed_selectors(
 	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
 	alphabet: &[char]
 ) {
-	*file_string = regexes::SELECTOR_PLACEHOLDERS.replace_all(
+	*file_string = regexes::PREFIXED_SELECTORS.replace_all(
 		file_string,
 		|capture: &Captures| {
-			let mut placeholder_value = capture.at(2).unwrap().trim().to_string();
+			let mut placeholder_value = capture.at(3).unwrap().trim().to_string();
 
-			match capture.at(1) {
-				Some("class") | Some("id") => {
-					process_string_of_tokens(
-						&mut placeholder_value,
-						selectors,
-						index,
-						alphabet,
-						capture.at(1).unwrap()
-					);
-				},
-				Some("selector") => {
-					process_css(
-						&mut placeholder_value,
+			match capture.at(2) {
+				Some("class") => {
+					placeholder_value = get_encoded_selector(
+						&format!(".{}", placeholder_value),
 						selectors,
 						index,
 						alphabet
 					);
 				},
-				Some("url") => {
-					process_anchor_links(
-						&mut placeholder_value,
+
+				Some("id") => {
+					placeholder_value = get_encoded_selector(
+						&format!("#{}", placeholder_value),
 						selectors,
 						index,
 						alphabet
 					);
 				},
-				// No need to do anything here, the value capture group
+
+				// Prefix (if any # or .) prefixed to value capture group
 				// will replace the entire match.
-				Some("ignore") => {},
-				// Shouldn't ever match the following, regex should only
-				// match the above text.
+				Some("ignore") => {
+					placeholder_value = format!(
+						"{prefix}{name}",
+						prefix = capture.at(1).unwrap_or(""),
+						name = placeholder_value
+					);
+				},
+
+				// No context provided, meaning
 				Some(&_) | None => {
-					placeholder_value = capture.at(0).unwrap().to_string();
+					placeholder_value = format!(
+						"{prefix}{name}",
+						prefix = capture.at(1).unwrap(),
+						name = get_encoded_selector(
+							&format!(
+								"{prefix}{name}",
+								prefix = capture.at(1).unwrap(),
+								name = placeholder_value,
+							),
+							selectors,
+							index,
+							alphabet
+						)
+					);
 				},
 			}
 
@@ -733,8 +745,6 @@ fn process_js_properties(
 			let mut property_value: String = capture.at(3).unwrap().to_string();
 			let property_name: &str = capture.at(1).unwrap();
 
-			println!("{}", property_value);
-
 			match property_name {
 				".className" => {
 					process_string_of_tokens(
@@ -826,9 +836,9 @@ fn process_string_of_tokens(
 		tokens = regexes::STRING_DELIMITED_BY_SPACE.replace_all(
 			string,
 			|capture: &Captures| {
-				// Check if token is a placeholder,
-				// It should be handled with process_selector_placeholders().
-				if regexes::SELECTOR_PLACEHOLDERS.find(capture.at(0).unwrap()).is_some() {
+				// Check if token has a minify-selectors specific prefix,
+				// It should be handled with process_prefixed_selectors().
+				if regexes::PREFIXED_SELECTORS.find(capture.at(0).unwrap()).is_some() {
 					return capture.at(0).unwrap().to_string();
 				}
 
@@ -869,9 +879,9 @@ fn process_string_of_arguments(
 	*string = regexes::STRING_DELIMITED_BY_COMMA.replace_all(
 		string,
 		|capture: &Captures| {
-			// Check if argument is a placeholder,
-			// It should be handled with process_selector_placeholders().
-			if regexes::SELECTOR_PLACEHOLDERS.find(capture.at(0).unwrap()).is_some() {
+			// Check if argument has a minify-selectors specific prefix,
+			// It should be handled with process_prefixed_selectors().
+			if regexes::PREFIXED_SELECTORS.find(capture.at(0).unwrap()).is_some() {
 				return capture.at(0).unwrap().to_string();
 			}
 

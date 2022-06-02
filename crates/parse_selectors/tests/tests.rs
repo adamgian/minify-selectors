@@ -168,8 +168,8 @@ fn html_files() {
 
 	// Placeholders
 	assert_eq!(
-		fs::read_to_string(dir.clone().join("placeholders/output.html")).unwrap(),
-		process_file("html", &dir.clone().join("placeholders/source.html")),
+		fs::read_to_string(dir.clone().join("prefixed-selectors/output.html")).unwrap(),
+		process_file("html", &dir.clone().join("prefixed-selectors/source.html")),
 	);
 }
 

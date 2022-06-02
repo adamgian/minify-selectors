@@ -1,0 +1,36 @@
+<!-- __id--SELECTOR-1 #__--SELECTOR-1 #__--SELECTOR-2 -->
+<button type="button" data-toggle="modal" data-target="#__--SELECTOR-1"></button>
+<div id="__ignore--foo" class="__ignore--foo SELECTOR-1 SELECTOR-2"></div>
+<component data-classes="__class--SELECTOR-2 __class--SELECTOR-3 foo"></component>
+<code>
+// See: http://example.com/#__--SELECTOR-1
+// See: files/#__--SELECTOR-4
+</code>
+
+<style>
+	#SELECTOR-1 {}
+	.SELECTOR-2, .SELECTOR-3, .__ignore--foo {}
+
+	.SELECTOR-5::after {
+		content: "./path/#__--SELECTOR-4";
+	}
+
+	.SELECTOR-5::before {
+		content: "./path/#foo";
+	}
+
+	#__ignore--bar {}
+	[id="__ignore--bar"] {}
+</style>
+
+<script>
+	a.classList.add(() => {
+		if (foo) return "__class--SELECTOR-6";
+		else if (bar) return "__class--SELECTOR-7 __class--SELECTOR-6";
+		else if (baz) return "__class--SELECTOR-8";
+	});
+	document.getElementById('__ignore--baz');
+	document.getElementsByClassName('__ignore--foo');
+	document.querySelector('#__ignore--baz');
+	b.classList.add('__ignore--is-active', 'SELECTOR-9');
+</script>
