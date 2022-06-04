@@ -225,7 +225,7 @@ minify-selectors will work on attribute selectors with operators that guarantee 
 .b[href$=".com.au"] { … }
 </pre>
 </td></tr>
-</table><br>
+</table>
 
 <br>
 
@@ -235,7 +235,7 @@ minify-selectors will work on attribute selectors with operators that guarantee 
 ## JS files and embedded scripts support
 
 > **Please note:**
-> minify-selectors will not be able to detect class or ID names that are in variables or in strings. Will be resolved with [#11](https://github.com/adamgian/minify-selectors/issues/11).
+> minify-selectors will not be able to detect selectors that are in variables. Selector names will need to be prefixed (see: [Marking selectors](#marking-selectors)).
 >
 > ```js
 > // 😢
@@ -246,7 +246,7 @@ minify-selectors will work on attribute selectors with operators that guarantee 
 > bar.innerHtml = `<button class="btn btn-danger" id="${foo}"></button>`;
 > ```
 >
-> minify-selectors currently does not support parsing of selector names in expressions and logic within the function arguments. [#15](https://github.com/adamgian/minify-selectors/issues/15) can resolve to a certain extent and can [#11](https://github.com/adamgian/minify-selectors/issues/11) offers a work-around for this issue.
+> minify-selectors currently does not support parsing of selector names in expressions and logic within the function arguments. Selector names will need to be prefixed (see: [Marking selectors](#marking-selectors)). [#15](https://github.com/adamgian/minify-selectors/issues/15) aims to resolve this a certain extent.
 >
 > ```js
 > // 😢
@@ -339,15 +339,9 @@ document.querySelector('p.r:disabled');
 
 ## HTML support
 
-> **Please note:**
-> Custom attributes are currently not supported. [#11](https://github.com/adamgian/minify-selectors/issues/11) and [#12](https://github.com/adamgian/minify-selectors/issues/12) will be ways to resolve this in future.
->
-> ```html
-> <!-- 😢 -->
-> <button data-toggle="modal" data-target="#modal-confirm-order-delete">
-> </button>
-> ```
-<br>
+### Standard attributes
+
+minify-selectors supports all the standard HTML attibutes that contain selector classes and IDs — `aria-describedby`, `aria-labelledby`, `class`, `for`, `form`, `headers`, `id`, `itemref` and `list`.
 
 <table>
 <tr><td><p><sub>Source:</sub></p>
@@ -355,22 +349,7 @@ document.querySelector('p.r:disabled');
 &lt;input id="foo" type="text">                 ‎
 &lt;div class="foo bar">&lt;/div>
 &lt;label for="foo">&lt;/label>
-</pre>
-</td><td><p><sub>Output:</sub></p>
-<pre lang="html">
-&lt;input id="a" type="text">                   ‎
-&lt;div class="b e">&lt;/div>
-&lt;label for="a">&lt;/label>
-</pre>
-</td></tr>
-</table>
-
-minify-selectors supports all native HTML attibutes that contain IDs — `id`, `aria-describedby`, `aria-labelledby`, `for`, `form`, `headers`, `itemref` and `list`.
-
-<table>
-<tr><td><p><sub>Source:</sub></p>
-<pre lang="html">
-&lt;a href="#" aria-labelledby="foo">&lt;/a>       ‎
+&lt;a href="#" aria-labelledby="foo">&lt;/a>
 &lt;a href="#" aria-describedby="foo">&lt;/a>
 &lt;input form="foo">
 &lt;input list="foo">
@@ -379,7 +358,10 @@ minify-selectors supports all native HTML attibutes that contain IDs — `id`, `
 </pre>
 </td><td><p><sub>Output:</sub></p>
 <pre lang="html">
-&lt;a href="#" aria-labelledby="a">&lt;/a>         ‎
+&lt;input id="a" type="text">                   ‎
+&lt;div class="b e">&lt;/div>
+&lt;label for="a">&lt;/label>
+&lt;a href="#" aria-labelledby="a">&lt;/a>
 &lt;a href="#" aria-describedby="a">&lt;/a>
 &lt;input form="a">
 &lt;input list="a">
@@ -390,7 +372,32 @@ minify-selectors supports all native HTML attibutes that contain IDs — `id`, `
 </table>
 
 
-Target IDs in anchor links are also handled.
+### Custom attributes
+
+Selectors in custom attribute values need to be prefixed (see: [Marking selectors](#marking-selectors)). In future, [#12](https://github.com/adamgian/minify-selectors/issues/12) will be another method to support custom attributes.
+
+<table>
+<tr><td><p><sub>Source:</sub></p>
+<pre lang="html">
+&lt;button                                      ‎
+  data-toggle="modal"
+  data-target="#__--modal-confirm-delete">
+&lt;/button>
+</pre>
+</td><td><p><sub>Output:</sub></p>
+<pre lang="html">
+&lt;button                                      ‎
+  data-toggle="modal"
+  data-target="#t">
+&lt;/button>
+</pre>
+</td></tr>
+</table>
+
+
+### URLs
+
+Target IDs in relative anchor links are also handled.
 
 <table>
 <tr><td><p><sub>Source:</sub></p>
@@ -405,7 +412,90 @@ Target IDs in anchor links are also handled.
 &lt;a href="#a">&lt;/a>                            ‎
 &lt;a href="/#e">&lt;/a>
 &lt;a href="faq/#s">&lt;/a>
-&lt;a href="https://example.com/foo/#e">&lt;/a>
+&lt;a href="https://example.com/foo/#bar">&lt;/a>
+</pre>
+</td></tr>
+</table>
+
+<br>
+
+
+
+
+## Marking selectors
+
+<sub>New feature in v1.0.0</sub>
+
+You can instruct minify-selectors to either encode or ignore certain selectors by setting the appropriate prefix.
+
+### CSS selectors
+
+Using `.__--` instead of `.` or `#__--` instead of `#` before the selector name will instruct minify-selectors to encode a class or ID respectively.
+
+<table>
+<tr><td><p><sub>Source:</sub></p>
+<pre lang="html">
+&lt;button                                         ‎
+  class="btn btn-default"
+  data-toggle="modal"
+  data-target="#__--confirm-prompt">
+&lt;/button>
+&lt;div class="modal" id="confirm-prompt">&lt;/div>
+</pre>
+</td><td><p><sub>Output:</sub></p>
+<pre lang="html">
+&lt;button                                         ‎
+  class="a b"
+  data-toggle="modal"
+  data-target="#c">
+&lt;/button>
+&lt;div class="d" id="c">&lt;/div>
+</pre>
+</td></tr>
+</table>
+
+
+### Selector names only
+
+Adding a `__class--` or `__id--` before a selector name will instruct minify-selectors to encode a selector as a class and ID respectively.
+
+<table>
+<tr><td><p><sub>Source:</sub></p>
+<pre lang="js">
+const ACTIVE_STATE = '__class--is_active';         ‎
+component.classList.toggle(ACTIVE_STATE);
+</pre>
+</td><td><p><sub>Output:</sub></p>
+<pre lang="js">
+const ACTIVE_STATE = 'a';                          ‎
+component.classList.toggle(ACTIVE_STATE);
+</pre>
+</td></tr>
+</table>
+
+
+### Ignoring selectors
+
+Adding a `__ignore--` before a selector name will instruct minify-selectors not to encode the selector.
+
+<table>
+<tr><td><p><sub>Source:</sub></p>
+<pre lang="html">
+&lt;nav class="site-nav">
+  &lt;a href="about/#__ignore--contact">&lt;/a>
+&lt;/nav>
+&lt;script>
+  ctx = document.getElementByID('__ignore--canvas');
+&lt;/script>
+</pre>
+</td><td><p><sub>Output:</sub></p>
+<pre lang="html">
+&lt;nav class="a">                                 ‎
+  &lt;a href="about/#contact">&lt;/a>
+&lt;/nav>
+&lt;script>
+  ctx = document.getElementByID('canvas');
+&lt;/script>
 </pre>
 </td></tr>
 </table>
