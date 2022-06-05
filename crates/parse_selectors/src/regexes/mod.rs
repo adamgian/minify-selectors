@@ -187,7 +187,6 @@ lazy_static! {
 			)
 			(?<join>
 				\(\s*+
-				| \s*+[\=\+\!]++\s*+
 			)
 			(?<arguments>
 				(?:
