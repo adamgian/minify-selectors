@@ -565,10 +565,13 @@ fn process_js_arguments(
 			}
 
 			let mut replacement_args: String = capture.at(3).unwrap().to_string();
-			let function: &str = capture.at(1).unwrap();
+			let mut function = capture.at(1).unwrap().to_owned();
+			function.retain(|c| !c.is_whitespace());
+
+			println!("{}", function);
 
 			// Work out function call and its argument pattern:
-			match function {
+			match function.as_str() {
 				// Takes one argument, an CSS selector string.
 				".querySelector" | ".querySelectorAll" | ".closest" => {
 					process_css(
@@ -701,9 +704,37 @@ fn process_js_arguments(
 					);
 				},
 
+				// Takes either only one argument or up to two arguments:
+				// we are only ever interested in argument number 1.
+				"window.open" | "window.location.assign" | "window.location.replace" => {
+					let link: String = regexes::STRING_DELIMITED_BY_COMMA
+						.captures_iter(&replacement_args)
+						.next()
+						.unwrap()
+						.at(0)
+						.unwrap()
+						.to_string();
+					let mut replacement_link = link.clone();
+
+					println!("{}: {}", function, link);
+
+					process_anchor_links(
+						&mut replacement_link,
+						selectors,
+						index,
+						alphabet
+					);
+
+					replacement_args = replacement_args.replace(
+						&link,
+						&replacement_link
+					);
+				},
+
 				// Takes one or more arguments, each argument is for
 				// an individual class name (no period prefix).
-				_ if function.contains(".classList") => {
+				".classList.add" | ".classList.contains" | ".classList.remove"
+				| ".classList.replace" | ".classList.toggle"  => {
 					process_string_of_arguments(
 						&mut replacement_args,
 						selectors,
@@ -718,7 +749,7 @@ fn process_js_arguments(
 
 			return format!(
 				"{function}{join}{arguments}",
-				function = function,
+				function = capture.at(1).unwrap(),
 				join = capture.at(2).unwrap(),
 				arguments = replacement_args
 			);

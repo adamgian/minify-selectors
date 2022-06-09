@@ -20,11 +20,16 @@ Enhance your front-end assets and build optimisations pipeline — wring even mo
 
 
 
-## Examples
+## Features
 
 For a full outline of capabilities and current limitations, see [parse_selectors/info.md](crates/parse_selectors/info.md).
 
-### CSS (or embedded style)
+### Comprehensive out of the box selector support
+
+minify-selectors aims to minify all obvious selectors right out of the gate. Any extra work configuring should be to assist minify-selectors to identify additional and/or ambigious selectors.
+
+
+#### CSS (or embedded style) example
 
 <table>
 	<tr>
@@ -50,7 +55,7 @@ For a full outline of capabilities and current limitations, see [parse_selectors
 </table>
 
 
-### JS (or embedded script)
+#### JS (or embedded script) example
 
 <table>
 	<tr>
@@ -73,7 +78,7 @@ for (let link of document.querySelectorAll('a.Bd')) {    ‎
 </table>
 
 
-### HTML
+#### HTML example
 
 <table>
 	<tr>
@@ -117,9 +122,9 @@ for (let link of document.querySelectorAll('a.Bd')) {    ‎
 
 <sub>Available in v1.0.0</sub>
 
-In cases where minify-selectors is unable to parse selectors, for example: in custom HTML attributes, JS variables, or forcing a selector to be encoded in a code element or comment. You can prefix your selector names so that minify-selectors knows to parse it and how to encode it:
+In cases where minify-selectors is unable to parse selectors, for example: in custom HTML attributes or JS variables. Or forcing a selector to be encoded when it otherwise would not be, such as in a HTML code element or comments. You can prefix your selector names so that minify-selectors knows to parse it and how to encode it:
 
-- `.__--` or `#__--` — in lieu of the selector type ('#' or '.') before CSS selector names
+- `.__--` or `#__--` — instead of the selector type ('#' or '.') before CSS selector names
 - `__class--` or `__id--` — for "name only" selectors, use '\_\_class--' for class selectors and '\_\_id--' for ID selectors
 
 <table>
@@ -127,17 +132,17 @@ In cases where minify-selectors is unable to parse selectors, for example: in cu
 		<td>
 			<p><sub>Source:</sub></p>
 			<pre lang="html">
-&lt;button                                                  ‎
-  class="btn btn-warning"
-  data-toggle="modal"
-  data-target="#__--prompt-delete-user">
-&lt;/button>
+&lt;main class="page page-dark">                            ‎
+  &lt;button
+    class="btn btn-warning"
+    data-toggle="modal"
+    data-target="#__--prompt-delete-user">
+  &lt;/button>
+&lt;/main>
 &lt;script>
-  view.classList.add(() => {
-    return isDarkMode
-      ? '__class--page--dark'
-      : '__class--page--light';
-  });
+  view.className = isDarkMode
+    ? '__class--page __class--page--dark'
+    : '__class--page __class--page--light';
 &lt;/script>
 <!--
 			--></pre>
@@ -145,17 +150,17 @@ In cases where minify-selectors is unable to parse selectors, for example: in cu
 		<td valign="top">
 			<p><sub>Output:</sub></p>
 			<pre lang="html">
-&lt;button                                                  ‎
-  class="a4 a7"
-  data-toggle="modal"
-  data-target="#prompt-delete-user">
-&lt;/button>
+&lt;main class="b2 b3">                                     ‎
+  &lt;button
+    class="a4 a7"
+    data-toggle="modal"
+    data-target="#bc">
+  &lt;/button>
+&lt;/main>
 &lt;script>
-  view.classList.add(() => {
-    return isDarkMode
-      ? 'page--dark'
-      : 'page--light';
-  });
+  view.className = isDarkMode
+    ? 'b2 b3'
+    : 'b2 b4;
 &lt;/script>
 <!--
 			--></pre>
@@ -165,7 +170,7 @@ In cases where minify-selectors is unable to parse selectors, for example: in cu
 
 Or, you do not want minify-selectors to encode certain selectors (for reasons such as SEO). You can prefix your selector names so minify-selectors will leave the name as is (the prefix will be omitted):
 
-- `.__ignore--` and `#__ignore--` — in lieu of the selector type ('#' or '.') before CSS selector names
+- `.__ignore--` and `#__ignore--` — instead of the selector type ('#' or '.') before CSS selector names
 - `__ignore--` — for selectors that are "name only"
 
 <table>
