@@ -184,7 +184,7 @@ lazy_static! {
 				| \.getElementsByClassName
 				| \.classList\s*+\.(?> add | remove | contains | replace | toggle )
 				| \.setAttribute
-				| window\s*+\.(?> location\.assign | location\.replace | open )
+				| window\s*+\.(?> location\s*+\.assign | location\s*+\.replace | open )
 			)
 			(?<join>
 				\(\s*+

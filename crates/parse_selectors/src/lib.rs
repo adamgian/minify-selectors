@@ -568,8 +568,6 @@ fn process_js_arguments(
 			let mut function = capture.at(1).unwrap().to_owned();
 			function.retain(|c| !c.is_whitespace());
 
-			println!("{}", function);
-
 			// Work out function call and its argument pattern:
 			match function.as_str() {
 				// Takes one argument, an CSS selector string.
@@ -715,8 +713,6 @@ fn process_js_arguments(
 						.unwrap()
 						.to_string();
 					let mut replacement_link = link.clone();
-
-					println!("{}: {}", function, link);
 
 					process_anchor_links(
 						&mut replacement_link,

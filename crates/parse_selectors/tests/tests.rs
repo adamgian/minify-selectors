@@ -135,6 +135,24 @@ fn js_files() {
 		fs::read_to_string(dir.clone().join("set-attribute/output.js")).unwrap(),
 		process_file("js", &dir.clone().join("set-attribute/source.js"))
 	);
+
+	// window.location.assign()
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("window-location-assign/output.js")).unwrap(),
+		process_file("js", &dir.clone().join("window-location-assign/source.js"))
+	);
+
+	// window.location.replace()
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("window-location-replace/output.js")).unwrap(),
+		process_file("js", &dir.clone().join("window-location-replace/source.js"))
+	);
+
+	// window.open()
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("window-open/output.js")).unwrap(),
+		process_file("js", &dir.clone().join("window-open/source.js"))
+	);
 }
 
 #[test]
