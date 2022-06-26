@@ -100,6 +100,18 @@ fn js_files() {
 		process_file("js", &dir.clone().join("get-elements-by-class-name/source.js"))
 	);
 
+	// history.pushState()
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("history-push-state/output.js")).unwrap(),
+		process_file("js", &dir.clone().join("history-push-state/source.js"))
+	);
+
+	// history.replaceState()
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("history-replace-state/output.js")).unwrap(),
+		process_file("js", &dir.clone().join("history-replace-state/source.js"))
+	);
+
 	// innerHTML()
 	assert_eq!(
 		fs::read_to_string(dir.clone().join("inner-html/output.js")).unwrap(),

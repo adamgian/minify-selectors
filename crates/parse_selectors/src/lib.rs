@@ -572,12 +572,23 @@ fn process_js_arguments(
 			match function.as_str() {
 				// Takes one argument, an CSS selector string.
 				".querySelector" | ".querySelectorAll" | ".closest" => {
-					process_css(
-						&mut replacement_args,
-						selectors,
-						index,
-						alphabet
-					);
+					// FIXME: rudimentary way to check if arg is a immediate
+					// string value rather than some expression.
+					let quote_type: &str = match replacement_args.chars().next(){
+						Some('\'') => { "'" },
+						Some('"') => { "\"" },
+						Some('`') => { "`" },
+						_ => { "" },
+					};
+
+					if !quote_type.is_empty() {
+						process_css(
+							&mut replacement_args,
+							selectors,
+							index,
+							alphabet
+						);
+					}
 				},
 
 				// Takes one argument, a string of classes (no period prefixed)
@@ -615,9 +626,11 @@ fn process_js_arguments(
 					let attribute_name: &str = function_args
 						.next()
 						.unwrap()
-						.at(1)
+						.at(2)
 						.unwrap()
 						.trim();
+
+					println!("{}", attribute_name);
 
 					// Check first argument is an known attribute which its value will have
 					// classses or an id. If it is not, leave value as is (second argument).
@@ -626,7 +639,7 @@ fn process_js_arguments(
 						let attribute_value: String = function_args
 							.next()
 							.unwrap()
-							.at(1)
+							.at(2)
 							.unwrap()
 							.to_string();
 						let mut replacement_value = attribute_value.clone();
@@ -675,7 +688,7 @@ fn process_js_arguments(
 						.captures_iter(&replacement_args)
 						.last()
 						.unwrap()
-						.at(1)
+						.at(2)
 						.unwrap()
 						.to_string();
 
@@ -725,6 +738,28 @@ fn process_js_arguments(
 						&link,
 						&replacement_link
 					);
+				},
+
+				// Takes two or three arguments, the final argument which
+				// is an optional URL is the one that we are interested in.
+				"history.pushState" | "history.replaceState" => {
+					let link = regexes::STRING_DELIMITED_BY_COMMA
+						.captures_iter(&replacement_args)
+						.nth(2);
+
+					if link.is_some() {
+						let mut replacement_link = link.as_ref().unwrap().at(0).unwrap().to_string();
+						process_anchor_links(
+							&mut replacement_link,
+							selectors,
+							index,
+							alphabet
+						);
+						replacement_args = replacement_args.replace(
+							link.as_ref().unwrap().at(0).unwrap(),
+							&replacement_link,
+						);
+					}
 				},
 
 				// Takes one or more arguments, each argument is for
@@ -912,28 +947,49 @@ fn process_string_of_arguments(
 				return capture.at(0).unwrap().to_string();
 			}
 
-			// Need to put quote delimiters back around the argument value
-			let quote_type: &str = match capture.at(0).unwrap().chars().next(){
-				Some('\'') => { "'" },
-				Some('"') => { "\"" },
-				Some('`') => { "`" },
-				_ => { "" },
-			};
+			// Check if argument is a string, variable/expression or object/array.
+			//   - 1: simple string argument (with delimiters)
+			//   - 2: simple string argument (without delimiters)
+			//   - 3: variable or expression argument
+			//   - 4: object argument
+			//   - 5: array argument
+			if capture.at(2).is_some() {
+				let mut token:String = capture.at(1).unwrap().to_string();
 
-			return format!(
-				"{quote}{argument}{quote}",
-				argument = get_encoded_selector(
-					&format!(
-						"{prefix}{token}",
-						prefix = prefix,
-						token = capture.at(1).unwrap()
+				// Get quote delimiters from argument.
+				let quote_type: &str = match capture.at(1).unwrap().chars().next(){
+					Some('\'') => { "'" },
+					Some('"') => { "\"" },
+					Some('`') => { "`" },
+					_ => { "" },
+				};
+
+				// Trim quotes from argument.
+				token.pop();
+				token.remove(0);
+
+				return format!(
+					"{quote}{argument}{quote}",
+					argument = get_encoded_selector(
+						&format!(
+							"{prefix}{token}",
+							prefix = prefix,
+							token = token
+						),
+						selectors,
+						index,
+						alphabet
 					),
-					selectors,
-					index,
-					alphabet
-				),
-				quote = quote_type,
-			);
+					quote = quote_type,
+				);
+			} else if capture.at(3).is_some() {
+				// TODO:
+				return capture.at(0).unwrap().to_string();
+			} else {
+				// Capture group 4 (<object>) or 5 (<array>) .is_some() evaluates to true
+				// or another case. Either way nothing needs to be done to this argument.
+				return capture.at(0).unwrap().to_string();
+			}
 		}
 	);
 }

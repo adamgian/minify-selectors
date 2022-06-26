@@ -37,6 +37,6 @@ var m = document.querySelector(
 		? getStuff()
 		: 'SELECTOR-13'
 );
-var n = document.querySelector(foo.classList.contains('j') && ".SELECTOR-15");
+var n = document.querySelector(foo.classList.contains('SELECTOR-14') && ".SELECTOR-15");
 var o = document.querySelector(!isSomething ?? ".SELECTOR-16");
 var p = document.querySelector(doSomething() || ".SELECTOR-17");

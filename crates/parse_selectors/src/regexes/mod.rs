@@ -184,6 +184,7 @@ lazy_static! {
 				| \.getElementsByClassName
 				| \.classList\s*+\.(?> add | remove | contains | replace | toggle )
 				| \.setAttribute
+				| history\s*+\.(?> pushState | replaceState )
 				| window\s*+\.(?> location\s*+\.assign | location\s*+\.replace | open )
 			)
 			(?<join>
@@ -214,8 +215,43 @@ lazy_static! {
 							)*
 							'
 						)
+						| (?:
+							!*
+							(?:
+								\.?
+								[$\w]+
+							)+
+						)
+						| (?:
+							\(
+							(?: [^()] | \k<arguments>)*
+							\)
+						)
+						| (?:
+							\{
+							(?: [^{}] | \k<arguments> )*
+							\}
+						)
+						| (?:
+							\[
+							(?: [^\[\]] | \k<arguments> )*
+							\]
+						)
 					)
-					(?:\s*,)?
+					(?:
+						\s*
+						(?:
+							,
+							| &&
+							| \|\|
+							| \?{1,2}
+							| :
+							| ={1,3}
+							| !={1,2}
+							| >={0,2}
+							| <={0,2}
+						)
+					)?
 				)++
 			)
 		"##
@@ -392,26 +428,68 @@ lazy_static! {
 	).unwrap();
 
 	// Extract function arguments.
+	//   - "foo", 'bar', `baz`, etc.
+	//   - foo, foo.bar, foo(), foo.bar(), baz({}), baz(foo()), etc.
+	//   - {foo: "foo"}, {foo: {bar: []}}, etc.
+	//   - ["foo", "bar"], [{foo}], etc.
 	pub static ref STRING_DELIMITED_BY_COMMA: Regex = Regex::new(
 		r##"(?x)
-			["'`]
 			(?<token>
-				(?:
-					(?<=")
-					[^"]*
+				["'`]
+				(?<string>
+					(?:(?<=")[^"]*)
+					|
+					(?:(?<=')[^']*)
+					|
+					(?:(?<=`)[^`]*)
 				)
-				|
-				(?:
-					(?<=')
-					[^']*
-				)
-				|
-				(?:
-					(?<=`)
-					[^`]*
-				)
+				["'`]
 			)
-			["'`]
+			|
+			(?<expression>
+				(?:
+					!*
+					(?:
+						(?:
+							\.?
+							[$\w]+
+						)
+						|
+						(?:
+							\(
+							(?: [^()] | \k<expression>)*
+							\)
+						)
+					)+
+					(?:
+						\s*
+						(?:
+							&&
+							| \|\|
+							| \?{1,2}
+							| :
+							| ={1,3}
+							| !={1,2}
+							| >={0,2}
+							| <={0,2}
+							| ["'`] \k<string> ["'`]
+						)
+						\s*
+					)*
+				)+
+			)
+			|
+			(?<object>
+				\{
+				(?: [^{}] | \k<object> )*
+				\}
+			)
+			|
+			(?<array>
+				\[
+				(?: [^\[\]] | \k<array> )*
+				\]
+			)
 		"##
 	).unwrap();
 

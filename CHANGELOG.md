@@ -9,6 +9,7 @@
 ### Fixes
 - Only encode target IDs for relative URLs (i.e. without the protocol)
 - Strip string delimiters (if any) from URL values before parsing
+- JS arguments regex not matching empty strings, variables and objects
 
 <br>
 
