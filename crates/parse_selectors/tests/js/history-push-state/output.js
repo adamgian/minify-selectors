@@ -21,3 +21,6 @@ history
 		"",
 		"/path/#c"
 	);
+
+history.pushState({}, '');
+history.pushState({'page_id': 1, 'user_id': 5}, '');

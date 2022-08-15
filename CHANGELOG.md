@@ -4,7 +4,7 @@
 ### Updates
 - Parse and encode minify-selectors specific prefixed selectors [#11](https://github.com/adamgian/minify-selectors/issues/11)
 - Add support for JS Location interface proprties: `window.location.hash`, 'window.location.href' and `window.location`
-- Add support for JS URL methods: `window.location.assign()`, `window.location.replace()` and `window.open()`
+- Add support for JS URL methods: `history.pushState()`, `history.replaceState()`, `window.location.assign()`, `window.location.replace()` and `window.open()`
 
 ### Fixes
 - Only encode target IDs for relative URLs (i.e. without the protocol)

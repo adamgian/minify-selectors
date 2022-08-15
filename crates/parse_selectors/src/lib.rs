@@ -618,8 +618,7 @@ fn process_js_arguments(
 				// process value if attribute is whitelisted.
 				".setAttribute" => {
 					// Go over the (two) function arguments
-					let mut function_args = regexes::STRING_DELIMITED_BY_COMMA
-						.captures_iter(&replacement_args);
+					let mut function_args = get_function_arguments(&replacement_args);
 
 					// Check first arg in function, without the string delimiters
 					// and then trimming any whitespace off ends.
@@ -684,71 +683,56 @@ fn process_js_arguments(
 				// Takes two arguments: position and html,
 				// we are only interested in the latter argument.
 				".insertAdjacentHTML" => {
-					let html: String = regexes::STRING_DELIMITED_BY_COMMA
-						.captures_iter(&replacement_args)
-						.last()
-						.unwrap()
-						.at(2)
-						.unwrap()
-						.to_string();
+					if let Some(html) = get_function_arguments(&replacement_args).last() {
+						let mut replacement_html = html.at(2).unwrap().clone().to_string();
 
-					let mut replacement_html = html.clone();
+						match html.at(2).unwrap().contains("</body>") {
+							true => process_html(
+								&mut replacement_html,
+								selectors,
+								index,
+								alphabet
+							),
+							false => process_html_attributes(
+								&mut replacement_html,
+								selectors,
+								index,
+								alphabet
+							),
+						};
 
-					match html.contains("</body>") {
-						true => process_html(
-							&mut replacement_html,
-							selectors,
-							index,
-							alphabet
-						),
-						false => process_html_attributes(
-							&mut replacement_html,
-							selectors,
-							index,
-							alphabet
-						),
-					};
-
-					replacement_args = replacement_args.replace(
-						&html,
-						&replacement_html,
-					);
+						replacement_args = replacement_args.replace(
+							&html.at(2).unwrap(),
+							&replacement_html,
+						);
+					}
 				},
 
 				// Takes either only one argument or up to two arguments:
 				// we are only ever interested in argument number 1.
 				"window.open" | "window.location.assign" | "window.location.replace" => {
-					let link: String = regexes::STRING_DELIMITED_BY_COMMA
-						.captures_iter(&replacement_args)
-						.next()
-						.unwrap()
-						.at(0)
-						.unwrap()
-						.to_string();
-					let mut replacement_link = link.clone();
+					if let Some(link) = get_function_arguments(&replacement_args).next() {
+						let mut replacement_link = link.at(0).unwrap().clone().to_string();
 
-					process_anchor_links(
-						&mut replacement_link,
-						selectors,
-						index,
-						alphabet
-					);
+						process_anchor_links(
+							&mut replacement_link,
+							selectors,
+							index,
+							alphabet
+						);
 
-					replacement_args = replacement_args.replace(
-						&link,
-						&replacement_link
-					);
+						replacement_args = replacement_args.replace(
+							&link.at(0).unwrap(),
+							&replacement_link
+						);
+					}
 				},
 
 				// Takes two or three arguments, the final argument which
 				// is an optional URL is the one that we are interested in.
 				"history.pushState" | "history.replaceState" => {
-					let link = regexes::STRING_DELIMITED_BY_COMMA
-						.captures_iter(&replacement_args)
-						.nth(2);
-
-					if link.is_some() {
-						let mut replacement_link = link.as_ref().unwrap().at(0).unwrap().to_string();
+					if let Some(link) = get_function_arguments(&replacement_args).nth(2) {
+						let mut replacement_link = link.at(0).unwrap().to_string();
 						process_anchor_links(
 							&mut replacement_link,
 							selectors,
@@ -756,7 +740,7 @@ fn process_js_arguments(
 							alphabet
 						);
 						replacement_args = replacement_args.replace(
-							link.as_ref().unwrap().at(0).unwrap(),
+							link.at(0).unwrap(),
 							&replacement_link,
 						);
 					}
@@ -918,6 +902,14 @@ fn process_string_of_tokens(
 		),
 		quote = quote_type,
 	);
+}
+
+/// Returns an iterator of function arguments.
+fn get_function_arguments<'r, 't> (
+	string: &'t String
+) -> FindCaptures<'r, 't> {
+	let captures = regexes::STRING_DELIMITED_BY_COMMA.captures_iter(&string);
+	captures
 }
 
 /// Process function arguments, delimited by commas.
