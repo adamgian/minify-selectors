@@ -2,7 +2,17 @@
 <sub>TBD</sub>
 
 ### Updates
-- Parse and encode minify-selectors specific prefixed selectors [#11](https://github.com/adamgian/minify-selectors/issues/11)
+
+### Fixes
+
+
+
+
+# v1.0.0-beta.1
+<sub>22 Aug 2022</sub>
+
+### Updates
+- Parse and encode minify-selectors specific prefixed selectors ([#11](https://github.com/adamgian/minify-selectors/issues/11))
 - Add support for JS Location interface proprties: `window.location.hash`, 'window.location.href' and `window.location`
 - Add support for JS URL methods: `history.pushState()`, `history.replaceState()`, `window.location.assign()`, `window.location.replace()` and `window.open()`
 
