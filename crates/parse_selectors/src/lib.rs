@@ -57,7 +57,7 @@ pub fn from_css(
 	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
-	alphabet: &[char]
+	alphabet: &[char],
 ) {
 	process_css(
 		file_string,
@@ -71,7 +71,7 @@ pub fn from_html(
 	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
-	alphabet: &[char]
+	alphabet: &[char],
 ) {
 	process_html(
 		file_string,
@@ -85,7 +85,7 @@ pub fn from_js(
 	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
-	alphabet: &[char]
+	alphabet: &[char],
 ) {
 	process_js(
 		file_string,
@@ -105,7 +105,7 @@ fn get_encoded_selector(
 	selector: &str,
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
-	alphabet: &[char]
+	alphabet: &[char],
 ) -> String {
 	match selectors.contains_key(selector) {
 		true => {
@@ -132,7 +132,7 @@ fn process_css(
 	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
-	alphabet: &[char]
+	alphabet: &[char],
 ) {
 	process_css_selectors(
 		file_string,
@@ -161,7 +161,7 @@ fn process_html(
 	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
-	alphabet: &[char]
+	alphabet: &[char],
 ) {
 	process_html_attributes(
 		file_string,
@@ -229,7 +229,7 @@ fn process_js(
 	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
-	alphabet: &[char]
+	alphabet: &[char],
 ) {
 	process_js_arguments(
 		file_string,
@@ -261,7 +261,7 @@ fn process_prefixed_selectors(
 	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
-	alphabet: &[char]
+	alphabet: &[char],
 ) {
 	*file_string = regexes::PREFIXED_SELECTORS.replace_all(
 		file_string,
@@ -327,7 +327,7 @@ fn process_css_selectors(
 	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
-	alphabet: &[char]
+	alphabet: &[char],
 ) {
 	*file_string = regexes::CSS_SELECTORS.replace_all(
 		file_string,
@@ -359,7 +359,7 @@ fn process_css_attributes(
 	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
-	alphabet: &[char]
+	alphabet: &[char],
 ) {
 	*file_string = regexes::CSS_ATTRIBUTES.replace_all(
 		file_string,
@@ -432,7 +432,7 @@ fn process_html_attributes(
 	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
-	alphabet: &[char]
+	alphabet: &[char],
 ) {
 	*file_string = regexes::HTML_ATTRIBUTES.replace_all(
 		file_string,
@@ -553,7 +553,7 @@ fn process_js_arguments(
 	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
-	alphabet: &[char]
+	alphabet: &[char],
 ) {
 	*file_string = regexes::JS_ARGUMENTS.replace_all(
 		file_string,
@@ -575,10 +575,10 @@ fn process_js_arguments(
 					// FIXME: rudimentary way to check if arg is a immediate
 					// string value rather than some expression.
 					let quote_type: &str = match replacement_args.chars().next(){
-						Some('\'') => { "'" },
-						Some('"') => { "\"" },
-						Some('`') => { "`" },
-						_ => { "" },
+						Some('\'') => "'",
+						Some('"') => "\"",
+						Some('`') => "`",
+						_ => "",
 					};
 
 					if !quote_type.is_empty() {
@@ -683,28 +683,31 @@ fn process_js_arguments(
 				// Takes two arguments: position and html,
 				// we are only interested in the latter argument.
 				".insertAdjacentHTML" => {
-					if let Some(html) = get_function_arguments(&replacement_args).last() {
-						let mut replacement_html = html.at(2).unwrap().clone().to_string();
+					if let Some(html) = get_function_arguments(&replacement_args).nth(1) {
+						// Second capture group, which should be the string (without the delimeters).
+						if html.at(2).is_some() {
+							let mut replacement_html = html.at(2).unwrap().to_string();
 
-						match html.at(2).unwrap().contains("</body>") {
-							true => process_html(
-								&mut replacement_html,
-								selectors,
-								index,
-								alphabet
-							),
-							false => process_html_attributes(
-								&mut replacement_html,
-								selectors,
-								index,
-								alphabet
-							),
-						};
+							match html.at(2).unwrap().contains("</body>") {
+								true => process_html(
+									&mut replacement_html,
+									selectors,
+									index,
+									alphabet
+								),
+								false => process_html_attributes(
+									&mut replacement_html,
+									selectors,
+									index,
+									alphabet
+								),
+							};
 
-						replacement_args = replacement_args.replace(
-							&html.at(2).unwrap(),
-							&replacement_html,
-						);
+							replacement_args = replacement_args.replace(
+								&html.at(2).unwrap(),
+								&replacement_html,
+							);
+						}
 					}
 				},
 
@@ -712,7 +715,7 @@ fn process_js_arguments(
 				// we are only ever interested in argument number 1.
 				"window.open" | "window.location.assign" | "window.location.replace" => {
 					if let Some(link) = get_function_arguments(&replacement_args).next() {
-						let mut replacement_link = link.at(0).unwrap().clone().to_string();
+						let mut replacement_link = link.at(0).unwrap().to_string();
 
 						process_anchor_links(
 							&mut replacement_link,
@@ -777,7 +780,7 @@ fn process_js_properties(
 	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
-	alphabet: &[char]
+	alphabet: &[char],
 ) {
 	*file_string = regexes::JS_PROPERTIES.replace_all(
 		file_string,
@@ -855,20 +858,20 @@ fn process_string_of_tokens(
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
 	alphabet: &[char],
-	context: &str
+	context: &str,
 ) {
 	let prefix: &str = match context {
-		"class" => { "." },
-		"id" => { "#" },
-		_ => { "" },
+		"class" => ".",
+		"id" => "#",
+		_ => "",
 	};
 
 	// Handle strings that have quote delimiters included.
 	let quote_type: &str = match string.chars().next(){
-		Some('\'') => { "'" },
-		Some('"') => { "\"" },
-		Some('`') => { "`" },
-		_ => { "" },
+		Some('\'') => "'",
+		Some('"') => "\"",
+		Some('`') => "`",
+		_ => "",
 	};
 
 	// Trim quotes (if any) from value capture group.
@@ -906,10 +909,9 @@ fn process_string_of_tokens(
 
 /// Returns an iterator of function arguments.
 fn get_function_arguments<'r, 't> (
-	string: &'t String
+	string: &'t str
 ) -> FindCaptures<'r, 't> {
-	let captures = regexes::STRING_DELIMITED_BY_COMMA.captures_iter(&string);
-	captures
+	regexes::STRING_DELIMITED_BY_COMMA.captures_iter(string)
 }
 
 /// Process function arguments, delimited by commas.
@@ -922,12 +924,12 @@ fn process_string_of_arguments(
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
 	alphabet: &[char],
-	context: &str
+	context: &str,
 ) {
 	let prefix: &str = match context {
-		"class" => { "." },
-		"id" => { "#" },
-		_ => { "" },
+		"class" => ".",
+		"id" => "#",
+		_ => "",
 	};
 
 	*string = regexes::STRING_DELIMITED_BY_COMMA.replace_all(
@@ -950,10 +952,10 @@ fn process_string_of_arguments(
 
 				// Get quote delimiters from argument.
 				let quote_type: &str = match capture.at(1).unwrap().chars().next(){
-					Some('\'') => { "'" },
-					Some('"') => { "\"" },
-					Some('`') => { "`" },
-					_ => { "" },
+					Some('\'') => "'",
+					Some('"') => "\"",
+					Some('`') => "`",
+					_ => "",
 				};
 
 				// Trim quotes from argument.
@@ -991,14 +993,14 @@ fn process_anchor_links(
 	string: &mut String,
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
-	alphabet: &[char]
+	alphabet: &[char],
 ) {
 	// Handle strings that have quote delimiters included.
 	let quote_type: &str = match string.chars().next(){
-		Some('\'') => { "'" },
-		Some('"') => { "\"" },
-		Some('`') => { "`" },
-		_ => { "" },
+		Some('\'') => "'",
+		Some('"') => "\"",
+		Some('`') => "`",
+		_ => "",
 	};
 
 	// Trim quotes (if any).

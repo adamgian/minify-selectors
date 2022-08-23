@@ -8,8 +8,8 @@
 
 
 
-# v1.0.0-beta.1
-<sub>22 Aug 2022</sub>
+# v1.0.0-beta.2
+<sub>23 Aug 2022</sub>
 
 ### Updates
 - Parse and encode minify-selectors specific prefixed selectors ([#11](https://github.com/adamgian/minify-selectors/issues/11))

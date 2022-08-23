@@ -16,3 +16,5 @@ l
 		'beforebegin',
 		'<div class="SELECTOR-11"></div>'
 	);
+
+m.insertAdjacentHTML("afterbegin",m.content)

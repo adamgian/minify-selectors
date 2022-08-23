@@ -16,3 +16,5 @@ l
 		'beforebegin',
 		'<div class="k"></div>'
 	);
+
+m.insertAdjacentHTML("afterbegin",m.content)

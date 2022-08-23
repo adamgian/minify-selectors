@@ -4,8 +4,8 @@ use std::{
 	path::PathBuf,
 };
 
-use parse_selectors;
 use encode_selector;
+use parse_selectors;
 
 
 
@@ -13,8 +13,7 @@ use encode_selector;
 
 #[test]
 fn css_files() {
-	let dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-		.join("tests/css/");
+	let dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/css/");
 
 	// at rules
 	assert_eq!(
@@ -49,8 +48,7 @@ fn css_files() {
 
 #[test]
 fn js_files() {
-	let dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-		.join("tests/js/");
+	let dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/js/");
 
 	// classList.add()
 	assert_eq!(
@@ -169,8 +167,7 @@ fn js_files() {
 
 #[test]
 fn html_files() {
-	let dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-		.join("tests/html/");
+	let dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/html/");
 
 	// Anchor links
 	assert_eq!(
@@ -224,21 +221,21 @@ fn process_file(
 			&mut file,
 			&mut HashMap::<String, String>::new(),
 			&mut usize::from(false),
-			&alphabet
+			&alphabet,
 		);
 	} else if file_type == "js" {
 		parse_selectors::from_js(
 			&mut file,
 			&mut HashMap::<String, String>::new(),
 			&mut usize::from(false),
-			&alphabet
+			&alphabet,
 		);
 	} else if file_type == "html" {
 		parse_selectors::from_html(
 			&mut file,
 			&mut HashMap::<String, String>::new(),
 			&mut usize::from(false),
-			&alphabet
+			&alphabet,
 		);
 	}
 

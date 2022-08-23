@@ -135,7 +135,7 @@ fn minify_selectors() -> Result<(), Box<dyn Error>> {
 						file_path,
 						&mut selectors,
 						&mut selector_counter,
-						&alphabet
+						&alphabet,
 					)?
 				)?;
 			},
@@ -156,7 +156,7 @@ fn process_file(
 	file_path: &Path,
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
-	alphabet: &[char]
+	alphabet: &[char],
 ) -> Result<String, std::io::Error> {
 	let file_extension = file_path.extension().and_then(OsStr::to_str).unwrap();
 	let mut file_contents = fs::read_to_string(file_path)?;
