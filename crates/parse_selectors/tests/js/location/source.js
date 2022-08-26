@@ -23,4 +23,3 @@ window.location = "/#SELECTOR-3";
 window.location = "#SELECTOR-4";
 window.location = '#SELECTOR-5';
 window.location = `#SELECTOR-6`;
-

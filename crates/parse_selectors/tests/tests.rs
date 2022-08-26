@@ -146,6 +146,12 @@ fn js_files() {
 		process_file("js", &dir.clone().join("set-attribute/source.js"))
 	);
 
+	// window.location
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("location/output.js")).unwrap(),
+		process_file("js", &dir.clone().join("location/source.js"))
+	);
+
 	// window.location.assign()
 	assert_eq!(
 		fs::read_to_string(dir.clone().join("window-location-assign/output.js")).unwrap(),
