@@ -366,10 +366,10 @@ lazy_static! {
 	pub static ref HTML_ATTRIBUTES: Regex = Regex::new(
 		r##"(?x)
 			<!--.*?-->
-			| <head[^>]*>(?:.|\s)*?<\/head>
-			| <style[^>]*>(?:.|\s)*?<\/style>
-			| <code[^>]*>(?:.|\s)*?<\/code>
-			| <script[^>]*>(?:.|\s)*?<\/script>
+			| <head[>\s](?:.|\s)*?<\/head>
+			| <style[>\s](?:.|\s)*?<\/style>
+			| <code[>\s](?:.|\s)*?<\/code>
+			| <script[>\s](?:.|\s)*?<\/script>
 			|
 			(?<attribute>
 				[^\s\x00\/>"'=]+

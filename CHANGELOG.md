@@ -2,8 +2,10 @@
 <sub>TBD</sub>
 
 ### Updates
+- Nil
 
 ### Fixes
+- More explicit HTML attribute regex, to address catastrophic backtracking when a HTML element name begins with one of the ignored elements (`code`, `head`, `script` and `style`)
 
 
 
