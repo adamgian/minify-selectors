@@ -629,8 +629,6 @@ fn process_js_arguments(
 						.unwrap()
 						.trim();
 
-					println!("{}", attribute_name);
-
 					// Check first argument is an known attribute which its value will have
 					// classses or an id. If it is not, leave value as is (second argument).
 					if ATTRIBUTES_WHITELIST.contains_key(attribute_name) {
