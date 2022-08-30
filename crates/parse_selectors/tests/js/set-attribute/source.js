@@ -22,3 +22,8 @@ g.setAttribute(`form`, `SELECTOR-7`);
 h.setAttribute(`headers`, `SELECTOR-8`);
 i.setAttribute(`itemref`, `SELECTOR-9`);
 j.setAttribute(`list`, `SELECTOR-10`);
+
+k.setAttribute(foo, "foo")
+l.setAttribute(bar.bar, "bar")
+m.setAttribute("class", "")
+m.setAttribute("class", foo)

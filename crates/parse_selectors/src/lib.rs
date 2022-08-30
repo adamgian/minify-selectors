@@ -626,54 +626,53 @@ fn process_js_arguments(
 						.next()
 						.unwrap()
 						.at(2)
-						.unwrap()
+						.unwrap_or("")
 						.trim();
 
 					// Check first argument is an known attribute which its value will have
 					// classses or an id. If it is not, leave value as is (second argument).
 					if ATTRIBUTES_WHITELIST.contains_key(attribute_name) {
 
-						let attribute_value: String = function_args
-							.next()
-							.unwrap()
-							.at(2)
-							.unwrap()
-							.to_string();
-						let mut replacement_value = attribute_value.clone();
+						// FIXME:
+						if let Some(attribute_value) = function_args.next() {
+							if attribute_value.at(2).is_some() {
+								let mut replacement_value = attribute_value.at(2).unwrap().to_string();
+								let attribute_type_designation: &str = ATTRIBUTES_WHITELIST
+									.get(attribute_name)
+									.unwrap();
 
-						let attribute_type_designation: &str = ATTRIBUTES_WHITELIST
-							.get(attribute_name)
-							.unwrap();
 
-						match attribute_type_designation {
-							"id" | "class" => {
-								process_string_of_tokens(
-									&mut replacement_value,
-									selectors,
-									index,
-									alphabet,
-									attribute_type_designation
+								match attribute_type_designation {
+									"id" | "class" => {
+										process_string_of_tokens(
+											&mut replacement_value,
+											selectors,
+											index,
+											alphabet,
+											attribute_type_designation
+										);
+									},
+
+									"selector" => {
+										process_css(
+											&mut replacement_value,
+											selectors,
+											index,
+											alphabet
+										);
+									},
+
+									_ => {
+										return replacement_value;
+									},
+								};
+
+								replacement_args = replacement_args.replace(
+									&attribute_value.at(2).unwrap(),
+									&replacement_value,
 								);
-							},
-
-							"selector" => {
-								process_css(
-									&mut replacement_value,
-									selectors,
-									index,
-									alphabet
-								);
-							},
-
-							_ => {
-								return replacement_value;
-							},
-						};
-
-						replacement_args = replacement_args.replace(
-							&attribute_value,
-							&replacement_value,
-						);
+							}
+						}
 
 					}
 				},
