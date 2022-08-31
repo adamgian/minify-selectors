@@ -594,24 +594,32 @@ fn process_js_arguments(
 				// Takes one argument, a string of classes (no period prefixed)
 				// separated by spaces (if more than one) —
 				".getElementsByClassName" => {
-					process_string_of_tokens(
-						&mut replacement_args,
-						selectors,
-						index,
-						alphabet,
-						"class"
-					);
+					// Checking that argument is a string
+					if capture.at(4).is_some() {
+						process_string_of_tokens(
+							&mut replacement_args,
+							selectors,
+							index,
+							alphabet,
+							"class"
+						);
+					}
+					// TODO: handle expressions?
 				},
 
 				// Takes one argument, an ID (no hash prefixed).
 				".getElementById" => {
-					process_string_of_tokens(
-						&mut replacement_args,
-						selectors,
-						index,
-						alphabet,
-						"id"
-					);
+					// Checking that argument is a string
+					if capture.at(4).is_some() {
+						process_string_of_tokens(
+							&mut replacement_args,
+							selectors,
+							index,
+							alphabet,
+							"id"
+						);
+					};
+					// TODO: handle expressions?
 				},
 
 				// Takes two arguments: attribute name and value,
@@ -633,7 +641,6 @@ fn process_js_arguments(
 					// classses or an id. If it is not, leave value as is (second argument).
 					if ATTRIBUTES_WHITELIST.contains_key(attribute_name) {
 
-						// FIXME:
 						if let Some(attribute_value) = function_args.next() {
 							if attribute_value.at(2).is_some() {
 								let mut replacement_value = attribute_value.at(2).unwrap().to_string();
