@@ -6,6 +6,7 @@
 
 ### Fixes
 - More explicit HTML attribute regex, to address catastrophic backtracking when a HTML element name begins with one of the ignored elements (`code`, `head`, `script` and `style`)
+- JS function arguments regex not including the string when it is part of a variable assignment or expression
 
 
 
