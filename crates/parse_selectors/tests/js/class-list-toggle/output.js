@@ -7,3 +7,5 @@ f.classList.toggle("f", somethingA > 0);
 g.classList.toggle("g", somethingA >= somethingB);
 h.classList.toggle("h", somethingA < somethingB);
 i.classList.toggle("i", somethingA === "foo");
+
+j.classList.toggle(foo);

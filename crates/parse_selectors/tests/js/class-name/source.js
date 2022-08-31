@@ -1,6 +1,9 @@
 a.className = "SELECTOR-1";
+a.className="SELECTOR-1";
 b.className = 'SELECTOR-2';
+b.className= 'SELECTOR-2';
 c.className = `SELECTOR-3`;
+c.className =`SELECTOR-3`;
 d.className = "SELECTOR-4 SELECTOR-1";
 e.className = 'SELECTOR-5 SELECTOR-2';
 f.className = `SELECTOR-6 SELECTOR-3`;
@@ -28,3 +31,9 @@ x.className !== `SELECTOR-24`;
 y.className += "SELECTOR-25";
 z.className += 'SELECTOR-26';
 A.className += `SELECTOR-27`;
+
+B.className = foo;
+C.className = foo.bar;
+D.className = '';
+E.className = "";
+F.className = ``;

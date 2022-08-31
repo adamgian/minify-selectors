@@ -40,3 +40,8 @@ var m = document.querySelector(
 var n = document.querySelector(foo.classList.contains('SELECTOR-14') && ".SELECTOR-15");
 var o = document.querySelector(!isSomething ?? ".SELECTOR-16");
 var p = document.querySelector(doSomething() || ".SELECTOR-17");
+
+var q = document.querySelector(foo);
+var r = document.querySelector( bar );
+var s = document.querySelector(foo.bar);
+var t = document.querySelector( foo.bar );

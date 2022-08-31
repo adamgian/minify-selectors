@@ -14,3 +14,7 @@ document
 	.getElementsByClassName(
 		"SELECTOR-11"
 	);
+
+document.getElementsByClassName(foo);
+document.getElementsByClassName( bar );
+document.getElementsByClassName( foo.bar );

@@ -11,3 +11,7 @@ g.classList.remove( 'g' , 'd' , 'b' );
 h.classList.remove(  'h'  ,  'd'  ,  'g'  );
 i.classList.remove( 'i', 'd', 'g' );
 j.classList.remove( 'j', 'k', 'l' );
+
+k.classList.remove(foo, 'b');
+l.classList.remove('a', foo);
+m.classList.remove(foo, bar);

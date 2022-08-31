@@ -12,3 +12,6 @@ f.classList
 g
 	.classList
 	.add('SELECTOR-13');
+
+h.classList.add(foo);
+i.classList.add( bar );

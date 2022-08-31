@@ -8,3 +8,7 @@ f.innerHTML = `
 		<div class="a"></div>
 	</body>
 `;
+
+i.innerHTML = '';
+j.innerHTML = "";
+k.innerHTML = ``;

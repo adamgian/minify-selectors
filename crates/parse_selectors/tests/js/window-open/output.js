@@ -32,3 +32,7 @@ window.open('/path/#g')
 window.open('path/#g')
 window.open('https://www.rust-lang.org/#foo')
 window.open('http://www.rust-lang.org/#foo')
+
+window.open(foo)
+window.open( bar )
+window.open( foo.bar )

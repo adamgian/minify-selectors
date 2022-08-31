@@ -7,3 +7,7 @@ d
 		'e',
 		'f',
 	);
+
+e.classList.replace(foo, 'b');
+f.classList.replace('a', foo);
+g.classList.replace(foo, bar);

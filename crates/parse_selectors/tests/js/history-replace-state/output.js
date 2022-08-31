@@ -25,3 +25,6 @@ history
 		"",
 		"/path/#c"
 	);
+
+history.replaceState({}, '', foo);
+history.replaceState(foo, '', bar);

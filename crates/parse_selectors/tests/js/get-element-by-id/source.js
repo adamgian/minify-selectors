@@ -11,3 +11,7 @@ document
 	.getElementById(
 		"SELECTOR-8"
 	);
+
+document.getElementById(foo);
+document.getElementById( bar );
+document.getElementById( foo.bar );

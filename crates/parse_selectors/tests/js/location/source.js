@@ -23,3 +23,9 @@ window.location = "/#SELECTOR-3";
 window.location = "#SELECTOR-4";
 window.location = '#SELECTOR-5';
 window.location = `#SELECTOR-6`;
+
+window.location = foo;
+window.location =foo;
+window.location= foo;
+window.location=foo;
+window.location = foo.bar;

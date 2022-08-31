@@ -39,3 +39,8 @@ J.querySelectorAll(`.K[aria-labelledby=\'F\']`);
 K.querySelectorAll(".L[aria-labelledby='F' s]");
 L.querySelectorAll('.M[aria-labelledby="F" s]');
 M.querySelectorAll(`.N[aria-labelledby='F' s]`);
+
+N.querySelectorAll(foo);
+O.querySelectorAll( bar );
+P.querySelectorAll(foo.bar);
+Q.querySelectorAll( foo.bar );

@@ -7,3 +7,5 @@ f.classList.toggle("SELECTOR-6", somethingA > 0);
 g.classList.toggle("SELECTOR-7", somethingA >= somethingB);
 h.classList.toggle("SELECTOR-8", somethingA < somethingB);
 i.classList.toggle("SELECTOR-9", somethingA === "foo");
+
+j.classList.toggle(foo);

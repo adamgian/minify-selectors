@@ -17,3 +17,7 @@ k.closest(
 );
 l
 	.closest(  "  div .l  >  .a  "  );
+
+m.closest(foo);
+n.closest(foo.bar);
+o.closest( foo );

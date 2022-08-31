@@ -10,3 +10,7 @@ h
 		<body id="SELECTOR-8">
 			<div class="SELECTOR-1"></div>
 		</body>`;
+
+i.outerHTML = '';
+j.outerHTML = "";
+k.outerHTML = ``;

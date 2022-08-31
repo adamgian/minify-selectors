@@ -1,6 +1,9 @@
 a.className = "a";
+a.className="a";
 b.className = 'b';
+b.className= 'b';
 c.className = `c`;
+c.className =`c`;
 d.className = "d a";
 e.className = 'e b';
 f.className = `f c`;
@@ -28,3 +31,9 @@ x.className !== `x`;
 y.className += "y";
 z.className += 'z';
 A.className += `A`;
+
+B.className = foo;
+C.className = foo.bar;
+D.className = '';
+E.className = "";
+F.className = ``;

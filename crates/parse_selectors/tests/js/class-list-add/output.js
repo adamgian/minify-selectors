@@ -12,3 +12,6 @@ f.classList
 g
 	.classList
 	.add('m');
+
+h.classList.add(foo);
+i.classList.add( bar );

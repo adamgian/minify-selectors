@@ -11,3 +11,7 @@ document
 	.getElementById(
 		"h"
 	);
+
+document.getElementById(foo);
+document.getElementById( bar );
+document.getElementById( foo.bar );

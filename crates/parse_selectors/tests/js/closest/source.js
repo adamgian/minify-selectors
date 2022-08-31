@@ -17,3 +17,7 @@ k.closest(
 );
 l
 	.closest(  "  div .SELECTOR-12  >  .SELECTOR-1  "  );
+
+m.closest(foo);
+n.closest(foo.bar);
+o.closest( foo );

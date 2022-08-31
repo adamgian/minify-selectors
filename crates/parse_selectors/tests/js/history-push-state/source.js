@@ -24,3 +24,7 @@ history
 
 history.pushState({}, '');
 history.pushState({'page_id': 1, 'user_id': 5}, '');
+
+history.pushState({}, '', foo);
+history.pushState(foo, '', bar);
+history.pushState(foo, '', foo.bar);

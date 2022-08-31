@@ -4,3 +4,6 @@ c.classList.contains(`SELECTOR-3`);
 d.classList.contains( 'SELECTOR-4' );
 e.classList.contains( "SELECTOR-5" );
 f.classList.contains( `SELECTOR-6` );
+
+g.classList.contains(foo);
+h.classList.contains( bar );

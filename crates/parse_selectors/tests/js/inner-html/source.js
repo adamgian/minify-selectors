@@ -8,3 +8,7 @@ f.innerHTML = `
 		<div class="SELECTOR-1"></div>
 	</body>
 `;
+
+i.innerHTML = '';
+j.innerHTML = "";
+k.innerHTML = ``;

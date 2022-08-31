@@ -7,3 +7,7 @@ d
 		'SELECTOR-5',
 		'SELECTOR-6',
 	);
+
+e.classList.replace(foo, 'SELECTOR-2');
+f.classList.replace('SELECTOR-1', foo);
+g.classList.replace(foo, bar);

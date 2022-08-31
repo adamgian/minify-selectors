@@ -39,3 +39,8 @@ J.querySelectorAll(`.SELECTOR-36[aria-labelledby=\'SELECTOR-4\']`);
 K.querySelectorAll(".SELECTOR-37[aria-labelledby='SELECTOR-4' s]");
 L.querySelectorAll('.SELECTOR-38[aria-labelledby="SELECTOR-4" s]');
 M.querySelectorAll(`.SELECTOR-39[aria-labelledby='SELECTOR-4' s]`);
+
+N.querySelectorAll(foo);
+O.querySelectorAll( bar );
+P.querySelectorAll(foo.bar);
+Q.querySelectorAll( foo.bar );

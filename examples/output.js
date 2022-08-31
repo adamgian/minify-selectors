@@ -15,6 +15,6 @@ document
 		"k"
 	);
 
-document.getElementsByClassName(foo);
-document.getElementsByClassName( bar );
-document.getElementsByClassName( foo.bar );
+document.getElementsByClassName(l);
+document.getElementsByClassName( m );
+document.getElementsByClassName( l.m );

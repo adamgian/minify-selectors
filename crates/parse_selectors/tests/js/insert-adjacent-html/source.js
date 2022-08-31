@@ -18,3 +18,10 @@ l
 	);
 
 m.insertAdjacentHTML("afterbegin",m.content)
+n.insertAdjacentHTML("afterbegin", n.foo)
+o.insertAdjacentHTML("afterbegin",'')
+p.insertAdjacentHTML("afterbegin","")
+q.insertAdjacentHTML("afterbegin",``)
+r.insertAdjacentHTML("afterbegin", '')
+s.insertAdjacentHTML("afterbegin", "")
+t.insertAdjacentHTML("afterbegin", ``)

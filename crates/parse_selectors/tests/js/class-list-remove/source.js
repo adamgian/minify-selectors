@@ -11,3 +11,7 @@ g.classList.remove( 'SELECTOR-7' , 'SELECTOR-4' , 'SELECTOR-2' );
 h.classList.remove(  'SELECTOR-8'  ,  'SELECTOR-4'  ,  'SELECTOR-7'  );
 i.classList.remove( 'SELECTOR-9', 'SELECTOR-4', 'SELECTOR-7' );
 j.classList.remove( ' SELECTOR-10', 'SELECTOR-4 ', ' SELECTOR-7 ' );
+
+k.classList.remove(foo, 'SELECTOR-2');
+l.classList.remove('SELECTOR-1', foo);
+m.classList.remove(foo, bar);

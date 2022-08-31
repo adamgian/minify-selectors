@@ -35,3 +35,5 @@ window.location.assign('/path/#g')
 window.location.assign('path/#g')
 window.location.assign('https://www.rust-lang.org/#foo')
 window.location.assign('http://www.rust-lang.org/#foo')
+
+window.location.assign(foo)

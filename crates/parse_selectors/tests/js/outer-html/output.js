@@ -10,3 +10,7 @@ h
 		<body id="h">
 			<div class="a"></div>
 		</body>`;
+
+i.outerHTML = '';
+j.outerHTML = "";
+k.outerHTML = ``;

@@ -25,3 +25,6 @@ history
 		"",
 		"/path/#SELECTOR-3"
 	);
+
+history.replaceState({}, '', foo);
+history.replaceState(foo, '', bar);

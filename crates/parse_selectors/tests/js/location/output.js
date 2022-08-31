@@ -23,3 +23,9 @@ window.location = "/#c";
 window.location = "#d";
 window.location = '#e';
 window.location = `#f`;
+
+window.location = foo;
+window.location =foo;
+window.location= foo;
+window.location=foo;
+window.location = foo.bar;
