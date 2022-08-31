@@ -74,6 +74,12 @@ fn js_files() {
 		process_file("js", &dir.clone().join("class-list-replace/source.js"))
 	);
 
+	// classList.toggle()
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("class-list-toggle/output.js")).unwrap(),
+		process_file("js", &dir.clone().join("class-list-toggle/source.js"))
+	);
+
 	// className
 	assert_eq!(
 		fs::read_to_string(dir.clone().join("class-name/output.js")).unwrap(),
