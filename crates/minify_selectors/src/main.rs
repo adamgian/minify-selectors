@@ -104,40 +104,44 @@ fn minify_selectors() -> Result<(), Box<dyn Error>> {
 
 	for entry in globwalk::glob(&source_glob).unwrap() {
 		match entry {
-			Ok(file) => {
-				let file_path = Path::new(file.path());
-				let output_file = match source_dir.is_dir() {
-					// Remove given source directory to make each
-					// match file relative to the output directory.
-					true => {
-						PathBuf::from(&output_dir).join(
-							file_path.strip_prefix(&source_dir).unwrap()
-						)
-					},
-					// Or if input path was to a file, append only
-					// the file name to the given output directory
-					false => {
-						PathBuf::from(&output_dir).join(
-							file_path.file_name().unwrap()
-						)
-					},
-				};
+			Ok(glob_match) => {
+				let source_path = Path::new(glob_match.path());
 
-				// Making sure directories exists or are created
-				// before writing file.
-				if let Some(dir_only) = &output_file.parent() {
-					fs::create_dir_all(dir_only)?;
-				};
+				// Making sure glob matched path is indeed a file to proceed.
+				if source_path.is_file() {
+					let output_path = match source_dir.is_dir() {
+						// Remove given source directory to make each
+						// matched file relative to the output directory.
+						true => {
+							PathBuf::from(&output_dir).join(
+								source_path.strip_prefix(&source_dir).unwrap()
+							)
+						},
+						// Or if input path was to a file, append only
+						// the file name to the given output directory
+						false => {
+							PathBuf::from(&output_dir).join(
+								source_path.file_name().unwrap()
+							)
+						},
+					};
 
-				fs::write(
-					output_file,
-					process_file(
-						file_path,
-						&mut selectors,
-						&mut selector_counter,
-						&alphabet,
-					)?
-				)?;
+					// Making sure directories exists or are created
+					// before writing file.
+					if let Some(dir_only) = &output_path.parent() {
+						fs::create_dir_all(dir_only)?;
+					};
+
+					fs::write(
+						output_path,
+						process_file(
+							source_path,
+							&mut selectors,
+							&mut selector_counter,
+							&alphabet,
+						)?
+					)?;
+				}
 			},
 
 			Err(error) => println!("{:?}", error),
