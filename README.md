@@ -11,7 +11,7 @@
 
 # minify-selectors
 
-Post-processor that minifies classes and IDs selector names in CSS, HTML and Javascript files. Each unique selector, and any subsequent occurances elsewhere, is converted into an ultracompact one.
+Post-processor that minifies classes and IDs selector names in CSS, HTML, Javascript and SVG files. Each unique selector, and any subsequent occurances elsewhere, is converted into an ultracompact one.
 
 Enhance your front-end assets and build optimisations pipeline — wring even more out from your already minified and optimised payload sizes. Additionally, can offer a certain degree of obfuscation to your code.
 
@@ -24,17 +24,17 @@ Enhance your front-end assets and build optimisations pipeline — wring even mo
 
 For a full outline of capabilities and current limitations, see [parse_selectors/info.md](crates/parse_selectors/info.md).
 
-### Comprehensive out of the box selector support
+### Comprehensive out of the box support
 
 minify-selectors aims to minify all obvious selectors right out of the gate. Any extra work configuring should be to assist minify-selectors to identify additional and/or ambigious selectors.
 
 
-#### CSS (or embedded style) example
+#### CSS or embedded styles
 
 <table>
 	<tr>
 		<td>
-			<p><sub>Source:</sub></p>
+			<p><sub>Input</sub></p>
 			<pre lang="scss">
 [id='page--default'] { … }                               ‎
 .sidebar, .site-nav { … }
@@ -55,11 +55,11 @@ minify-selectors aims to minify all obvious selectors right out of the gate. Any
 </table>
 
 
-#### JS (or embedded script) example
+#### JS or embedded scripts
 
 <table>
 	<tr>
-		<td><p><sub>Source:</sub></p>
+		<td><p><sub>Input</sub></p>
 		<pre lang="js">
 for (let link of document.querySelectorAll('a.anchor')) {‎
   link.classList.remove('is-active');
@@ -78,12 +78,12 @@ for (let link of document.querySelectorAll('a.Bd')) {    ‎
 </table>
 
 
-#### HTML example
+#### HTML and SVGs
 
 <table>
 	<tr>
 		<td>
-			<p><sub>Source:</sub></p>
+			<p><sub>Input</sub></p>
 			<pre lang="html">
 &lt;body id="page--default">
   &lt;nav class="site-nav">
@@ -120,8 +120,6 @@ for (let link of document.querySelectorAll('a.Bd')) {    ‎
 
 ### Opt-in/opt-out selector encoding
 
-<sub>Available in v1.0.0</sub>
-
 In cases where minify-selectors is unable to parse selectors, for example: in custom HTML attributes or JS variables. Or forcing a selector to be encoded when it otherwise would not be, such as in a HTML code element or comments. You can prefix your selector names so that minify-selectors knows to parse it and how to encode it:
 
 - `.__--` or `#__--` — instead of the selector type ('#' or '.') before CSS selector names
@@ -130,7 +128,7 @@ In cases where minify-selectors is unable to parse selectors, for example: in cu
 <table>
 	<tr>
 		<td>
-			<p><sub>Source:</sub></p>
+			<p><sub>Input</sub></p>
 			<pre lang="html">
 &lt;main class="page page-dark">                            ‎
   &lt;button
@@ -176,7 +174,7 @@ Or, you do not want minify-selectors to encode certain selectors (for reasons su
 <table>
 	<tr>
 		<td>
-			<p><sub>Source:</sub></p>
+			<p><sub>Input</sub></p>
 			<pre lang="html">
 &lt;nav class="site-nav">                                   ‎
   &lt;a href="/faq/#__ignore--new-user">&lt;a>

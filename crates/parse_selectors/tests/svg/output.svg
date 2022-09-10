@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36">
+
+	<style>
+		.c {
+			fill: white;
+		}
+
+		.a.a path {
+			stroke: none !important;
+		}
+
+		.h {
+			fill: none;
+		}
+
+		.h.n {transform:translate(-2px, -2px)}
+		.h.i {transform:translate(-1px, -2px)}
+		.h.o {transform:translate(0, -2px)}
+		.h.p {transform:translate(-2px, -1px)}
+		.h.q {transform:translate(-1px, -1px)}
+		.h.r {transform:translate(0, -1px)}
+		.h.j {transform:translate(-2px, 0)}
+		.h.k {transform:translate(-1px, 0)}
+		.h.m {transform:translate(0, 0)}
+	</style>
+
+	<g class="a">
+		<rect class="b" height="0" width="0" x="18" y="18"/>
+		<path class="c" d="M23,20.5c0-2.76-2.24-5-5-5s-5,2.24-5,5H23z"/>
+		<path d="M18,15.5c-2.76,0-5,2.24-5,5h0.25h0.25h9h0.25H23C23,17.74,20.76,15.5,18,15.5z M13.55,20c0.25-2.25,2.13-4,4.45-4
+			s4.2,1.75,4.45,4H13.55z"/>
+		<text
+			class="d"
+			dominant-baseline="central"
+			text-anchor="middle"
+			x="24"
+			y="12">
+		</text>
+		<text
+			class="e"
+			dominant-baseline="central"
+			style="font-size:3px"
+			text-anchor="middle"
+			x="18"
+			y="18.33">
+		</text>
+		<g class="f">
+			<rect class="g" height="5" width="10" x="13" y="15.5"/>
+			<rect class="h i" height="2" width="2" x="18" y="15.5"/>
+			<rect class="h j" height="2" width="2" x="13" y="20.5"/>
+			<rect class="h k l" height="2" width="2" x="18" y="20.5"/>
+			<rect class="h m" height="2" width="2" x="23" y="20.5"/>
+		</g>
+	</g>
+
+</svg>

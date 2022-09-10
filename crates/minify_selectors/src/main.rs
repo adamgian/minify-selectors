@@ -79,16 +79,16 @@ fn minify_selectors() -> Result<(), Box<dyn Error>> {
 	);
 
 	// If glob string is for a directory, append
-	// glob pattern to search for CSS, HTML and JS files.
+	// glob pattern to search for CSS, HTML, JS and SVG files.
 	if source_dir.is_dir() {
 		if source_glob.ends_with('/') {
-			source_glob.push_str("**/*.{css,html,js}");
+			source_glob.push_str("**/*.{css,html,js,svg}");
 		} else {
-			source_glob.push_str("/**/*.{css,html,js}");
+			source_glob.push_str("/**/*.{css,html,js,svg}");
 		}
 	} else if source_glob.ends_with("/*") {
 		source_dir = source_dir.parent().unwrap().to_path_buf();
-		source_glob.push_str(".{css,html,js}");
+		source_glob.push_str(".{css,html,js,svg}");
 	}
 
 	// globwalk doesn't handle relative globs starting with "./".
@@ -179,7 +179,7 @@ fn process_file(
 				alphabet
 			);
 		},
-		"html" => {
+		"html" | "svg" => {
 			parse_selectors::from_html(
 				&mut file_contents,
 				selectors,

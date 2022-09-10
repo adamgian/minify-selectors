@@ -212,6 +212,16 @@ fn html_files() {
 	);
 }
 
+#[test]
+fn svg_files() {
+	let dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/svg/");
+
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("output.svg")).unwrap(),
+		process_file("html", &dir.clone().join("source.svg")),
+	);
+}
+
 
 
 
