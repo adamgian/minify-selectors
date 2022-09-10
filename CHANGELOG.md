@@ -2,9 +2,12 @@
 <sub>TBD</sub>
 
 ### Updates
-- Nil
+- Add support for SVG files
 
 ### Fixes
+- Convert captured attirbute names to lowercase before using
+
+<br>
 
 
 
@@ -17,6 +20,8 @@
 - JS function arguments regex not properly matching strings when it is part of a variable assignment or expression
 - Variable arguments in `getElementById()` and `get ElementsByClassName()` getting incorrectly processed as a string
 - Ignore glob path matches that are not files
+
+<br>
 
 
 

@@ -482,7 +482,7 @@ fn process_html_attributes(
 				true => {
 					// Work out if value(s) are classes, ids or selectors.
 					let attribute_type_designation: &str = ATTRIBUTES_WHITELIST
-						.get(capture.at(1).unwrap())
+						.get(&attribute_name.to_ascii_lowercase())
 						.unwrap();
 
 					// attribute_value will need to be cleaned up, as 'regexes::HTML_ATTRIBUTES'
