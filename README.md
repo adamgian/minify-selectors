@@ -45,7 +45,7 @@ minify-selectors aims to minify all obvious selectors right out of the gate. Any
 		<td>
 			<p><sub>Output:</sub></p>
 			<pre lang="scss">
-[id='a'], { … }                                          ‎
+[id='a'] { … }                                           ‎
 .b, .c { … }
 .b .d:focus-within { … }
 .e a.f { … }<!--
