@@ -20,5 +20,6 @@ path = "./src/main.rs"
 clap = { version = "3.1.8", features = ["derive"] }
 globwalk = "0.8.1"
 
+config = { version = "0.1.0", path = "../config" }
 parse_selectors = { version = "1.0.0", path = "../parse_selectors" }
 encode_selector = { version = "0.3.3", path = "../encode_selector" }

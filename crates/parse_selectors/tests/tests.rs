@@ -4,6 +4,7 @@ use std::{
 	path::PathBuf,
 };
 
+use config::Config;
 use encode_selector;
 use parse_selectors;
 
@@ -230,34 +231,38 @@ fn process_file(
 	file_path: &PathBuf,
 ) -> String {
 	let mut file = fs::read_to_string(file_path).unwrap();
-	let alphabet: Vec<char> = encode_selector::into_alphabet_set(
-		concat!(
-			"0123456789",
-			"abcdefghijklmnopqrstuvwxyz",
-			"ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-		)
-	);
+
+	let config = config::Config {
+		alphabet: encode_selector::into_alphabet_set(
+			concat!(
+				"0123456789",
+				"abcdefghijklmnopqrstuvwxyz",
+				"ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+			)
+		),
+		start_index: 0,
+	};
 
 	if file_type == "css" {
 		parse_selectors::from_css(
 			&mut file,
 			&mut HashMap::<String, String>::new(),
 			&mut usize::from(false),
-			&alphabet,
+			&config,
 		);
 	} else if file_type == "js" {
 		parse_selectors::from_js(
 			&mut file,
 			&mut HashMap::<String, String>::new(),
 			&mut usize::from(false),
-			&alphabet,
+			&config,
 		);
 	} else if file_type == "html" {
 		parse_selectors::from_html(
 			&mut file,
 			&mut HashMap::<String, String>::new(),
 			&mut usize::from(false),
-			&alphabet,
+			&config,
 		);
 	}
 

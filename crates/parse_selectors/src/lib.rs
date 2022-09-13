@@ -2,6 +2,8 @@ use lazy_static::lazy_static;
 use onig::*;
 use std::collections::HashMap;
 
+use config::Config;
+
 pub mod regexes;
 
 
@@ -57,13 +59,13 @@ pub fn from_css(
 	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
-	alphabet: &[char],
+	config: &Config,
 ) {
 	process_css(
 		file_string,
 		selectors,
 		index,
-		alphabet
+		config
 	)
 }
 
@@ -71,13 +73,13 @@ pub fn from_html(
 	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
-	alphabet: &[char],
+	config: &Config,
 ) {
 	process_html(
 		file_string,
 		selectors,
 		index,
-		alphabet
+		config
 	);
 }
 
@@ -85,13 +87,13 @@ pub fn from_js(
 	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
-	alphabet: &[char],
+	config: &Config,
 ) {
 	process_js(
 		file_string,
 		selectors,
 		index,
-		alphabet
+		config
 	);
 }
 
@@ -105,7 +107,7 @@ fn get_encoded_selector(
 	selector: &str,
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
-	alphabet: &[char],
+	config: &Config,
 ) -> String {
 	match selectors.contains_key(selector) {
 		true => {
@@ -115,7 +117,7 @@ fn get_encoded_selector(
 		},
 
 		false => {
-			let encoded_selector: String = encode_selector::to_radix(index, alphabet);
+			let encoded_selector: String = encode_selector::to_radix(index, &config.alphabet);
 			*index += 1;
 
 			selectors.insert(
@@ -132,27 +134,27 @@ fn process_css(
 	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
-	alphabet: &[char],
+	config: &Config,
 ) {
 	process_css_selectors(
 		file_string,
 		selectors,
 		index,
-		alphabet
+		config
 	);
 
 	process_css_attributes(
 		file_string,
 		selectors,
 		index,
-		alphabet
+		config
 	);
 
 	process_prefixed_selectors(
 		file_string,
 		selectors,
 		index,
-		alphabet
+		config
 	);
 }
 
@@ -161,13 +163,13 @@ fn process_html(
 	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
-	alphabet: &[char],
+	config: &Config,
 ) {
 	process_html_attributes(
 		file_string,
 		selectors,
 		index,
-		alphabet
+		config
 	);
 
 	// Processing any embedded scripts
@@ -181,7 +183,7 @@ fn process_html(
 				&mut embedded_script,
 				selectors,
 				index,
-				alphabet
+				config
 			);
 
 			format!(
@@ -204,7 +206,7 @@ fn process_html(
 				&mut embedded_style,
 				selectors,
 				index,
-				alphabet
+				config
 			);
 
 			format!(
@@ -220,7 +222,7 @@ fn process_html(
 		file_string,
 		selectors,
 		index,
-		alphabet
+		config
 	);
 }
 
@@ -229,27 +231,27 @@ fn process_js(
 	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
-	alphabet: &[char],
+	config: &Config,
 ) {
 	process_js_arguments(
 		file_string,
 		selectors,
 		index,
-		alphabet,
+		config,
 	);
 
 	process_js_properties(
 		file_string,
 		selectors,
 		index,
-		alphabet,
+		config,
 	);
 
 	process_prefixed_selectors(
 		file_string,
 		selectors,
 		index,
-		alphabet
+		config
 	);
 }
 
@@ -261,7 +263,7 @@ fn process_prefixed_selectors(
 	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
-	alphabet: &[char],
+	config: &Config,
 ) {
 	*file_string = regexes::PREFIXED_SELECTORS.replace_all(
 		file_string,
@@ -274,7 +276,7 @@ fn process_prefixed_selectors(
 						&format!(".{}", placeholder_value),
 						selectors,
 						index,
-						alphabet
+						config
 					);
 				},
 
@@ -283,7 +285,7 @@ fn process_prefixed_selectors(
 						&format!("#{}", placeholder_value),
 						selectors,
 						index,
-						alphabet
+						config
 					);
 				},
 
@@ -310,7 +312,7 @@ fn process_prefixed_selectors(
 							),
 							selectors,
 							index,
-							alphabet
+							config
 						)
 					);
 				},
@@ -327,7 +329,7 @@ fn process_css_selectors(
 	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
-	alphabet: &[char],
+	config: &Config,
 ) {
 	*file_string = regexes::CSS_SELECTORS.replace_all(
 		file_string,
@@ -343,7 +345,7 @@ fn process_css_selectors(
 						capture.at(0).unwrap(),
 						selectors,
 						index,
-						alphabet
+						config
 					)
 				);
 			}
@@ -359,7 +361,7 @@ fn process_css_attributes(
 	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
-	alphabet: &[char],
+	config: &Config,
 ) {
 	*file_string = regexes::CSS_ATTRIBUTES.replace_all(
 		file_string,
@@ -395,7 +397,7 @@ fn process_css_attributes(
 							&mut attribute_value,
 							selectors,
 							index,
-							alphabet,
+							config,
 							attribute_type_designation
 						);
 					},
@@ -404,7 +406,7 @@ fn process_css_attributes(
 							&mut attribute_value,
 							selectors,
 							index,
-							alphabet
+							config
 						);
 					},
 					_ => {},
@@ -432,7 +434,7 @@ fn process_html_attributes(
 	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
-	alphabet: &[char],
+	config: &Config,
 ) {
 	*file_string = regexes::HTML_ATTRIBUTES.replace_all(
 		file_string,
@@ -460,7 +462,7 @@ fn process_html_attributes(
 							&mut code_tag_attributes,
 							selectors,
 							index,
-							alphabet,
+							config,
 						);
 
 						format!(
@@ -500,7 +502,7 @@ fn process_html_attributes(
 								&mut attribute_value,
 								selectors,
 								index,
-								alphabet,
+								config,
 								attribute_type_designation
 							);
 						},
@@ -510,7 +512,7 @@ fn process_html_attributes(
 								&mut attribute_value,
 								selectors,
 								index,
-								alphabet
+								config
 							);
 						},
 
@@ -519,7 +521,7 @@ fn process_html_attributes(
 								&mut attribute_value,
 								selectors,
 								index,
-								alphabet
+								config
 							);
 						},
 
@@ -553,7 +555,7 @@ fn process_js_arguments(
 	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
-	alphabet: &[char],
+	config: &Config,
 ) {
 	*file_string = regexes::JS_ARGUMENTS.replace_all(
 		file_string,
@@ -586,7 +588,7 @@ fn process_js_arguments(
 							&mut replacement_args,
 							selectors,
 							index,
-							alphabet
+							config
 						);
 					}
 				},
@@ -600,7 +602,7 @@ fn process_js_arguments(
 							&mut replacement_args,
 							selectors,
 							index,
-							alphabet,
+							config,
 							"class"
 						);
 					}
@@ -615,7 +617,7 @@ fn process_js_arguments(
 							&mut replacement_args,
 							selectors,
 							index,
-							alphabet,
+							config,
 							"id"
 						);
 					};
@@ -655,7 +657,7 @@ fn process_js_arguments(
 											&mut replacement_value,
 											selectors,
 											index,
-											alphabet,
+											config,
 											attribute_type_designation
 										);
 									},
@@ -665,7 +667,7 @@ fn process_js_arguments(
 											&mut replacement_value,
 											selectors,
 											index,
-											alphabet
+											config
 										);
 									},
 
@@ -697,13 +699,13 @@ fn process_js_arguments(
 									&mut replacement_html,
 									selectors,
 									index,
-									alphabet
+									config
 								),
 								false => process_html_attributes(
 									&mut replacement_html,
 									selectors,
 									index,
-									alphabet
+									config
 								),
 							};
 
@@ -725,7 +727,7 @@ fn process_js_arguments(
 							&mut replacement_link,
 							selectors,
 							index,
-							alphabet
+							config
 						);
 
 						replacement_args = replacement_args.replace(
@@ -744,7 +746,7 @@ fn process_js_arguments(
 							&mut replacement_link,
 							selectors,
 							index,
-							alphabet
+							config
 						);
 						replacement_args = replacement_args.replace(
 							link.at(0).unwrap(),
@@ -761,7 +763,7 @@ fn process_js_arguments(
 						&mut replacement_args,
 						selectors,
 						index,
-						alphabet,
+						config,
 						"class"
 					);
 				},
@@ -784,7 +786,7 @@ fn process_js_properties(
 	file_string: &mut String,
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
-	alphabet: &[char],
+	config: &Config,
 ) {
 	*file_string = regexes::JS_PROPERTIES.replace_all(
 		file_string,
@@ -804,7 +806,7 @@ fn process_js_properties(
 						&mut property_value,
 						selectors,
 						index,
-						alphabet,
+						config,
 						"class"
 					);
 				},
@@ -814,14 +816,14 @@ fn process_js_properties(
 							&mut property_value,
 							selectors,
 							index,
-							alphabet
+							config
 						);
 					} else {
 						process_html_attributes(
 							&mut property_value,
 							selectors,
 							index,
-							alphabet
+							config
 						);
 					}
 				},
@@ -832,7 +834,7 @@ fn process_js_properties(
 						&mut property_value,
 						selectors,
 						index,
-						alphabet
+						config
 					);
 				},
 				_ => {},
@@ -861,7 +863,7 @@ fn process_string_of_tokens(
 	string: &mut String,
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
-	alphabet: &[char],
+	config: &Config,
 	context: &str,
 ) {
 	let prefix: &str = match context {
@@ -903,7 +905,7 @@ fn process_string_of_tokens(
 					),
 					selectors,
 					index,
-					alphabet
+					config
 				);
 			}
 		),
@@ -927,7 +929,7 @@ fn process_string_of_arguments(
 	string: &mut String,
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
-	alphabet: &[char],
+	config: &Config,
 	context: &str,
 ) {
 	let prefix: &str = match context {
@@ -976,7 +978,7 @@ fn process_string_of_arguments(
 						),
 						selectors,
 						index,
-						alphabet
+						config
 					),
 					quote = quote_type,
 				);
@@ -997,7 +999,7 @@ fn process_anchor_links(
 	string: &mut String,
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
-	alphabet: &[char],
+	config: &Config,
 ) {
 	// Handle strings that have quote delimiters included.
 	let quote_type: &str = match string.chars().next(){
@@ -1029,7 +1031,7 @@ fn process_anchor_links(
 						capture.at(2).unwrap(),
 						selectors,
 						index,
-						alphabet
+						config
 					),
 				)
 			}

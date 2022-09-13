@@ -11,6 +11,8 @@ use std::{
 	time::Instant,
 };
 
+use config::Config;
+
 
 
 
@@ -67,17 +69,6 @@ fn minify_selectors() -> Result<(), Box<dyn Error>> {
 	let mut source_glob = String::from(&args.source);
 	let output_dir = String::from(&args.output);
 
-	let alphabet = encode_selector::into_alphabet_set(
-		match &args.alphabet {
-			Some(alphabet) => alphabet,
-			None => concat!(
-				"0123456789",
-				"abcdefghijklmnopqrstuvwxyz",
-				"ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-			),
-		}
-	);
-
 	// If glob string is for a directory, append
 	// glob pattern to search for CSS, HTML, JS and SVG files.
 	if source_dir.is_dir() {
@@ -101,6 +92,17 @@ fn minify_selectors() -> Result<(), Box<dyn Error>> {
 	if source_dir.is_relative() & !source_dir.starts_with("./") {
 		source_dir = Path::new("./").join(source_dir);
 	}
+
+	let config = Config {
+		alphabet: encode_selector::into_alphabet_set(match &args.alphabet {
+			Some(alphabet) => alphabet,
+			None => "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+		}),
+		start_index: match &args.start_index {
+			Some(index) => *index,
+			None => 0,
+		},
+	};
 
 	for entry in globwalk::glob(&source_glob).unwrap() {
 		match entry {
@@ -138,7 +140,7 @@ fn minify_selectors() -> Result<(), Box<dyn Error>> {
 							source_path,
 							&mut selectors,
 							&mut selector_counter,
-							&alphabet,
+							&config,
 						)?
 					)?;
 				}
@@ -160,7 +162,7 @@ fn process_file(
 	file_path: &Path,
 	selectors: &mut HashMap<String, String>,
 	index: &mut usize,
-	alphabet: &[char],
+	config: &Config,
 ) -> Result<String, std::io::Error> {
 	let file_extension = file_path.extension().and_then(OsStr::to_str).unwrap();
 	let mut file_contents = fs::read_to_string(file_path)?;
@@ -176,7 +178,7 @@ fn process_file(
 				&mut file_contents,
 				selectors,
 				index,
-				alphabet
+				&config
 			);
 		},
 		"html" | "svg" => {
@@ -184,7 +186,7 @@ fn process_file(
 				&mut file_contents,
 				selectors,
 				index,
-				alphabet
+				&config
 			);
 		},
 		"js" => {
@@ -192,7 +194,7 @@ fn process_file(
 				&mut file_contents,
 				selectors,
 				index,
-				alphabet
+				&config
 			);
 		},
 		_ => {}

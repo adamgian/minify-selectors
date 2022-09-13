@@ -1,0 +1,15 @@
+[package]
+authors = ["Adam Gian <contact@adamgian.com>"]
+description = "Configuration for minify-selectors"
+edition = "2021"
+homepage = "https://github.com/adamgian/minify-selectors#readme"
+keywords = []
+license = "Apache-2.0"
+name = "config"
+repository = "https://github.com/adamgian/minify-selectors.git"
+version = "0.1.0"
+
+
+
+
+[dependencies]
