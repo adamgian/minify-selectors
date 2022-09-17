@@ -2,7 +2,20 @@
 <sub>TBD</sub>
 
 ### Updates
+
+### Fixes
+
+<br>
+
+
+
+
+# v1.0.0-beta.4
+<sub>TBD</sub>
+
+### Updates
 - Add support for SVG files
+- Keep track of IDs and classes separately
 
 ### Fixes
 - Convert captured attirbute names to lowercase before using

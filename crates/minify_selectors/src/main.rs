@@ -11,7 +11,7 @@ use std::{
 	time::Instant,
 };
 
-use config::Config;
+use minify_selectors_utils::*;
 
 
 
@@ -57,14 +57,6 @@ fn minify_selectors() -> Result<(), Box<dyn Error>> {
 	let stopwatch = Instant::now();
 	let args = Cli::parse();
 
-	// Set of selectors with its assigned base62 name
-	let mut selectors: HashMap<String, String> = HashMap::new();
-	// Counter of unique selectors
-	let mut selector_counter: usize = match &args.start_index {
-		Some(index) => *index,
-		None => 0,
-	};
-
 	let mut source_dir = PathBuf::from(&args.source);
 	let mut source_glob = String::from(&args.source);
 	let output_dir = String::from(&args.output);
@@ -104,6 +96,12 @@ fn minify_selectors() -> Result<(), Box<dyn Error>> {
 		},
 	};
 
+	let mut selectors = Selectors {
+		map: HashMap::new(),
+		class_index: config.start_index,
+		id_index: config.start_index,
+	};
+
 	for entry in globwalk::glob(&source_glob).unwrap() {
 		match entry {
 			Ok(glob_match) => {
@@ -139,7 +137,6 @@ fn minify_selectors() -> Result<(), Box<dyn Error>> {
 						process_file(
 							source_path,
 							&mut selectors,
-							&mut selector_counter,
 							&config,
 						)?
 					)?;
@@ -160,8 +157,7 @@ fn minify_selectors() -> Result<(), Box<dyn Error>> {
 
 fn process_file(
 	file_path: &Path,
-	selectors: &mut HashMap<String, String>,
-	index: &mut usize,
+	selectors: &mut Selectors,
 	config: &Config,
 ) -> Result<String, std::io::Error> {
 	let file_extension = file_path.extension().and_then(OsStr::to_str).unwrap();
@@ -177,7 +173,6 @@ fn process_file(
 			parse_selectors::from_css(
 				&mut file_contents,
 				selectors,
-				index,
 				&config
 			);
 		},
@@ -185,7 +180,6 @@ fn process_file(
 			parse_selectors::from_html(
 				&mut file_contents,
 				selectors,
-				index,
 				&config
 			);
 		},
@@ -193,7 +187,6 @@ fn process_file(
 			parse_selectors::from_js(
 				&mut file_contents,
 				selectors,
-				index,
 				&config
 			);
 		},
