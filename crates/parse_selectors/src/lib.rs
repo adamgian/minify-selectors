@@ -106,10 +106,15 @@ fn get_encoded_selector(
 		true => selectors.get(selector),
 
 		false => {
-			let encoded_selector: String = encode_selector::to_radix(&selectors.class_index, &config.alphabet);
-			selectors.increment_class_index();
+			let encoded_selector: String = encode_selector::to_radix(
+				match selector.chars().next() {
+					Some('.') => &selectors.class_index,
+					Some('#') | _ => &selectors.id_index,
+				},
+				&config.alphabet
+			);
 
-			selectors.map.insert(
+			selectors.add(
 				selector.to_owned(),
 				encoded_selector.clone()
 			);
@@ -539,7 +544,7 @@ fn process_js_arguments(
 				".querySelector" | ".querySelectorAll" | ".closest" => {
 					// FIXME: rudimentary way to check if arg is a immediate
 					// string value rather than some expression.
-					let quote_type: &str = match replacement_args.chars().next(){
+					let quote_type: &str = match replacement_args.chars().next() {
 						Some('\'') => "'",
 						Some('"') => "\"",
 						Some('`') => "`",
@@ -820,7 +825,7 @@ fn process_string_of_tokens(
 	};
 
 	// Handle strings that have quote delimiters included.
-	let quote_type: &str = match string.chars().next(){
+	let quote_type: &str = match string.chars().next() {
 		Some('\'') => "'",
 		Some('"') => "\"",
 		Some('`') => "`",
@@ -902,7 +907,7 @@ fn process_string_of_arguments(
 				let mut token:String = capture.at(1).unwrap().to_string();
 
 				// Get quote delimiters from argument.
-				let quote_type: &str = match capture.at(1).unwrap().chars().next(){
+				let quote_type: &str = match capture.at(1).unwrap().chars().next() {
 					Some('\'') => "'",
 					Some('"') => "\"",
 					Some('`') => "`",
@@ -945,7 +950,7 @@ fn process_anchor_links(
 	config: &Config,
 ) {
 	// Handle strings that have quote delimiters included.
-	let quote_type: &str = match string.chars().next(){
+	let quote_type: &str = match string.chars().next() {
 		Some('\'') => "'",
 		Some('"') => "\"",
 		Some('`') => "`",
