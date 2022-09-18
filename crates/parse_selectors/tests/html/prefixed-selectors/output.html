@@ -1,21 +1,21 @@
-<!-- g #g #k -->
-<button type="button" data-toggle="modal" data-target="#g"></button>
+<!-- a #a #c -->
+<button type="button" data-toggle="modal" data-target="#a"></button>
 <div id="foo" class="foo a b"></div>
-<component data-classes="b h foo"></component>
+<component data-classes="b g foo"></component>
 <code>
-// See: http://example.com/#g
-// See: files/#j
+// See: http://example.com/#a
+// See: files/#b
 </code>
 
 <style>
-	#g {}
-	.b, .h, .foo {}
+	#a {}
+	.b, .g, .foo {}
 
-	.i::after {
-		content: "./path/#j";
+	.h::after {
+		content: "./path/#b";
 	}
 
-	.i::before {
+	.h::before {
 		content: "./path/#foo";
 	}
 

@@ -1,5 +1,5 @@
-a.innerHTML = '<div class="SELECTOR-1"></div>';
-b.innerHTML == "<div class=\"SELECTOR-2\"></div>";
+a.innerHTML = '<div id="SELECTOR-1" class="SELECTOR-1"></div>';
+b.innerHTML == "<div id=\"SELECTOR-2\" class=\"SELECTOR-2\"></div>";
 c.innerHTML === "<div class='SELECTOR-3'></div>";
 d.innerHTML += "<div class=SELECTOR-4></div>";
 e.innerHTML -= '<div class="SELECTOR-5"></div>';

@@ -14,14 +14,14 @@ b.setAttribute(
 	"id", "b"
 );
 
-c.setAttribute(`class`, `c`);
-d.setAttribute(`aria-describedby`, `d`);
-e.setAttribute(`aria-labelledby`, `e`);
-f.setAttribute(`for`, `f`);
-g.setAttribute(`form`, `g`);
-h.setAttribute(`headers`, `h`);
-i.setAttribute(`itemref`, `i`);
-j.setAttribute(`list`, `j`);
+c.setAttribute(`class`, `a`);
+d.setAttribute(`aria-describedby`, `c`);
+e.setAttribute(`aria-labelledby`, `d`);
+f.setAttribute(`for`, `e`);
+g.setAttribute(`form`, `f`);
+h.setAttribute(`headers`, `g`);
+i.setAttribute(`itemref`, `h`);
+j.setAttribute(`list`, `i`);
 
 k.setAttribute(foo, "foo")
 l.setAttribute(bar.bar, "bar")

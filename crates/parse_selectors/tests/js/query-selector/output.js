@@ -5,12 +5,12 @@ var d = document.querySelector('.a');
 var e = document.querySelector(".b");
 var f = document.querySelector(`.c`);
 
-a = document.querySelector('.d > .a')
-b = document.querySelector(".e > .a")
-c = document.querySelector(`.f > .a`)
-d = document.querySelector('.d > .a');
-e = document.querySelector(".e > .a");
-f = document.querySelector(`.f > .a`);
+a = document.querySelector('.d > #a')
+b = document.querySelector(".e > #a")
+c = document.querySelector(`.f > #a`)
+d = document.querySelector('.d > #a');
+e = document.querySelector(".e > #a");
+f = document.querySelector(`.f > #a`);
 
 a = document.querySelector( ' .d  >  .a ' )
 b = document.querySelector( " .e  >  .a " )

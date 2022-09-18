@@ -1,13 +1,13 @@
 a.outerHTML = '<body><div class="a"></div></body>';
-b.outerHTML = "<label for=\"b\"></label>";
-c.outerHTML = "<div id='c'></div>";
-d.outerHTML = "<div id=d></div>";
-e.outerHTML = "<td headers=e></td>";
-f.outerHTML = '<div class="f"></div>';
-g.outerHTML = '<div class=\'g\'></div>';
+b.outerHTML = "<label for=\"a\"></label>";
+c.outerHTML = "<div id='b'></div>";
+d.outerHTML = "<div id=c></div>";
+e.outerHTML = "<td headers=d></td>";
+f.outerHTML = '<div class="b"></div>';
+g.outerHTML = '<div class=\'c\'></div>';
 h
 	.outerHTML = `
-		<body id="h">
+		<body id="e">
 			<div class="a"></div>
 		</body>`;
 

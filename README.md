@@ -29,33 +29,33 @@ For a full outline of capabilities and current limitations, see [parse_selectors
 minify-selectors aims to minify all obvious selectors right out of the gate. Any extra work configuring should be to assist minify-selectors to identify additional and/or ambigious selectors.
 
 
-#### CSS or embedded styles
+#### CSS and embedded styles
 
 <table>
 	<tr>
 		<td>
 			<p><sub>Input</sub></p>
 			<pre lang="scss">
-[id='page--default'] { … }                               ‎
-.sidebar, .site-nav { … }
+.sidebar, .site-nav { … }                                ‎
 .sidebar .search:focus-within { … }
-.sidebar--expanded a.is-active { … }<!--
+.sidebar--expanded a.is-active { … }
+#page--default { … }<!--
 			--></pre>
 		</td>
 		<td>
 			<p><sub>Output:</sub></p>
 			<pre lang="scss">
-[id='a'] { … }                                           ‎
-.b, .c { … }
-.b .d:focus-within { … }
-.e a.f { … }<!--
+.a, .b { … }                                             ‎
+.a .c:focus-within { … }
+.d a.e { … }
+#a { … }<!--
 			--></pre>
 		</td>
 	</tr>
 </table>
 
 
-#### JS or embedded scripts
+#### JS and embedded scripts
 
 <table>
 	<tr>
@@ -70,7 +70,7 @@ for (let link of document.querySelectorAll('a.anchor')) {‎
 			<p><sub>Output:</sub></p>
 			<pre lang="js">
 for (let link of document.querySelectorAll('a.Bd')) {    ‎
-  link.classList.remove('f');
+  link.classList.remove('e');
 }<!--
 			--></pre>
 		</td>
@@ -103,8 +103,8 @@ for (let link of document.querySelectorAll('a.Bd')) {    ‎
 			<p><sub>Output:</sub></p>
 			<pre lang="html">
 &lt;body id="a">                                            ‎
-  &lt;nav class="c">
-    &lt;div class="d a1">
+  &lt;nav class="b">
+    &lt;div class="c a1">
       &lt;label for="y" class="F j">
         Search app
       &lt;/label>
@@ -184,7 +184,7 @@ Or, you do not want minify-selectors to encode certain selectors (for reasons su
 		<td valign="top">
 			<p><sub>Output:</sub></p>
 			<pre lang="html">
-&lt;nav class="c">                                          ‎
+&lt;nav class="b">                                          ‎
   &lt;a href="/faq/#new-user">&lt;a>
 &lt;/div><!--
 			--></pre>

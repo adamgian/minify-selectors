@@ -4,17 +4,17 @@
 }
 
 @media screen and (resolution: 50.82dpcm) {
-	#c {}
-	.d {}
+	#a {}
+	.c {}
 }
 
 @supports (display: grid) {
-	.e {
+	.d {
 		color: #000;
 	}
 
 	@media (min-width: 900px) {
-		.f {
+		.e {
 			color: #fff;
 		}
 	}

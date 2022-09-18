@@ -5,12 +5,12 @@ var d = document.querySelector('.SELECTOR-1');
 var e = document.querySelector(".SELECTOR-2");
 var f = document.querySelector(`.SELECTOR-3`);
 
-a = document.querySelector('.SELECTOR-4 > .SELECTOR-1')
-b = document.querySelector(".SELECTOR-5 > .SELECTOR-1")
-c = document.querySelector(`.SELECTOR-6 > .SELECTOR-1`)
-d = document.querySelector('.SELECTOR-4 > .SELECTOR-1');
-e = document.querySelector(".SELECTOR-5 > .SELECTOR-1");
-f = document.querySelector(`.SELECTOR-6 > .SELECTOR-1`);
+a = document.querySelector('.SELECTOR-4 > #SELECTOR-1')
+b = document.querySelector(".SELECTOR-5 > #SELECTOR-1")
+c = document.querySelector(`.SELECTOR-6 > #SELECTOR-1`)
+d = document.querySelector('.SELECTOR-4 > #SELECTOR-1');
+e = document.querySelector(".SELECTOR-5 > #SELECTOR-1");
+f = document.querySelector(`.SELECTOR-6 > #SELECTOR-1`);
 
 a = document.querySelector( ' .SELECTOR-4  >  .SELECTOR-1 ' )
 b = document.querySelector( " .SELECTOR-5  >  .SELECTOR-1 " )

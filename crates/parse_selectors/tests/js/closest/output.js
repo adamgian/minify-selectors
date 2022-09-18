@@ -7,16 +7,16 @@ c.closest(`.c`);
 d.closest(".d .a");
 e.closest('.e .b');
 f.closest(`.f .c`);
-g.closest("#g");
-h.closest(".h + .a");
-i.closest(".i ~ .a");
-j.closest(".j > .a");
+g.closest("#a");
+h.closest(".g + .a");
+i.closest(".h ~ .a");
+j.closest(".i > .a");
 
 k.closest(
-	"  .k > .a + .a  "
+	"  .j > .a + .a  "
 );
 l
-	.closest(  "  div .l  >  .a  "  );
+	.closest(  "  div .k  >  .a  "  );
 
 m.closest(foo);
 n.closest(foo.bar);

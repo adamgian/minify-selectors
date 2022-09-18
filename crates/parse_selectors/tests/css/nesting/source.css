@@ -33,7 +33,7 @@
 	&& { padding: 2ch }
 }
 
-.error, #404 {
+.error, #code-404 {
 	&:hover > .baz { color: red }
 }
 

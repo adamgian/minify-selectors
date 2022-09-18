@@ -5,30 +5,30 @@
 [class~="f"] {}
 [class~='g'] {}
 
-[id=h] {}
-[id="i"] {}
-[id='j'] {}
-[id~=k] {}
-[id~="l"] {}
-[id~='m'] {}
+[id=a] {}
+[id="b"] {}
+[id='c'] {}
+[id~=d] {}
+[id~="e"] {}
+[id~='f'] {}
 
 [class=SELECTOR-13 i] {}
 [class="SELECTOR-13" i] {}
 [class="SELECTOR-13"i] {}
 [class="SELECTOR-13" I] {}
-[class=n s] {}
-[class="n" s] {}
-[class="n"s] {}
-[class="n" S] {}
+[class=h s] {}
+[class="h" s] {}
+[class="h"s] {}
+[class="h" S] {}
 [class="SELECTOR-14" x] {}
 
-[aria-describedby~='o'] {}
-[aria-labelledby~='p'] {}
-[for~='q'] {}
-[form~='r'] {}
-[headers~='s'] {}
-[itemref~='s'] {}
-[list~='t'] {}
+[aria-describedby~='g'] {}
+[aria-labelledby~='h'] {}
+[for~='i'] {}
+[form~='j'] {}
+[headers~='k'] {}
+[itemref~='k'] {}
+[list~='l'] {}
 
 [class^="SELECTOR-21"],
 [class$="SELECTOR-22"],

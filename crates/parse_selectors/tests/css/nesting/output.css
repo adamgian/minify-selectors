@@ -33,7 +33,7 @@
 	&& { padding: 2ch }
 }
 
-.e, #404 {
+.e, #a {
 	&:hover > .c { color: red }
 }
 

@@ -11,7 +11,7 @@
 
 
 # v1.0.0-beta.4
-<sub>TBD</sub>
+<sub>21 Sep 2022</sub>
 
 ### Updates
 - Add support for SVG files

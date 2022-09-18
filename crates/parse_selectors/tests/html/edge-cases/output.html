@@ -7,9 +7,9 @@
 
 		<style>
 			/* comment about .foo > .bar */
-			.k > .l {}
+			.i > .j {}
 			@media print {
-				.m {}
+				.k {}
 			}
 		</style>
 
@@ -21,7 +21,7 @@
 			 */
 			if (foo.bar < foo.baz) {
 				// document.classList.add('baz');
-				document.classList.add('h');
+				document.classList.add('f');
 			}
 		</script>
 	</head>
@@ -47,7 +47,7 @@
 			}
 		</CODE>
 
-		<code class="( b c )">
+		<code class="( a b )">
 			/*
 			 * comment about foo.bar < foo.baz
 			 *
@@ -59,12 +59,12 @@
 			}
 		</code>
 
-		<code id="d" class="[ e f ] g">
+		<code id="b" class="[ c d ] e">
 			&lt;div class="foo"&gt;&lt;/div&gt;
 		</code>
 
 		<script type="text/javascript">
-			a.className += 'i j';
+			a.className += 'g h';
 		</script>
 	</body>
 </html>
