@@ -215,9 +215,7 @@ fn index_to_base64_custom() {
 
 #[test]
 fn index_to_base26_latin_letters() {
-	let alphabet = into_alphabet_set(
-		&"abcdefghijklmnopqrstuvwxyz"
-	);
+	let alphabet = into_alphabet_set(&"abcdefghijklmnopqrstuvwxyz");
 
 	// 1 character length encoded selector names:
 	// - 26 valid combinations

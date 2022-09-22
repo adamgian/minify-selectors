@@ -31,9 +31,9 @@ lazy_static! {
 ///
 /// Function parameters:
 /// - ordinal (&usize) - Integer to encode, must be 0 or greater.
-/// - alphabet (&Vec<char>) - String sequence of characters in which to create
-///   a radix from. Use into_alphabet_set() to create this vector from a
-///   processed string such as: "0123456789ABCDEF".
+/// - alphabet (&Vec<char>) - String sequence of characters in which to create a
+///   radix from. Use into_alphabet_set() to create this vector from a processed
+///   string such as: "0123456789ABCDEF".
 pub fn to_radix(
 	ordinal: &usize,
 	alphabet: &[char],

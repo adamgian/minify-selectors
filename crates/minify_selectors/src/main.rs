@@ -1,16 +1,14 @@
 extern crate globwalk;
 
-use clap::Parser;
-use std::{
-	collections::HashMap,
-	error::Error,
-	ffi::OsStr,
-	fs,
-	path::Path,
-	path::PathBuf,
-	time::Instant,
-};
+use std::collections::HashMap;
+use std::error::Error;
+use std::ffi::OsStr;
+use std::fs;
+use std::path::Path;
+use std::path::PathBuf;
+use std::time::Instant;
 
+use clap::Parser;
 use minify_selectors_utils::*;
 
 
@@ -44,12 +42,9 @@ fn main() {
 	std::process::exit(match minify_selectors() {
 		Ok(_) => 0,
 		Err(error) => {
-			eprintln!(
-				"minify-selectors has encounted an error: {:?}",
-				error
-			);
+			eprintln!("minify-selectors has encounted an error: {:?}", error);
 			1
-		}
+		},
 	});
 }
 
@@ -113,17 +108,12 @@ fn minify_selectors() -> Result<(), Box<dyn Error>> {
 						// Remove given source directory to make each
 						// matched file relative to the output directory.
 						true => {
-							PathBuf::from(&output_dir).join(
-								source_path.strip_prefix(&source_dir).unwrap()
-							)
+							PathBuf::from(&output_dir)
+								.join(source_path.strip_prefix(&source_dir).unwrap())
 						},
 						// Or if input path was to a file, append only
 						// the file name to the given output directory
-						false => {
-							PathBuf::from(&output_dir).join(
-								source_path.file_name().unwrap()
-							)
-						},
+						false => PathBuf::from(&output_dir).join(source_path.file_name().unwrap()),
 					};
 
 					// Making sure directories exists or are created
@@ -134,11 +124,7 @@ fn minify_selectors() -> Result<(), Box<dyn Error>> {
 
 					fs::write(
 						output_path,
-						process_file(
-							source_path,
-							&mut selectors,
-							&config,
-						)?
+						process_file(source_path, &mut selectors, &config)?,
 					)?;
 				}
 			},
@@ -147,10 +133,7 @@ fn minify_selectors() -> Result<(), Box<dyn Error>> {
 		}
 	}
 
-	println!(
-		"minify-selectors finished in: {:.2?}",
-		stopwatch.elapsed()
-	);
+	println!("minify-selectors finished in: {:.2?}", stopwatch.elapsed());
 
 	Ok(())
 }
@@ -163,34 +146,13 @@ fn process_file(
 	let file_extension = file_path.extension().and_then(OsStr::to_str).unwrap();
 	let mut file_contents = fs::read_to_string(file_path)?;
 
-	println!(
-		"Processing file: {}",
-		file_path.display()
-	);
+	println!("Processing file: {}", file_path.display());
 
 	match file_extension {
-		"css" => {
-			parse_selectors::from_css(
-				&mut file_contents,
-				selectors,
-				&config
-			);
-		},
-		"html" | "svg" => {
-			parse_selectors::from_html(
-				&mut file_contents,
-				selectors,
-				&config
-			);
-		},
-		"js" => {
-			parse_selectors::from_js(
-				&mut file_contents,
-				selectors,
-				&config
-			);
-		},
-		_ => {}
+		"css" => parse_selectors::from_css(&mut file_contents, selectors, config),
+		"html" | "svg" => parse_selectors::from_html(&mut file_contents, selectors, config),
+		"js" => parse_selectors::from_js(&mut file_contents, selectors, config),
+		_ => {},
 	}
 
 	Ok(file_contents)
