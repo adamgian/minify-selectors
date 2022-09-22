@@ -1,0 +1,62 @@
+.SELECTOR-1:autofill {}
+.SELECTOR-1:enabled {}
+.SELECTOR-1:disabled {}
+.SELECTOR-1:read-only {}
+.SELECTOR-1:read-write {}
+.SELECTOR-1:placeholder-shown {}
+.SELECTOR-1:default {}
+.SELECTOR-1:checked {}
+.SELECTOR-1:indeterminate {}
+.SELECTOR-1:blank {}
+.SELECTOR-1:valid {}
+.SELECTOR-1:invalid {}
+.SELECTOR-1:in-range {}
+.SELECTOR-1:out-of-range {}
+.SELECTOR-1:required {}
+.SELECTOR-1:optional {}
+.SELECTOR-1:user-invalid {}
+
+.SELECTOR-2:dir(rtl) {}
+.SELECTOR-2:lang(nl) {}
+.SELECTOR-2:lang(en) > .SELECTOR-1 p {}
+
+.SELECTOR-3:any-link {}
+.SELECTOR-3:link {}
+.SELECTOR-3:visited {}
+.SELECTOR-3:local-link {}
+.SELECTOR-3:target {}
+.SELECTOR-3:target-within {}
+.SELECTOR-3:scope {}
+
+.SELECTOR-4:playing {}
+.SELECTOR-4:paused {}
+
+.SELECTOR-5:root {}
+.SELECTOR-5:empty {}
+.SELECTOR-5:nth-child(odd) {}
+.SELECTOR-5:nth-last-child(even) {}
+.SELECTOR-5:first-child {}
+.SELECTOR-5:last-child {}
+.SELECTOR-5:only-child {}
+.SELECTOR-5:nth-of-type(2n+1) {}
+.SELECTOR-5:nth-last-of-type(3n+4) {}
+.SELECTOR-5:first-of-type {}
+.SELECTOR-5:last-of-type {}
+.SELECTOR-5:only-of-type {}
+
+.SELECTOR-6:hover {}
+.SELECTOR-6:active {}
+.SELECTOR-6:focus {}
+.SELECTOR-6:focus-within {}
+.SELECTOR-6:focus-visible {}
+
+.SELECTOR-6:has(#SELECTOR-1) {}
+.SELECTOR-6:has(> #SELECTOR-2) {}
+.SELECTOR-6:has(img) {}
+.SELECTOR-6:has(foo) {}
+.SELECTOR-6:has(foo + bar) {}
+.SELECTOR-6:not(#SELECTOR-3) {}
+.SELECTOR-6:not(:has(#SELECTOR-4)) {}
+.SELECTOR-6:where(aside.SELECTOR-1, footer.SELECTOR-1) {}
+:is(thead.SELECTOR-1, tfoot.SELECTOR-1) :is(th.SELECTOR-2, td.SELECTOR-2) {}
+.SELECTOR-6:is(aside.SELECTOR-1, footer.SELECTOR-1) {}

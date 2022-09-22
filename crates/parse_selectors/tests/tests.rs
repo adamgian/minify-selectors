@@ -43,6 +43,18 @@ fn css_files() {
 		fs::read_to_string(dir.clone().join("nesting/output.css")).unwrap(),
 		process_file("css", &dir.clone().join("nesting/source.css")),
 	);
+
+	// pseudo classes
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("pseudo-classes/output.css")).unwrap(),
+		process_file("css", &dir.clone().join("pseudo-classes/source.css")),
+	);
+
+	// pseudo elements
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("pseudo-elements/output.css")).unwrap(),
+		process_file("css", &dir.clone().join("pseudo-elements/source.css")),
+	);
 }
 
 #[test]
