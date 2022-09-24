@@ -122,8 +122,8 @@ for (let link of document.querySelectorAll('a.Bd')) {    ‎
 
 In cases where minify-selectors is unable to parse selectors, for example: in custom HTML attributes or JS variables. Or forcing a selector to be encoded when it otherwise would not be, such as in a HTML code element or comments. You can prefix your selector names so that minify-selectors knows to parse it and how to encode it:
 
-- `.__--` or `#__--` — instead of the selector type ('#' or '.') before CSS selector names
-- `__class--` or `__id--` — for "name only" selectors, use '\_\_class--' for class selectors and '\_\_id--' for ID selectors
+- `.__--` or `#__--` instead of the selector type ('#' or '.') before selector names
+- `__class--` or `__id--` for "name only" selectors, use '\_\_class--' for class selectors and '\_\_id--' for ID selectors
 
 <table>
 	<tr>
@@ -168,8 +168,8 @@ In cases where minify-selectors is unable to parse selectors, for example: in cu
 
 Or, you do not want minify-selectors to encode certain selectors (for reasons such as SEO). You can prefix your selector names so minify-selectors will leave the name as is (the prefix will be omitted):
 
-- `.__ignore--` and `#__ignore--` — instead of the selector type ('#' or '.') before CSS selector names
-- `__ignore--` — for selectors that are "name only"
+- `.__ignore--` and `#__ignore--` instead of the selector type ('#' or '.') before selector names
+- `__ignore--` for selectors that are "name only"
 
 <table>
 	<tr>
@@ -200,7 +200,7 @@ Or, you do not want minify-selectors to encode certain selectors (for reasons su
 ## Usage
 
 > **Please note:**
-minify-selectors only supports regular CSS, HTML and JS files. minify-selectors should be one of the final steps in your build process — SASS/SCSS, LESS, Typescript, JQuery, Handlebars, etc. should be compiled or transpiled first into its respective vanilla form.
+minify-selectors only supports regular CSS, HTML, JS and SVG files. SASS/SCSS, LESS, TypeScript, JQuery, Handlebars, etc. should be compiled or transpiled first into its respective vanilla form.
 
 ### Via npm and npm scripts
 
@@ -209,7 +209,7 @@ minify-selectors only supports regular CSS, HTML and JS files. minify-selectors 
 	npm i minify-selectors
 	```
 
-2. Include minify-selectors in your package.json 'scripts' property:
+2. Include minify-selectors in your package.json 'scripts' property, for example:
 	```json
 	"scripts": {
 	  "build": "npm run build:webpack && npm run build:minify-selectors",
@@ -256,7 +256,7 @@ minify-selectors only supports regular CSS, HTML and JS files. minify-selectors 
 				<code lang="shell">--input</code> (or <code lang="shell">-i</code>)
 			</td>
 			<td>
-				Directory to process. Any CSS, HTML and JS files in the given directory and sub-directories will be parsed.
+				Directory to process. Any CSS, HTML, JS and SVG files in the given directory and sub-directories will be parsed.
 			</td>
 		</tr>
 		<tr>
