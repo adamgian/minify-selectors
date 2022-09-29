@@ -19,3 +19,21 @@
 		}
 	}
 }
+
+/* .foo and .bar */
+@container (max-width: 420px) {
+	#SELECTOR-1 {
+		display: none;
+	}
+
+	.SELECTOR-1 {
+		font-size: 1.25rem;
+	}
+}
+
+/* #baz */
+@container (min-width: 9000px) {
+	.SELECTOR-2 {
+		gap: 1.75rem;
+	}
+}

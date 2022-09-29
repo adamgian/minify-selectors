@@ -19,3 +19,21 @@
 		}
 	}
 }
+
+/* .foo and .bar */
+@container (max-width: 420px) {
+	#b {
+		display: none;
+	}
+
+	.a {
+		font-size: 1.25rem;
+	}
+}
+
+/* #baz */
+@container (min-width: 9000px) {
+	.b {
+		gap: 1.75rem;
+	}
+}
