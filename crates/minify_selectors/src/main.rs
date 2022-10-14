@@ -1,6 +1,5 @@
 extern crate globwalk;
 
-use std::collections::HashMap;
 use std::error::Error;
 use std::ffi::OsStr;
 use std::fs;
@@ -90,12 +89,7 @@ fn minify_selectors() -> Result<(), Box<dyn Error>> {
 			None => 0,
 		},
 	};
-
-	let mut selectors = Selectors {
-		map: HashMap::new(),
-		class_index: config.start_index,
-		id_index: config.start_index,
-	};
+	let mut selectors = Selectors::new(config.start_index);
 
 	for entry in globwalk::glob(&source_glob).unwrap() {
 		match entry {

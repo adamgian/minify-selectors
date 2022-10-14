@@ -33,6 +33,14 @@ impl Selectors {
 		self.map.get_key_value(selector).unwrap().1.to_string()
 	}
 
+	pub fn new(starting_index: usize) -> Self {
+		Self {
+			map: HashMap::new(),
+			class_index: starting_index,
+			id_index: starting_index,
+		}
+	}
+
 	// Note: assumes that this key is unique,
 	// should check first with contains().
 	pub fn add(
