@@ -1,9 +1,7 @@
-# v1.0.0 (Unreleased)
-<sub>TBD</sub>
+# v1.0.0
+<sub>16 Oct</sub>
 
-### Updates
-
-### Fixes
+No noteworthy changes since the last version
 
 <br>
 
