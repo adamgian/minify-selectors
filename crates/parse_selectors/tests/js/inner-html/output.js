@@ -12,3 +12,4 @@ f.innerHTML = `
 i.innerHTML = '';
 j.innerHTML = "";
 k.innerHTML = ``;
+l.innerHTML = foo;

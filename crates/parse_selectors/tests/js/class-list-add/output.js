@@ -15,3 +15,4 @@ g
 
 h.classList.add(foo);
 i.classList.add( bar );
+j.classList.add(foo, bar, baz);

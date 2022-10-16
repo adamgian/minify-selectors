@@ -9,3 +9,4 @@ h.classList.toggle("SELECTOR-8", somethingA < somethingB);
 i.classList.toggle("SELECTOR-9", somethingA === "foo");
 
 j.classList.toggle(foo);
+k.classList.toggle(foo, isFoo);

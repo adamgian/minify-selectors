@@ -9,3 +9,4 @@ h.classList.toggle("h", somethingA < somethingB);
 i.classList.toggle("i", somethingA === "foo");
 
 j.classList.toggle(foo);
+k.classList.toggle(foo, isFoo);

@@ -14,3 +14,4 @@ h
 i.outerHTML = '';
 j.outerHTML = "";
 k.outerHTML = ``;
+l.outerHTML = foo;

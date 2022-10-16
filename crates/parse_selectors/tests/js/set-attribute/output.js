@@ -26,4 +26,5 @@ j.setAttribute(`list`, `i`);
 k.setAttribute(foo, "foo")
 l.setAttribute(bar.bar, "bar")
 m.setAttribute("class", "")
-m.setAttribute("class", foo)
+n.setAttribute("class", foo)
+o.setAttribute(foo, baz)
