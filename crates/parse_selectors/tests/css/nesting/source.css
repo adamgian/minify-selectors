@@ -3,42 +3,42 @@
  * See (W3C working draft): https://www.w3.org/TR/css-nesting-1/
  */
 
-.foo {
+.CLASS-1 {
 	color: blue;
-	& > .bar { color: red }
+	& > .CLASS-2 { color: red }
 }
 
-.foo {
+.CLASS-1 {
 	color: blue;
-	&.bar { color: red }
+	&.CLASS-2 { color: red }
 }
 
-.foo, .bar {
+.CLASS-1, .CLASS-2 {
 	color: blue;
-	& + .baz, &.qux { color: red }
+	& + .CLASS-3, &.CLASS-4 { color: red }
 }
 
-.foo {
+.CLASS-1 {
 	color: blue;
-	& .bar & .baz & .qux { color: red }
+	& .CLASS-2 & .CLASS-3 & .CLASS-4 { color: red }
 }
 
-.foo {
+.CLASS-1 {
 	color: blue;
 	& { padding: 2ch }
 }
 
-.foo {
+.CLASS-1 {
 	color: blue;
 	&& { padding: 2ch }
 }
 
-.error, #code-404 {
-	&:hover > .baz { color: red }
+.CLASS-5, #ID-1 {
+	&:hover > .CLASS-3 { color: red }
 }
 
-.foo {
-	&:is(.bar, &.baz) { color: red }
+.CLASS-1 {
+	&:is(.CLASS-2, &.CLASS-3) { color: red }
 }
 
 figure {
@@ -54,39 +54,39 @@ figure {
 }
 
 
-.foo {
+.CLASS-1 {
 	color: red;
-	@nest & > .bar {
+	@nest & > .CLASS-2 {
 		color: blue;
 	}
 }
 
-.foo {
+.CLASS-1 {
 	color: red;
 	@nest .parent & {
 		color: blue;
 	}
 }
 
-.foo {
+.CLASS-1 {
 	color: red;
 	@nest :not(&) {
 		color: blue;
 	}
 }
 
-.foo {
+.CLASS-1 {
 	color: blue;
-	@nest .bar & {
+	@nest .CLASS-2 & {
 		color: red;
-		&.baz {
+		&.CLASS-3 {
 			color: green;
 		}
 	}
 }
 
 
-.foo {
+.CLASS-1 {
 	display: grid;
 
 	@media (orientation: landscape) {
@@ -94,7 +94,7 @@ figure {
 	}
 }
 
-.foo {
+.CLASS-1 {
 	display: grid;
 
 	@media (orientation: landscape) {

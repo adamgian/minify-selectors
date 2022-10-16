@@ -1,20 +1,20 @@
 @media print {
-	.SELECTOR-1 {}
-	.SELECTOR-2 {}
+	.CLASS-1 {}
+	.CLASS-2 {}
 }
 
 @media screen and (resolution: 50.82dpcm) {
-	#SELECTOR-3 {}
-	.SELECTOR-4 {}
+	#ID-1 {}
+	.CLASS-3 {}
 }
 
 @supports (display: grid) {
-	.SELECTOR-5 {
+	.CLASS-4 {
 		color: #000;
 	}
 
 	@media (min-width: 900px) {
-		.SELECTOR-6 {
+		.CLASS-5 {
 			color: #fff;
 		}
 	}
@@ -22,18 +22,18 @@
 
 /* .foo and .bar */
 @container (max-width: 420px) {
-	#SELECTOR-1 {
+	#ID-2 {
 		display: none;
 	}
 
-	.SELECTOR-1 {
+	.CLASS-1 {
 		font-size: 1.25rem;
 	}
 }
 
 /* #baz */
 @container (min-width: 9000px) {
-	.SELECTOR-2 {
+	.CLASS-2 {
 		gap: 1.75rem;
 	}
 }

@@ -1,38 +1,38 @@
-[class=SELECTOR-1] {}
-[class="SELECTOR-2"] {}
-[class='SELECTOR-3'] {}
-[class~=SELECTOR-4] {}
-[class~="SELECTOR-5"] {}
-[class~='SELECTOR-6'] {}
+[class=CLASS-1] {}
+[class="CLASS-2"] {}
+[class='CLASS-3'] {}
+[class~=CLASS-4] {}
+[class~="CLASS-5"] {}
+[class~='CLASS-6'] {}
 
-[id=SELECTOR-7] {}
-[id="SELECTOR-8"] {}
-[id='SELECTOR-9'] {}
-[id~=SELECTOR-10] {}
-[id~="SELECTOR-11"] {}
-[id~='SELECTOR-12'] {}
+[id=ID-1] {}
+[id="ID-2"] {}
+[id='ID-3'] {}
+[id~=ID-4] {}
+[id~="ID-5"] {}
+[id~='ID-6'] {}
 
-[class=SELECTOR-13 i] {}
-[class="SELECTOR-13" i] {}
-[class="SELECTOR-13"i] {}
-[class="SELECTOR-13" I] {}
-[class=SELECTOR-14 s] {}
-[class="SELECTOR-14" s] {}
-[class="SELECTOR-14"s] {}
-[class="SELECTOR-14" S] {}
-[class="SELECTOR-14" x] {}
+[class=foo i] {}
+[class="foo" i] {}
+[class="foo"i] {}
+[class="foo" I] {}
+[class=CLASS-7 s] {}
+[class="CLASS-7" s] {}
+[class="CLASS-7"s] {}
+[class="CLASS-7" S] {}
+[class="bar" x] {}
 
-[aria-describedby~='SELECTOR-16'] {}
-[aria-labelledby~='SELECTOR-17'] {}
-[for~='SELECTOR-15'] {}
-[form~='SELECTOR-18'] {}
-[headers~='SELECTOR-19'] {}
-[itemref~='SELECTOR-19'] {}
-[list~='SELECTOR-20'] {}
+[aria-describedby~='ID-7'] {}
+[aria-labelledby~='ID-8'] {}
+[for~='ID-9'] {}
+[form~='ID-10'] {}
+[headers~='ID-11'] {}
+[itemref~='ID-11'] {}
+[list~='ID-12'] {}
 
-[class^="SELECTOR-21"],
-[class$="SELECTOR-22"],
-[class*="SELECTOR-23"] {}
+[class^="baz"],
+[class$="baz"],
+[class*="baz"] {}
 
 .SELECTOR-24 {}
-[data-toggle="SELECTOR-25"] {}
+[data-toggle="baz"] {}

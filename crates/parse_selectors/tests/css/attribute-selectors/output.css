@@ -12,15 +12,15 @@
 [id~="e"] {}
 [id~='f'] {}
 
-[class=SELECTOR-13 i] {}
-[class="SELECTOR-13" i] {}
-[class="SELECTOR-13"i] {}
-[class="SELECTOR-13" I] {}
+[class=foo i] {}
+[class="foo" i] {}
+[class="foo"i] {}
+[class="foo" I] {}
 [class=h s] {}
 [class="h" s] {}
 [class="h"s] {}
 [class="h" S] {}
-[class="SELECTOR-14" x] {}
+[class="bar" x] {}
 
 [aria-describedby~='g'] {}
 [aria-labelledby~='h'] {}
@@ -30,9 +30,9 @@
 [itemref~='k'] {}
 [list~='l'] {}
 
-[class^="SELECTOR-21"],
-[class$="SELECTOR-22"],
-[class*="SELECTOR-23"] {}
+[class^="baz"],
+[class$="baz"],
+[class*="baz"] {}
 
 .a {}
-[data-toggle="SELECTOR-25"] {}
+[data-toggle="baz"] {}

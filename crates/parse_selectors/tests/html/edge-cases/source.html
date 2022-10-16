@@ -7,9 +7,9 @@
 
 		<style>
 			/* comment about .foo > .bar */
-			.SELECTOR-6 > .SELECTOR-7 {}
+			.CLASS-4 > .CLASS-5 {}
 			@media print {
-				.SELECTOR-8 {}
+				.CLASS-6 {}
 			}
 		</style>
 
@@ -21,12 +21,12 @@
 			 */
 			if (foo.bar < foo.baz) {
 				// document.classList.add('baz');
-				document.classList.add('SELECTOR-5');
+				document.classList.add('CLASS-3');
 			}
 		</script>
 	</head>
 
-	<body id="SELECTOR-1">
+	<body id="ID-1">
 		<!-- .foo.bar -->
 		<!-- class="foo" -->
 		<!-- <div class="foo"></div> -->
@@ -47,7 +47,7 @@
 			}
 		</CODE>
 
-		<code class="( SELECTOR-3 SELECTOR-4 )">
+		<code class="( CLASS-1 CLASS-2 )">
 			/*
 			 * comment about foo.bar < foo.baz
 			 *
@@ -59,12 +59,12 @@
 			}
 		</code>
 
-		<code id="SELECTOR-2" class="[ SELECTOR-11 SELECTOR-12 ] SELECTOR-13">
+		<code id="ID-2" class="[ CLASS-9 CLASS-10 ] CLASS-11">
 			&lt;div class="foo"&gt;&lt;/div&gt;
 		</code>
 
 		<script type="text/javascript">
-			a.className += 'SELECTOR-9 SELECTOR-10';
+			a.className += 'CLASS-7 CLASS-8';
 		</script>
 	</body>
 </html>

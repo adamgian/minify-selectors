@@ -1,55 +1,55 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36">
 
 	<style>
-		.SELECTOR-3 {
+		.CLASS-3 {
 			fill: white;
 		}
 
-		.SELECTOR-1.SELECTOR-1 path {
+		.CLASS-1.CLASS-1 path {
 			stroke: none !important;
 		}
 
-		.SELECTOR-8 {
+		.CLASS-8 {
 			fill: none;
 		}
 
-		.SELECTOR-8.SELECTOR-10 {transform:translate(-2px, -2px)}
-		.SELECTOR-8.SELECTOR-11 {transform:translate(-1px, -2px)}
-		.SELECTOR-8.SELECTOR-12 {transform:translate(0, -2px)}
-		.SELECTOR-8.SELECTOR-13 {transform:translate(-2px, -1px)}
-		.SELECTOR-8.SELECTOR-14 {transform:translate(-1px, -1px)}
-		.SELECTOR-8.SELECTOR-15 {transform:translate(0, -1px)}
-		.SELECTOR-8.SELECTOR-16 {transform:translate(-2px, 0)}
-		.SELECTOR-8.SELECTOR-17 {transform:translate(-1px, 0)}
-		.SELECTOR-8.SELECTOR-18 {transform:translate(0, 0)}
+		.CLASS-8.CLASS-10 {transform:translate(-2px, -2px)}
+		.CLASS-8.CLASS-11 {transform:translate(-1px, -2px)}
+		.CLASS-8.CLASS-12 {transform:translate(0, -2px)}
+		.CLASS-8.CLASS-13 {transform:translate(-2px, -1px)}
+		.CLASS-8.CLASS-14 {transform:translate(-1px, -1px)}
+		.CLASS-8.CLASS-15 {transform:translate(0, -1px)}
+		.CLASS-8.CLASS-16 {transform:translate(-2px, 0)}
+		.CLASS-8.CLASS-17 {transform:translate(-1px, 0)}
+		.CLASS-8.CLASS-18 {transform:translate(0, 0)}
 	</style>
 
-	<g class="SELECTOR-1">
-		<rect class="SELECTOR-2" height="0" width="0" x="18" y="18"/>
-		<path class="SELECTOR-3" d="M23,20.5c0-2.76-2.24-5-5-5s-5,2.24-5,5H23z"/>
+	<g class="CLASS-1">
+		<rect class="CLASS-2" height="0" width="0" x="18" y="18"/>
+		<path class="CLASS-3" d="M23,20.5c0-2.76-2.24-5-5-5s-5,2.24-5,5H23z"/>
 		<path d="M18,15.5c-2.76,0-5,2.24-5,5h0.25h0.25h9h0.25H23C23,17.74,20.76,15.5,18,15.5z M13.55,20c0.25-2.25,2.13-4,4.45-4
 			s4.2,1.75,4.45,4H13.55z"/>
 		<text
-			class="SELECTOR-4"
+			class="CLASS-4"
 			dominant-baseline="central"
 			text-anchor="middle"
 			x="24"
 			y="12">
 		</text>
 		<text
-			class="SELECTOR-5"
+			class="CLASS-5"
 			dominant-baseline="central"
 			style="font-size:3px"
 			text-anchor="middle"
 			x="18"
 			y="18.33">
 		</text>
-		<g class="SELECTOR-6">
-			<rect class="SELECTOR-7" height="5" width="10" x="13" y="15.5"/>
-			<rect class="SELECTOR-8 SELECTOR-11" height="2" width="2" x="18" y="15.5"/>
-			<rect class="SELECTOR-8 SELECTOR-16" height="2" width="2" x="13" y="20.5"/>
-			<rect class="SELECTOR-8 SELECTOR-17 SELECTOR-9" height="2" width="2" x="18" y="20.5"/>
-			<rect class="SELECTOR-8 SELECTOR-18" height="2" width="2" x="23" y="20.5"/>
+		<g class="CLASS-6">
+			<rect class="CLASS-7" height="5" width="10" x="13" y="15.5"/>
+			<rect class="CLASS-8 CLASS-11" height="2" width="2" x="18" y="15.5"/>
+			<rect class="CLASS-8 CLASS-16" height="2" width="2" x="13" y="20.5"/>
+			<rect class="CLASS-8 CLASS-17 CLASS-9" height="2" width="2" x="18" y="20.5"/>
+			<rect class="CLASS-8 CLASS-18" height="2" width="2" x="23" y="20.5"/>
 		</g>
 	</g>
 

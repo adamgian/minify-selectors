@@ -1,21 +1,21 @@
-<!-- __id--SELECTOR-1 #__--SELECTOR-1 #__--SELECTOR-2 -->
-<button type="button" data-toggle="modal" data-target="#__--SELECTOR-1"></button>
-<div id="__ignore--foo" class="__ignore--foo SELECTOR-1 SELECTOR-2"></div>
-<component data-classes="__class--SELECTOR-2 __class--SELECTOR-3 foo"></component>
+<!-- __id--ID-1 #__--ID-1 #__--ID-3 -->
+<button type="button" data-toggle="modal" data-target="#__--ID-1"></button>
+<div id="__ignore--foo" class="__ignore--foo CLASS-1 CLASS-2"></div>
+<component data-classes="__class--CLASS-2 __class--CLASS-3 foo"></component>
 <code>
-// See: http://example.com/#__--SELECTOR-1
-// See: files/#__--SELECTOR-4
+// See: http://example.com/#__--ID-1
+// See: files/#__--ID-2
 </code>
 
 <style>
-	#SELECTOR-1 {}
-	.SELECTOR-2, .SELECTOR-3, .__ignore--foo {}
+	#ID-1 {}
+	.CLASS-2, .CLASS-3, .__ignore--foo {}
 
-	.SELECTOR-5::after {
-		content: "./path/#__--SELECTOR-4";
+	.CLASS-4::after {
+		content: "./path/#__--ID-2";
 	}
 
-	.SELECTOR-5::before {
+	.CLASS-4::before {
 		content: "./path/#foo";
 	}
 
@@ -25,12 +25,12 @@
 
 <script>
 	a.classList.add(() => {
-		if (foo) return "__class--SELECTOR-6";
-		else if (bar) return "__class--SELECTOR-7 __class--SELECTOR-6";
-		else if (baz) return "__class--SELECTOR-8";
+		if (foo) return "__class--CLASS-5";
+		else if (bar) return "__class--CLASS-6 __class--CLASS-5";
+		else if (baz) return "__class--CLASS-7";
 	});
 	document.getElementById('__ignore--baz');
 	document.getElementsByClassName('__ignore--foo');
 	document.querySelector('#__ignore--baz');
-	b.classList.add('__ignore--is-active', 'SELECTOR-9');
+	b.classList.add('__ignore--is-active', 'CLASS-8');
 </script>
