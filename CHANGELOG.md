@@ -1,3 +1,14 @@
+# v1.1.0
+<sub>TBD</sub>
+
+### Updates
+- Upgrade clap to v4
+
+<br>
+
+
+
+
 # v1.0.0
 <sub>16 Oct</sub>
 

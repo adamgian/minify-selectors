@@ -11,9 +11,9 @@
 
 # minify-selectors
 
-Post-processor that minifies classes and IDs selector names in CSS, HTML, Javascript and SVG files. Each unique selector, and any subsequent occurances elsewhere, is converted into an ultracompact one.
+Post-processor that minifies classes and IDs selector names in CSS, HTML, Javascript and SVG files. Each unique selector — and any subsequent occurances elsewhere — is converted into an ultracompact one.
 
-Enhance your front-end assets and build optimisations pipeline — wring even more out from your already minified and optimised payload sizes. Additionally, can offer a certain degree of obfuscation to your code.
+Enhance your front-end assets and build optimisations pipeline — wring even more out from your already minified and optimised payload sizes. Additionally can offer a certain degree of obfuscation to your code.
 
 <br>
 
@@ -26,7 +26,7 @@ For a full outline of capabilities and current limitations, see [parse_selectors
 
 ### Comprehensive out of the box support
 
-minify-selectors aims to minify all obvious selectors right out of the gate. Any extra work configuring should be to assist minify-selectors to identify additional and/or ambigious selectors.
+minify-selectors aims to minify all obvious selectors right out of the gate. Any extra work configuring should be to assist minify-selectors to identify additional or ambigious selectors.
 
 
 #### CSS and embedded styles
@@ -223,7 +223,7 @@ minify-selectors only supports regular CSS, HTML, JS and SVG files. SASS/SCSS, L
 	npm run build
 	```
 
-### Running as CLI tool
+### Running as a CLI tool
 
 1. Install via homebrew:
 	```shell
