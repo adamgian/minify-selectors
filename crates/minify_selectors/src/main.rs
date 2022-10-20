@@ -7,32 +7,7 @@ use std::path::Path;
 use std::path::PathBuf;
 use std::time::Instant;
 
-use clap::Parser;
 use minify_selectors_utils::*;
-
-
-
-
-/// Post-processor that minifies classes and IDs in CSS, HTML and JS files.
-#[derive(Parser, Debug)]
-#[clap(version, about, long_about = None)]
-struct Cli {
-	/// Directory or file to process
-	#[clap(short = 'i', long = "input")]
-	source: String,
-
-	/// Output directory to save file(s)
-	#[clap(short = 'o', long = "output")]
-	output: String,
-
-	/// Index to start encoding from
-	#[clap(long = "start-index")]
-	start_index: Option<usize>,
-
-	/// Sequence of characters to use when encoding
-	#[clap(long)]
-	alphabet: Option<String>,
-}
 
 
 
@@ -49,11 +24,12 @@ fn main() {
 
 fn minify_selectors() -> Result<(), Box<dyn Error>> {
 	let stopwatch = Instant::now();
-	let args = Cli::parse();
+	let config = Config::new();
+	let mut selectors = Selectors::new(config.start_index);
 
-	let mut source_dir = PathBuf::from(&args.source);
-	let mut source_glob = String::from(&args.source);
-	let output_dir = String::from(&args.output);
+	let mut source_dir = PathBuf::from(&config.source);
+	let mut source_glob = config.source.to_owned();
+	let output_dir = config.output.clone();
 
 	// If glob string is for a directory, append
 	// glob pattern to search for CSS, HTML, JS and SVG files.
@@ -79,18 +55,6 @@ fn minify_selectors() -> Result<(), Box<dyn Error>> {
 		source_dir = Path::new("./").join(source_dir);
 	}
 
-	let config = Config {
-		alphabet: encode_selector::into_alphabet_set(match &args.alphabet {
-			Some(alphabet) => alphabet,
-			None => "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
-		}),
-		start_index: match &args.start_index {
-			Some(index) => *index,
-			None => 0,
-		},
-	};
-	let mut selectors = Selectors::new(config.start_index);
-
 	for entry in globwalk::glob(&source_glob).unwrap() {
 		match entry {
 			Ok(glob_match) => {
@@ -101,13 +65,10 @@ fn minify_selectors() -> Result<(), Box<dyn Error>> {
 					let output_path = match source_dir.is_dir() {
 						// Remove given source directory to make each
 						// matched file relative to the output directory.
-						true => {
-							PathBuf::from(&output_dir)
-								.join(source_path.strip_prefix(&source_dir).unwrap())
-						},
+						true => output_dir.join(source_path.strip_prefix(&source_dir).unwrap()),
 						// Or if input path was to a file, append only
 						// the file name to the given output directory
-						false => PathBuf::from(&output_dir).join(source_path.file_name().unwrap()),
+						false => output_dir.join(source_path.file_name().unwrap()),
 					};
 
 					// Making sure directories exists or are created
