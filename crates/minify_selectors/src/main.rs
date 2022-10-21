@@ -55,36 +55,32 @@ fn minify_selectors() -> Result<(), Box<dyn Error>> {
 		source_dir = Path::new("./").join(source_dir);
 	}
 
-	for entry in globwalk::glob(&source_glob).unwrap() {
-		match entry {
-			Ok(glob_match) => {
-				let source_path = Path::new(glob_match.path());
+	for entry in globwalk::glob(&source_glob)? {
+		if let Ok(entry) = entry {
+			let source_path = Path::new(entry.path());
 
-				// Making sure glob matched path is indeed a file to proceed.
-				if source_path.is_file() {
-					let output_path = match source_dir.is_dir() {
-						// Remove given source directory to make each
-						// matched file relative to the output directory.
-						true => output_dir.join(source_path.strip_prefix(&source_dir).unwrap()),
-						// Or if input path was to a file, append only
-						// the file name to the given output directory
-						false => output_dir.join(source_path.file_name().unwrap()),
-					};
+			// Making sure glob matched path is indeed a file to proceed.
+			if source_path.is_file() {
+				let output_path = match source_dir.is_dir() {
+					// Remove given source directory to make each
+					// matched file relative to the output directory.
+					true => output_dir.join(source_path.strip_prefix(&source_dir).unwrap()),
+					// Or if input path was to a file, append only
+					// the file name to the given output directory
+					false => output_dir.join(source_path.file_name().unwrap()),
+				};
 
-					// Making sure directories exists or are created
-					// before writing file.
-					if let Some(dir_only) = &output_path.parent() {
-						fs::create_dir_all(dir_only)?;
-					};
+				// Making sure directories exists or are created
+				// before writing file.
+				if let Some(dir_only) = &output_path.parent() {
+					fs::create_dir_all(dir_only)?;
+				};
 
-					fs::write(
-						output_path,
-						process_file(source_path, &mut selectors, &config)?,
-					)?;
-				}
-			},
-
-			Err(error) => println!("{:?}", error),
+				fs::write(
+					output_path,
+					process_file(source_path, &mut selectors, &config)?,
+				)?;
+			}
 		}
 	}
 

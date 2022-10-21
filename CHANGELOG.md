@@ -53,7 +53,7 @@ No noteworthy changes since the last version
 
 ### Updates
 - Parse and encode minify-selectors specific prefixed selectors ([#11](https://github.com/adamgian/minify-selectors/issues/11))
-- Add support for JS Location interface proprties: `window.location.hash`, 'window.location.href' and `window.location`
+- Add support for JS Location interface proprties: `window.location.hash`, `window.location.href` and `window.location`
 - Add support for JS URL methods: `history.pushState()`, `history.replaceState()`, `window.location.assign()`, `window.location.replace()` and `window.open()`
 
 ### Fixes
@@ -120,8 +120,8 @@ No noteworthy changes since the last version
 ### Updates:
 - Add build for macOS 64-bit arm platforms
 - `.closest()` function support in JS file and scripts
-- Optional custom alphabet flag (`--alphabet`)
-- Optional starting index flag (`--start-index`)
+- Support for an optional custom alphabet argument (`--alphabet`)
+- Support for an optional starting index argument (`--start-index`)
 
 ### Fixes:
 - Ignore comments when searching for attribute selectors in CSS
