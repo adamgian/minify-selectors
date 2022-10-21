@@ -246,7 +246,7 @@ minify-selectors only supports regular CSS, HTML, JS and SVG files. SASS/SCSS, L
 <table>
 	<thead>
 		<tr>
-			<th align="left" width="165">Flag</th>
+			<th align="left" width="165">Option</th>
 			<th align="left">Description</th>
 		</tr>
 	</thead>
