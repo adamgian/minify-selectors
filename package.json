@@ -14,7 +14,7 @@
 		"postinstall": "node ./build/install.js",
 		"lint:clippy": "cargo clippy -- -A clippy::needless_return",
 		"lint:rustfmt": "cargo +nightly fmt --check",
-		"bench": "cargo bench"
+		"bench": "cargo bench",
 		"test": "cargo test"
 	},
 	"repository": {

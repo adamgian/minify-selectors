@@ -18,9 +18,10 @@ path = "./src/main.rs"
 
 [dependencies]
 clap = { version = "4.0.15", features = ["derive"] }
-globwalk = "0.8.1"
+rayon = "1.5.3"
+walkdir = "2.3.2"
 
-minify_selectors_utils = { version = "0.2.0", path = "../minify_selectors_utils" }
+minify_selectors_utils = { version = "0.3.0", path = "../minify_selectors_utils" }
 parse_selectors = { version = "1.0.0", path = "../parse_selectors" }
 encode_selector = { version = "0.3.3", path = "../encode_selector" }
 
