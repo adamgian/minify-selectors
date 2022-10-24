@@ -2,7 +2,6 @@ use std::error::Error;
 use std::ffi::OsStr;
 use std::fs;
 use std::path::Path;
-use std::path::PathBuf;
 use std::time::Instant;
 
 use minify_selectors_utils::*;
@@ -27,16 +26,8 @@ fn minify_selectors() -> Result<(), Box<dyn Error>> {
 	let config = Config::new();
 	let mut selectors = Selectors::new(config.start_index);
 
-	let mut source_dir = PathBuf::from(&config.source);
-	let output_dir = config.output.clone();
-
-	// Force all relative paths to start with "./"
-	if source_dir.is_relative() & !source_dir.starts_with("./") {
-		source_dir = Path::new("./").join(source_dir);
-	}
-
 	// TODO: setup rayon
-	// let entries: Vec<PathBuf> = WalkDir::new(&source_dir)
+	// let entries: Vec<PathBuf> = WalkDir::new(&config.source)
 	// 	.into_iter()
 	// 	.filter_map(|e| e.ok())
 	// 	.filter(|e| is_processable(e))
@@ -47,30 +38,33 @@ fn minify_selectors() -> Result<(), Box<dyn Error>> {
 	// 	println!("entries: {}", entry.display());
 	// });
 
-	for entry in WalkDir::new(&source_dir)
+	for entry in WalkDir::new(&config.source)
 		.into_iter()
 		.filter_map(|e| e.ok())
 		.filter(|e| is_processable(e))
 	{
-		let source_path = Path::new(entry.path());
-		let output_path = match source_dir.is_dir() {
+		let output_path = match &config.source.is_dir() {
 			// Remove given source directory to make each
 			// matched file relative to the output directory.
-			true => output_dir.join(source_path.strip_prefix(&source_dir).unwrap()),
+			true => {
+				config
+					.output
+					.join(entry.path().strip_prefix(&config.source).unwrap())
+			},
 			// Or if input path was to a file, append only
 			// the file name to the given output directory
-			false => output_dir.join(source_path.file_name().unwrap()),
+			false => config.output.join(entry.path().file_name().unwrap()),
 		};
 
-		// Making sure directories exists or are created
-		// before writing file.
+		// Making sure output directory exists or is
+		// created before writing file.
 		if let Some(dir_only) = &output_path.parent() {
 			fs::create_dir_all(dir_only)?;
 		};
 
 		fs::write(
 			output_path,
-			process_file(source_path, &mut selectors, &config)?,
+			process_file(entry.path(), &mut selectors, &config)?,
 		)?;
 	}
 
@@ -84,14 +78,14 @@ fn process_file(
 	selectors: &mut Selectors,
 	config: &Config,
 ) -> Result<String, std::io::Error> {
-	let file_extension = file_path.extension().and_then(OsStr::to_str);
 	let mut file_contents = fs::read_to_string(file_path)?;
-
 	println!("Processing file: {}", file_path.display());
 
-	match file_extension {
+	match file_path.extension().and_then(OsStr::to_str) {
 		Some("css") => parse_selectors::from_css(&mut file_contents, selectors, config),
-		Some("html") | Some("svg") => parse_selectors::from_html(&mut file_contents, selectors, config),
+		Some("html") | Some("svg") => {
+			parse_selectors::from_html(&mut file_contents, selectors, config)
+		},
 		Some("js") => parse_selectors::from_js(&mut file_contents, selectors, config),
 		_ => (),
 	}
@@ -102,7 +96,7 @@ fn process_file(
 fn is_processable(entry: &walkdir::DirEntry) -> bool {
 	// Check that current path is a file
 	if !entry.path().is_file() {
-		return false
+		return false;
 	};
 
 	// Finally, check file has a extension that can be processed

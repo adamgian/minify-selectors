@@ -34,7 +34,7 @@ pub struct Cli {
 
 #[derive(Debug)]
 pub struct Config {
-	pub source: String,
+	pub source: PathBuf,
 	pub output: PathBuf,
 	pub alphabet: Vec<char>,
 	pub start_index: usize,
@@ -46,7 +46,7 @@ impl Config {
 		let args = Cli::parse();
 
 		Self {
-			source: String::from(&args.source),
+			source: PathBuf::from(&args.source),
 			output: PathBuf::from(&args.output),
 			alphabet: encode_selector::into_alphabet_set(match &args.alphabet {
 				Some(alphabet) => alphabet,
