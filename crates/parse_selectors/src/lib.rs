@@ -617,9 +617,7 @@ fn process_js_properties(
 					process_html_attributes(&mut property_value, selectors, config);
 				}
 			},
-			"window.location.hash"
-			| "window.location.href"
-			| "window.location" => {
+			"window.location.hash" | "window.location.href" | "window.location" => {
 				process_anchor_links(&mut property_value, selectors, config);
 			},
 			_ => {},
@@ -695,9 +693,7 @@ fn process_string_of_tokens(
 }
 
 /// Returns an iterator of function arguments.
-fn get_function_arguments<'r, 't> (
-	string: &'t str
-) -> FindCaptures<'r, 't> {
+fn get_function_arguments<'r, 't>(string: &'t str) -> FindCaptures<'r, 't> {
 	regexes::STRING_DELIMITED_BY_COMMA.captures_iter(string)
 }
 

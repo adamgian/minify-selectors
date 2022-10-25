@@ -9,7 +9,6 @@ use parse_selectors;
 
 
 
-
 #[test]
 fn css_files() {
 	let dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/css/");
@@ -112,7 +111,10 @@ fn js_files() {
 	// getElementsByClassName()
 	assert_eq!(
 		fs::read_to_string(dir.clone().join("get-elements-by-class-name/output.js")).unwrap(),
-		process_file("js", &dir.clone().join("get-elements-by-class-name/source.js"))
+		process_file(
+			"js",
+			&dir.clone().join("get-elements-by-class-name/source.js")
+		)
 	);
 
 	// history.pushState()
