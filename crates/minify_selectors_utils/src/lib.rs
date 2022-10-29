@@ -32,7 +32,7 @@ pub struct Cli {
 pub struct Config {
 	pub source: PathBuf,
 	pub output: PathBuf,
-	pub alphabet: Vec<char>,
+	pub alphabet: (Vec<char>, Vec<usize>),
 	pub start_index: usize,
 }
 
@@ -103,8 +103,8 @@ impl Selectors {
 		self.map.insert(key.clone(), value);
 		match key.chars().next() {
 			Some('.') => self.class_index += 1,
-			// Some('#') |
-			_ => self.id_index += 1,
+			Some('#') => self.id_index += 1,
+			_ => panic!("Missing or unknown selector type"),
 		}
 	}
 }

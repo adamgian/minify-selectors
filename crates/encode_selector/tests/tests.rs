@@ -257,6 +257,6 @@ fn index_to_base26_latin_letters() {
 fn alphabet_sanitisation() {
 	assert_eq!(
 		into_alphabet_set(&"`~!@#$%^&*()_-+=<>?[]{}|abc"),
-		['_', '-', 'a', 'b', 'c']
+		(vec!['_', '-', 'a', 'b', 'c'], vec![0, 1])
 	);
 }

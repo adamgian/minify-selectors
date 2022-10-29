@@ -97,8 +97,8 @@ fn get_encoded_selector(
 			let encoded_selector: String = encode_selector::to_radix(
 				match selector.chars().next() {
 					Some('.') => &selectors.class_index,
-					// Some('#') |
-					_ => &selectors.id_index,
+					Some('#') => &selectors.id_index,
+					_ => panic!("Missing or unknown selector type"),
 				},
 				&config.alphabet,
 			);

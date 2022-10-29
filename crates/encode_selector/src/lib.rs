@@ -31,27 +31,15 @@ lazy_static! {
 ///
 /// Function parameters:
 /// - ordinal (&usize) - Integer to encode, must be 0 or greater.
-/// - alphabet (&Vec<char>) - String sequence of characters in which to create a
-///   radix from. Use into_alphabet_set() to create this vector from a processed
-///   string such as: "0123456789ABCDEF".
+/// - alphabet (&(Vec<char>, &Vec<usize>)) - A tuple, use into_alphabet_set() to
+///   create this tuple from a processed string such as: "0123456789ABCDEF".
 pub fn to_radix(
 	ordinal: &usize,
-	alphabet: &[char],
+	alphabet: &(Vec<char>, Vec<usize>),
 ) -> String {
-	let invalid_char_positions: Vec<usize> = alphabet
-		.iter()
-		.enumerate()
-		.filter_map(|(index, char)| {
-			match INVALID_FIRST_CHARACTER.contains(char) {
-				true => Some(index),
-				false => None,
-			}
-		})
-		.collect();
-
 	// Work out the number of places encoded ordinal will take up.
-	let base: usize = alphabet.len();
-	let subset: usize = base - invalid_char_positions.len();
+	let base: usize = alphabet.0.len();
+	let subset: usize = base - alphabet.1.len();
 	let mut carry: usize = 0;
 	let mut exponent: u8 = 0;
 	let mut floor: usize = 1; // base ^ exponent
@@ -72,7 +60,7 @@ pub fn to_radix(
 	let mut offset: usize = 0;
 
 	// Loop over invalid chars vector and make sure offset(s) are accounted for.
-	for (index, alphabet_position) in invalid_char_positions.iter().enumerate() {
+	for (index, alphabet_position) in alphabet.1.iter().enumerate() {
 		if modulo + index < *alphabet_position {
 			break;
 		}
@@ -88,7 +76,7 @@ pub fn to_radix(
 	let mut encoded_selector = String::new();
 	for _ in 0..=exponent {
 		let remainder = assigned_index.rem_euclid(base);
-		encoded_selector.insert(0, *alphabet.get(remainder).unwrap());
+		encoded_selector.insert(0, *alphabet.0.get(remainder).unwrap());
 		assigned_index = (assigned_index - remainder).wrapping_div(base);
 	}
 
@@ -96,8 +84,10 @@ pub fn to_radix(
 }
 
 
-/// Returns a sanitised vector of chars that are all unique.
-pub fn into_alphabet_set(alphabet: &str) -> Vec<char> {
+/// Returns a tuple of:
+///  0. sanitised vector of chars that are all unique
+///  1. vector of the positions of chars a selector name cannot start with.
+pub fn into_alphabet_set(alphabet: &str) -> (Vec<char>, Vec<usize>) {
 	let mut alphabet_set: Vec<char> = Vec::new();
 
 	// Sanitise alphabet, remove any invalid characters
@@ -110,5 +100,18 @@ pub fn into_alphabet_set(alphabet: &str) -> Vec<char> {
 		}
 	}
 
-	alphabet_set
+	// Noting the positions of characters that are blacklisted from
+	// being the first character in a encoded selector name.
+	let invalid_as_first_char_positions: Vec<usize> = alphabet_set
+		.iter()
+		.enumerate()
+		.filter_map(|(index, char)| {
+			match INVALID_FIRST_CHARACTER.contains(char) {
+				true => Some(index),
+				false => None,
+			}
+		})
+		.collect();
+
+	(alphabet_set, invalid_as_first_char_positions)
 }

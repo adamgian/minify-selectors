@@ -15,4 +15,4 @@ version = "0.3.0"
 [dependencies]
 clap = { version = "4.0.15", features = ["derive"] }
 
-encode_selector = { version = "0.3.3", path = "../encode_selector" }
+encode_selector = { version = "0.4.0", path = "../encode_selector" }
