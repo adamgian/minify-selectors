@@ -14,7 +14,7 @@ lazy_static! {
 	// -  \56: period (.)
 	// -  \57: slash (/)
 	// -  \72-\100: colon (:) to at (@)
-	// -  \133-\136: left square bracket ([) to  caret (^)
+	// -  \133-\136: left square bracket ([) to caret (^)
 	// -  \140: backtick (`)
 	// -  \173-\177: left brace ({) to delete
 	static ref INVALID_CHARACTERS: Regex = Regex::new(
@@ -54,8 +54,7 @@ pub fn to_radix(
 	let subset: usize = base - invalid_char_positions.len();
 	let mut carry: usize = 0;
 	let mut exponent: u8 = 0;
-	// base ^ exponent
-	let mut floor: usize = 1;
+	let mut floor: usize = 1; // base ^ exponent
 
 	while *ordinal >= subset * floor + carry {
 		carry += subset * floor;

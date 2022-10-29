@@ -6,7 +6,12 @@ use criterion::Criterion;
 
 
 
-pub fn fixme(c: &mut Criterion) {}
+pub fn minify_selectors_benchmarks(c: &mut Criterion) {
+	c.bench_function(
+		"todo",
+		|b| b.iter(|| {})
+	);
+}
 
-criterion_group!(benches, fixme);
+criterion_group!(benches, minify_selectors_benchmarks);
 criterion_main!(benches);
