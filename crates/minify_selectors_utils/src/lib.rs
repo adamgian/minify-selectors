@@ -25,10 +25,6 @@ pub struct Cli {
 	/// Sequence of characters to use when encoding
 	#[clap(long)]
 	alphabet: Option<String>,
-
-	/// Output directory to save file(s)
-	#[clap(short = 'p', long)]
-	parallel: Option<Option<bool>>,
 }
 
 
@@ -38,7 +34,6 @@ pub struct Config {
 	pub output: PathBuf,
 	pub alphabet: Vec<char>,
 	pub start_index: usize,
-	pub parallel: bool,
 }
 
 impl Config {
@@ -55,12 +50,6 @@ impl Config {
 			start_index: match &args.start_index {
 				Some(index) => *index,
 				None => 0,
-			},
-			parallel: match &args.parallel {
-				None => false,
-				Some(None) => true,         // --parallel
-				Some(Some(true)) => true,   // --parallel=true
-				Some(Some(false)) => false, // --parallel=false
 			},
 		}
 	}

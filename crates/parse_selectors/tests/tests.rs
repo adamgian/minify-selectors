@@ -245,7 +245,7 @@ fn process_file(
 	let mut file = fs::read_to_string(file_path).unwrap();
 
 	let config = Config {
-		source: String::from(""),
+		source: PathBuf::from(""),
 		output: PathBuf::from(""),
 		alphabet: encode_selector::into_alphabet_set(concat!(
 			"0123456789",
@@ -253,7 +253,6 @@ fn process_file(
 			"ABCDEFGHIJKLMNOPQRSTUVWXYZ",
 		)),
 		start_index: 0,
-		parallel: false,
 	};
 
 	let mut selectors = Selectors {

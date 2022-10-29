@@ -180,7 +180,9 @@ fn process_prefixed_selectors(
 	*file_string = regexes::PREFIXED_SELECTORS.replace_all(file_string, |capture: &Captures| {
 		let mut placeholder_value = capture.at(3).unwrap().trim().to_string();
 
+
 		match capture.at(2) {
+			#[rustfmt::skip]
 			// "__class--foo"
 			Some("class") => {
 				placeholder_value = get_encoded_selector(
@@ -190,6 +192,7 @@ fn process_prefixed_selectors(
 				);
 			},
 
+			#[rustfmt::skip]
 			// "__id--foo"
 			Some("id") => {
 				placeholder_value = get_encoded_selector(
@@ -283,9 +286,8 @@ fn process_css_attributes(
 			}
 
 			// Work out if value(s) are classes, ids or selectors.
-			let attribute_type_designation: &str = ATTRIBUTES_WHITELIST
-				.get(attribute_name)
-				.unwrap();
+			let attribute_type_designation: &str =
+				ATTRIBUTES_WHITELIST.get(attribute_name).unwrap();
 
 			match attribute_type_designation {
 				"id" | "class" => {
@@ -335,7 +337,8 @@ fn process_html_attributes(
 				// <code> element.
 				// Check for attributes to encode on the opening tag.
 				true => {
-					let code_element = capture.at(0)
+					let code_element = capture
+						.at(0)
 						.unwrap()
 						.strip_prefix("<code")
 						.unwrap()
@@ -415,7 +418,6 @@ fn process_html_attributes(
 				return capture.at(0).unwrap().to_string();
 			},
 		}
-
 	});
 }
 
@@ -481,23 +483,16 @@ fn process_js_arguments(
 
 				// Check first arg in function, without the string delimiters
 				// and then trimming any whitespace off ends.
-				let attribute_name: &str = function_args
-					.next()
-					.unwrap()
-					.at(2)
-					.unwrap_or("")
-					.trim();
+				let attribute_name: &str = function_args.next().unwrap().at(2).unwrap_or("").trim();
 
 				// Check first argument is an known attribute which its value will have
 				// classses or an id. If it is not, leave value as is (second argument).
 				if ATTRIBUTES_WHITELIST.contains_key(attribute_name) {
-
 					if let Some(attribute_value) = function_args.next() {
 						if attribute_value.at(2).is_some() {
 							let mut replacement_value = attribute_value.at(2).unwrap().to_string();
-							let attribute_type_designation: &str = ATTRIBUTES_WHITELIST
-								.get(attribute_name)
-								.unwrap();
+							let attribute_type_designation: &str =
+								ATTRIBUTES_WHITELIST.get(attribute_name).unwrap();
 
 
 							match attribute_type_designation {
@@ -521,7 +516,6 @@ fn process_js_arguments(
 								.replace(attribute_value.at(2).unwrap(), &replacement_value);
 						}
 					}
-
 				}
 			},
 
@@ -540,8 +534,8 @@ fn process_js_arguments(
 							},
 						};
 
-						replacement_args = replacement_args
-							.replace(html.at(2).unwrap(), &replacement_html);
+						replacement_args =
+							replacement_args.replace(html.at(2).unwrap(), &replacement_html);
 					}
 				}
 			},
@@ -552,8 +546,8 @@ fn process_js_arguments(
 				if let Some(link) = get_function_arguments(&replacement_args).next() {
 					let mut replacement_link = link.at(0).unwrap().to_string();
 					process_anchor_links(&mut replacement_link, selectors, config);
-					replacement_args = replacement_args
-						.replace(link.at(0).unwrap(), &replacement_link);
+					replacement_args =
+						replacement_args.replace(link.at(0).unwrap(), &replacement_link);
 				}
 			},
 
@@ -563,8 +557,8 @@ fn process_js_arguments(
 				if let Some(link) = get_function_arguments(&replacement_args).nth(2) {
 					let mut replacement_link = link.at(0).unwrap().to_string();
 					process_anchor_links(&mut replacement_link, selectors, config);
-					replacement_args = replacement_args
-						.replace(link.at(0).unwrap(), &replacement_link);
+					replacement_args =
+						replacement_args.replace(link.at(0).unwrap(), &replacement_link);
 				}
 			},
 
@@ -791,7 +785,6 @@ fn process_anchor_links(
 			if capture.at(1).is_none() {
 				return capture.at(0).unwrap().to_string();
 			}
-
 			format!(
 				"{url}#{target_id}",
 				url = capture.at(1).unwrap_or(""),

@@ -2,11 +2,9 @@ use std::error::Error;
 use std::ffi::OsStr;
 use std::fs;
 use std::path::Path;
-use std::path::PathBuf;
 use std::time::Instant;
 
 use minify_selectors_utils::*;
-use rayon::prelude::*;
 use walkdir::WalkDir;
 
 
@@ -27,26 +25,12 @@ fn minify_selectors() -> Result<(), Box<dyn Error>> {
 	let config = Config::new();
 	let mut selectors = Selectors::new(config.start_index);
 
-	let entries: Vec<PathBuf> = WalkDir::new(&config.source)
+	for entry in WalkDir::new(&config.source)
 		.into_iter()
 		.filter_map(|e| e.ok())
 		.filter(|e| is_processable(e))
-		.map(|e| e.path().to_owned())
-		.collect();
-
-	if config.parallel {
-		entries.par_iter().try_for_each(
-			|entry: &PathBuf| -> Result<(), std::io::Error> {
-				println!("todo process_file: {}", entry.display());
-				// process_file(entry, &mut selectors, &config)?;
-				Ok(())
-			}
-		)?;
-	} else {
-		entries.iter().try_for_each(|entry| -> Result<(), std::io::Error> {
-			process_file(entry, &mut selectors, &config)?;
-			Ok(())
-		})?;
+	{
+		process_file(entry.path(), &mut selectors, &config)?;
 	}
 
 	println!("minify-selectors finished in: {:.2?}", stopwatch.elapsed());

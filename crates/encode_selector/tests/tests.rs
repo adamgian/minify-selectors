@@ -21,6 +21,7 @@ use encode_selector::*;
 
 #[test]
 fn index_to_base62_standard() {
+	#[rustfmt::skip]
 	let alphabet = into_alphabet_set(
 		&"0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	);
@@ -74,6 +75,7 @@ fn index_to_base62_standard() {
 
 #[test]
 fn index_to_base62_nums_last() {
+	#[rustfmt::skip]
 	let alphabet = into_alphabet_set(
 		&"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	);
@@ -133,6 +135,7 @@ fn index_to_base62_nums_last() {
 
 #[test]
 fn index_to_base62_nums_scattered() {
+	#[rustfmt::skip]
 	let alphabet = into_alphabet_set(
 		&"a0bc1d234ef5ghijklmn6opqr78s9tuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	);
@@ -179,6 +182,7 @@ fn index_to_base62_nums_scattered() {
 
 #[test]
 fn index_to_base64_custom() {
+	#[rustfmt::skip]
 	let alphabet = into_alphabet_set(
 		&"0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_"
 	);
