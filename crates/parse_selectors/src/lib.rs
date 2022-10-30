@@ -10,7 +10,7 @@ pub mod regexes;
 
 
 lazy_static! {
-	// HTML attributes which its values will contain classes/ids
+	// HTML attributes which its values will contain classes/IDs
 	static ref ATTRIBUTES_WHITELIST: HashMap<String, String> = HashMap::from([
 		// div id="foo"
 		(String::from("id"), String::from("id")),
@@ -107,6 +107,9 @@ fn get_encoded_selector(
 		},
 	}
 }
+
+
+
 
 fn process_css(
 	file_string: &mut String,
@@ -212,7 +215,7 @@ fn process_prefixed_selectors(
 				);
 			},
 
-			// "#__--foo" / ".__--bar"
+			// "#__--foo" or ".__--bar"
 			Some(&_) | None => {
 				placeholder_value = format!(
 					"{prefix}{name}",
@@ -285,7 +288,7 @@ fn process_css_attributes(
 				return capture.at(0).unwrap().to_string();
 			}
 
-			// Work out if value(s) are classes, ids or selectors.
+			// Work out if value(s) are classes, IDs or selectors.
 			let attribute_type_designation: &str =
 				ATTRIBUTES_WHITELIST.get(attribute_name).unwrap();
 
@@ -304,7 +307,7 @@ fn process_css_attributes(
 				_ => {},
 			}
 		} else {
-			// Attribute does not contain classes and/or ids.
+			// Attribute does not contain classes and/or IDs.
 			// Leave it as is.
 			return capture.at(0).unwrap().to_string();
 		}
@@ -362,11 +365,10 @@ fn process_html_attributes(
 		let attribute_quote: &str = capture.at(4).unwrap_or("");
 		let mut attribute_value: String = capture.at(3).unwrap().to_string();
 
-		// Attributes whitelist of which its
-		// values should be processed.
+		// Attributes whitelist of which its values should be processed.
 		match ATTRIBUTES_WHITELIST.contains_key(&attribute_name.to_ascii_lowercase()) {
 			true => {
-				// Work out if value(s) are classes, ids or selectors.
+				// Work out if value(s) are classes, IDs or selectors.
 				let attribute_type_designation: &str = ATTRIBUTES_WHITELIST
 					.get(&attribute_name.to_ascii_lowercase())
 					.unwrap();
@@ -412,7 +414,7 @@ fn process_html_attributes(
 				)
 			},
 
-			// Attribute does not contain classes and/or ids.
+			// Attribute does not contain classes and/or IDs.
 			// Leave it as is.
 			false => {
 				return capture.at(0).unwrap().to_string();

@@ -24,11 +24,3 @@ walkdir = "2.3.2"
 minify_selectors_utils = { version = "0.3.0", path = "../minify_selectors_utils" }
 parse_selectors = { version = "1.0.0", path = "../parse_selectors" }
 encode_selector = { version = "0.4.0", path = "../encode_selector" }
-
-
-[dev-dependencies]
-criterion = "0.4.0"
-
-[[bench]]
-harness = false
-name = "minify_selectors"

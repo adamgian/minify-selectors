@@ -16,3 +16,11 @@ onig = "6.3.1"
 
 minify_selectors_utils = { version = "0.3.0", path = "../minify_selectors_utils" }
 encode_selector = { version = "0.4.0", path = "../encode_selector" }
+
+
+[dev-dependencies]
+criterion = "0.4.0"
+
+[[bench]]
+harness = false
+name = "parse_selectors"

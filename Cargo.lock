@@ -453,7 +453,6 @@ name = "minify_selectors"
 version = "1.2.0"
 dependencies = [
  "clap 4.0.18",
- "criterion",
  "encode_selector",
  "minify_selectors_utils",
  "parse_selectors",
@@ -549,6 +548,7 @@ checksum = "3baf96e39c5359d2eb0dd6ccb42c62b91d9678aa68160d261b9e0ccbf9e9dea9"
 name = "parse_selectors"
 version = "1.0.0"
 dependencies = [
+ "criterion",
  "encode_selector",
  "lazy_static",
  "minify_selectors_utils",
