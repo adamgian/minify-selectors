@@ -29,8 +29,11 @@ w.className !== 'w';
 x.className !== `x`;
 
 y.className += "y";
+y.className += " y";
 z.className += 'z';
+z.className += ' z';
 A.className += `A`;
+A.className += ` A`;
 
 B.className = foo;
 C.className = foo.bar;

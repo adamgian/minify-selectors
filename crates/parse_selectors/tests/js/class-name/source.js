@@ -29,8 +29,11 @@ w.className !== 'SELECTOR-23';
 x.className !== `SELECTOR-24`;
 
 y.className += "SELECTOR-25";
+y.className += " SELECTOR-25";
 z.className += 'SELECTOR-26';
+z.className += ' SELECTOR-26';
 A.className += `SELECTOR-27`;
+A.className += ` SELECTOR-27`;
 
 B.className = foo;
 C.className = foo.bar;
