@@ -37,3 +37,19 @@
 		gap: 1.75rem;
 	}
 }
+
+@keyframes foo-animation {
+	0% {}
+	33.33% {}
+	66.66% {}
+	100% {}
+}
+
+@keyframes bar-animation {
+	from {
+		transform: translateX(0%);
+	}
+	to {
+		transform: translateX(100%);
+	}
+}

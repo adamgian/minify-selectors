@@ -2,6 +2,7 @@
 .-7 { color: red }
 .0 { color: red }
 .00 { color: red }
+.111 { color: red }
 .-- { color: red }
 .--1 { color: red }
 .--a { color: red }
@@ -9,6 +10,8 @@
 #-7 { color: red }
 #0 { color: red }
 #00 { color: red }
+#99 { color: red }
+#123 { color: red }
 #-- { color: red }
 #--1 { color: red }
 #--a { color: red }
