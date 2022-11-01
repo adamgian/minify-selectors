@@ -1,7 +1,8 @@
-# v1.2.0
+# v1.3.0
 <sub>TBD</sub>
 
 ### Updates
+- Add support for `xlink:href` attribute
 - Calculate the positions of invalid first characters in the alphabet set only once, instead of everytime a radix encoding is required (approximately -90% change to `encode_selector::to_radix()`)
 - Upgrade clap to v4
 

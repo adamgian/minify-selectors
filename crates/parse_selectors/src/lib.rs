@@ -49,6 +49,9 @@ lazy_static! {
 
 		// <a href="/#foo"></a>
 		(String::from("href"), String::from("anchor")),
+
+		// <a xlink:href="/#foo"></a>
+		(String::from("xlink:href"), String::from("anchor")),
 	]);
 }
 
