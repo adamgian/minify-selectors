@@ -602,10 +602,13 @@ fn process_js_properties(
 			return capture.at(0).unwrap().to_string();
 		}
 
-		let mut property_value: String = capture.at(3).unwrap().to_string();
+		let mut property_value: String = capture.at(4).unwrap().to_string();
 		let property_name: &str = capture.at(1).unwrap();
 
 		match property_name {
+			".id" => {
+				process_string_of_tokens(&mut property_value, selectors, config, "id");
+			},
 			".className" => {
 				process_string_of_tokens(&mut property_value, selectors, config, "class");
 			},
@@ -619,13 +622,16 @@ fn process_js_properties(
 			"window.location.hash" | "window.location.href" | "window.location" => {
 				process_anchor_links(&mut property_value, selectors, config);
 			},
+			_ if property_name.starts_with(".classList") => {
+				process_string_of_tokens(&mut property_value, selectors, config, "class");
+			},
 			_ => {},
 		}
 
 		format!(
 			"{name}{operator}{value}",
 			name = property_name,
-			operator = capture.at(2).unwrap(),
+			operator = capture.at(3).unwrap(),
 			value = property_value,
 		)
 	});

@@ -270,7 +270,19 @@ lazy_static! {
 				window.location.hash
 				| window.location.href
 				| window.location
+				| \.id
 				| \.className
+				| \.classList
+					(?>
+						\[[0-9]++\]
+						| \.value
+						| \.item
+							(?<arguments>
+								\(
+								[^)(]*+(?:(\g<arguments>)[^)(]*)*+
+								\)
+							)
+					)?
 				| \.innerHTML
 				| \.outerHTML
 			)

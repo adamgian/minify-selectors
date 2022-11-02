@@ -60,6 +60,12 @@ fn css_files() {
 fn js_files() {
 	let dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/js/");
 
+	// classList
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("class-list/output.js")).unwrap(),
+		process_file("js", &dir.clone().join("class-list/source.js"))
+	);
+
 	// classList.add()
 	assert_eq!(
 		fs::read_to_string(dir.clone().join("class-list-add/output.js")).unwrap(),
@@ -70,6 +76,12 @@ fn js_files() {
 	assert_eq!(
 		fs::read_to_string(dir.clone().join("class-list-contains/output.js")).unwrap(),
 		process_file("js", &dir.clone().join("class-list-contains/source.js"))
+	);
+
+	// classList.item()
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("class-list-item/output.js")).unwrap(),
+		process_file("js", &dir.clone().join("class-list-item/source.js"))
 	);
 
 	// classList.remove()
@@ -88,6 +100,12 @@ fn js_files() {
 	assert_eq!(
 		fs::read_to_string(dir.clone().join("class-list-toggle/output.js")).unwrap(),
 		process_file("js", &dir.clone().join("class-list-toggle/source.js"))
+	);
+
+	// classList.value
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("class-list-value/output.js")).unwrap(),
+		process_file("js", &dir.clone().join("class-list-value/source.js"))
 	);
 
 	// className
@@ -127,6 +145,12 @@ fn js_files() {
 	assert_eq!(
 		fs::read_to_string(dir.clone().join("history-replace-state/output.js")).unwrap(),
 		process_file("js", &dir.clone().join("history-replace-state/source.js"))
+	);
+
+	// id
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("id/output.js")).unwrap(),
+		process_file("js", &dir.clone().join("id/source.js"))
 	);
 
 	// innerHTML()
