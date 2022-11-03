@@ -167,6 +167,35 @@ lazy_static! {
 		"##
 	).unwrap();
 
+	pub static ref CSS_FUNCTIONS: Regex = Regex::new(
+		r##"(?x)
+			(?<function>
+				url
+			)
+			(?<join>
+				\(\s*+
+			)
+			(?<quote>
+				(?:\\?["'])?
+			)
+			(?<argument>
+				(?:
+					(?:
+						(?<=")
+						(?:[^"])*
+					)
+					| (?:
+						(?<=')
+						(?:[^'])*
+					)
+					| (?:
+						[^\s\)]*
+					)
+				)
+			)
+		"##
+	).unwrap();
+
 	// Extracts arguments from functions that take classes, IDs,
 	// URL (which may have a target ID) or a CSS selector string.
 	//

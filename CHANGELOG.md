@@ -1,7 +1,8 @@
-# v1.4.0
+# v1.5.0
 <sub>TBD</sub>
 
 ### Updates
+- Add support for `url()` functions in CSS
 - Add support for `.classList`, `.classList.item()`, `.classList.value` and `.id` properties
 - Add support for `xlink:href` attribute
 - Calculate the positions of invalid first characters in the alphabet set only once, instead of everytime a radix encoding is required (approximately -90% change to `encode_selector::to_radix()`)

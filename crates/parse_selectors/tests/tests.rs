@@ -31,6 +31,12 @@ fn css_files() {
 		process_file("css", &dir.clone().join("comments/source.css")),
 	);
 
+	// functions
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("functions/output.css")).unwrap(),
+		process_file("css", &dir.clone().join("functions/source.css")),
+	);
+
 	// general selectors
 	assert_eq!(
 		fs::read_to_string(dir.clone().join("general-selectors/output.css")).unwrap(),

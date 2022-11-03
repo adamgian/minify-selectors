@@ -121,6 +121,7 @@ fn process_css(
 ) {
 	process_css_selectors(file_string, selectors, config);
 	process_css_attributes(file_string, selectors, config);
+	process_css_functions(file_string, selectors, config);
 	process_prefixed_selectors(file_string, selectors, config);
 }
 
@@ -271,8 +272,8 @@ fn process_css_attributes(
 	config: &Config,
 ) {
 	*file_string = regexes::CSS_ATTRIBUTES.replace_all(file_string, |capture: &Captures| {
-		// Check that capture group 2 exists, if it doesn't it is
-		// matched to an attribute selector, rule block or comment.
+		// Check that capture group 2 exists — if it doesn't, it is matched
+		// to an incomplete attribute selector (no value), rule block or comment.
 		// Leave it as is.
 		if capture.at(2).is_none() {
 			return capture.at(0).unwrap().to_owned();
@@ -282,7 +283,6 @@ fn process_css_attributes(
 		let attribute_quote_type: &str = capture.at(3).unwrap_or("");
 		let attribute_flag: &str = capture.at(5).unwrap_or("");
 		let mut attribute_value = capture.at(4).unwrap().to_string();
-
 
 		if ATTRIBUTES_WHITELIST.contains_key(attribute_name) {
 			// Do not process attribute selector if case-insensitive
@@ -322,6 +322,40 @@ fn process_css_attributes(
 			quote = attribute_quote_type,
 			value = attribute_value,
 			flag = attribute_flag,
+		)
+	});
+}
+
+
+// Process CSS functions.
+fn process_css_functions(
+	file_string: &mut String,
+	selectors: &mut Selectors,
+	config: &Config,
+) {
+	*file_string = regexes::CSS_FUNCTIONS.replace_all(file_string, |capture: &Captures| {
+		// Check that capture group 4 (argument) exists
+		if capture.at(4).is_none() {
+			return capture.at(0).unwrap().to_owned();
+		}
+
+		let function_name: &str = capture.at(1).unwrap();
+		let mut function_argument = capture.at(4).unwrap().to_string();
+
+		// For now, only url is needed to be processed
+		// match function_name {
+		// 	"url" => {
+		process_anchor_links(&mut function_argument, selectors, config);
+		// 	},
+		// 	_ => {},
+		// }
+
+		format!(
+			"{function}{join}{quote}{argument}",
+			function = function_name,
+			join = capture.at(2).unwrap(),
+			quote = capture.at(3).unwrap(),
+			argument = function_argument,
 		)
 	});
 }
