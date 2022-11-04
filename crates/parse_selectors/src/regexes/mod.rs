@@ -433,11 +433,15 @@ lazy_static! {
 
 	// Extract ID from anchor links.
 	//
-	// Only URLs without the protocol will have the inner first
-	// and second named capture groups (url and target_id).
+	// Only URLs without the protocol ('http://', 'https://' or '//')
+	// or not prepended with minify-selector specific prefix
+	// will have the inner first and second named capture groups
+	// (url and target_id).
 	pub static ref INTERNAL_ANCHOR_TARGET_ID: Regex = Regex::new(
 		r##"(?x)
-			^https?:\/\/.*$
+			^(?>http:|https:)?\/{2}.*$
+			|
+			^[^#]*[#]__(?:class | id | ignore)?--
 			|
 			^(?<url>[^#]*)
 			(?<target_id>\#[^#]*)$
