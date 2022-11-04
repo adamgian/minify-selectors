@@ -34,6 +34,9 @@ lazy_static! {
 		// <input form="foo">
 		(String::from("form"), String::from("id")),
 
+		// <rect fill="url(#foo)"></rect>
+		(String::from("fill"), String::from("selector")),
+
 		// <th id="foo"></th>
 		// <td headers="foo"></td>
 		(String::from("headers"), String::from("id")),
@@ -49,6 +52,9 @@ lazy_static! {
 
 		// <a href="/#foo"></a>
 		(String::from("href"), String::from("anchor")),
+
+		// <div style="filter: url(#svg-blur)"></div>
+		(String::from("style"), String::from("selector")),
 
 		// <a xlink:href="/#foo"></a>
 		(String::from("xlink:href"), String::from("anchor")),

@@ -259,9 +259,16 @@ fn html_files() {
 fn svg_files() {
 	let dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/svg/");
 
+	// General selector names
 	assert_eq!(
-		fs::read_to_string(dir.clone().join("output.svg")).unwrap(),
-		process_file("html", &dir.clone().join("source.svg")),
+		fs::read_to_string(dir.clone().join("general-selectors/output.svg")).unwrap(),
+		process_file("html", &dir.clone().join("general-selectors/source.svg")),
+	);
+
+	// Attributes
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("attributes/output.svg")).unwrap(),
+		process_file("html", &dir.clone().join("attributes/source.svg")),
 	);
 }
 
