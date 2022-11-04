@@ -35,7 +35,7 @@ lazy_static! {
 		(String::from("form"), String::from("id")),
 
 		// <rect fill="url(#foo)"></rect>
-		(String::from("fill"), String::from("selector")),
+		(String::from("fill"), String::from("style")),
 
 		// <th id="foo"></th>
 		// <td headers="foo"></td>
@@ -54,7 +54,7 @@ lazy_static! {
 		(String::from("href"), String::from("anchor")),
 
 		// <div style="filter: url(#svg-blur)"></div>
-		(String::from("style"), String::from("selector")),
+		(String::from("style"), String::from("style")),
 
 		// <a xlink:href="/#foo"></a>
 		(String::from("xlink:href"), String::from("anchor")),
@@ -437,6 +437,10 @@ fn process_html_attributes(
 
 					"selector" => {
 						process_css(&mut attribute_value, selectors, config);
+					},
+
+					"style" => {
+						process_css_functions(&mut attribute_value, selectors, config);
 					},
 
 					"anchor" => {

@@ -11,6 +11,7 @@
 
 ### Fixes
 - Account for whitespaces that may be before and after the operator in CSS attribute selectors (e.g. `[lang = 'nl']`)
+- Anchor IDs in `url()` being processed twice if they are used in `fill` and `style` HTML attributes
 
 <br>
 

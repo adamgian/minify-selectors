@@ -13,3 +13,5 @@ i.innerHTML = '';
 j.innerHTML = "";
 k.innerHTML = ``;
 l.innerHTML = foo;
+m.innerHTML = '<rect class="e" fill="url(#c)"></rect>'
+n.innerHTML = '<div class="e" style="mask-image: url(foo.svg#d)"></div>'
