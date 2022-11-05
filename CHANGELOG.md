@@ -1,5 +1,13 @@
-# v1.6.0
+# v1.x.x
 <sub>TBD</sub>
+
+<br>
+
+
+
+
+# v1.6.2
+<sub>5 Nov 2022</sub>
 
 ### Updates
 - Add support for `fill` and `style` HTML attributes
@@ -19,7 +27,7 @@
 
 
 # v1.0.0
-<sub>16 Oct</sub>
+<sub>16 Oct 2022</sub>
 
 No noteworthy changes since the last version
 
