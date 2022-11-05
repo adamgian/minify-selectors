@@ -12,6 +12,7 @@
 	filter: url("./../foo.svg#a");
 
 	mask-image: url("foo.svg#b");
+	mask-image: url("foo.svg#foo");
 	mask-image: url("http://foo-cdn.com/assets/foo.svg#bar");
 
 	offset-path: url();

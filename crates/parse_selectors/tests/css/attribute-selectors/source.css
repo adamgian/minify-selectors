@@ -6,6 +6,7 @@
 [class~='CLASS-6'] {}
 
 [id=ID-1] {}
+[id=__ignore--foo] {}
 [id="ID-2"] {}
 [id='ID-3'] {}
 [id~=ID-4] {}
@@ -36,3 +37,4 @@
 
 .SELECTOR-24 {}
 [data-toggle="baz"] {}
+[data-toggle="__id--ID-1"] {}

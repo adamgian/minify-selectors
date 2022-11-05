@@ -6,6 +6,7 @@
 [class~='g'] {}
 
 [id=a] {}
+[id=foo] {}
 [id="b"] {}
 [id='c'] {}
 [id~=d] {}
@@ -36,3 +37,4 @@
 
 .a {}
 [data-toggle="baz"] {}
+[data-toggle="a"] {}
