@@ -69,7 +69,7 @@ pub fn from_css(
 	selectors: &mut Selectors,
 	config: &Config,
 ) {
-	process_css(file_string, selectors, config)
+	process_css(file_string, selectors, config);
 }
 
 pub fn from_html(
@@ -172,35 +172,8 @@ fn process_html(
 	config: &Config,
 ) {
 	process_html_attributes(file_string, selectors, config);
-
-	// Processing any embedded scripts
-	// Create subset string(s) to process <script> embeds
-	*file_string = regexes::HTML_SCRIPT_ELEMENT.replace_all(file_string, |capture: &Captures| {
-		let mut embedded_script = capture.at(2).unwrap().to_string();
-		process_js(&mut embedded_script, selectors, config);
-
-		format!(
-			"{tag_open}{script}{tag_close}",
-			tag_open = capture.at(1).unwrap(),
-			script = embedded_script,
-			tag_close = capture.at(3).unwrap()
-		)
-	});
-
-	// Processing any embedded styles
-	// Create subset string(s) to process <style> embeds
-	*file_string = regexes::HTML_STYLE_ELEMENT.replace_all(file_string, |capture: &Captures| {
-		let mut embedded_style = capture.at(2).unwrap().to_string();
-		process_css(&mut embedded_style, selectors, config);
-
-		format!(
-			"{tag_open}{styles}{tag_close}",
-			tag_open = capture.at(1).unwrap(),
-			styles = embedded_style,
-			tag_close = capture.at(3).unwrap(),
-		)
-	});
-
+	process_html_scripts(file_string, selectors, config);
+	process_html_styles(file_string, selectors, config);
 	process_prefixed_selectors(file_string, selectors, config);
 }
 
@@ -373,7 +346,6 @@ fn process_css_attributes(
 	});
 }
 
-
 // Process CSS functions.
 fn process_css_functions(
 	file_string: &mut String,
@@ -508,6 +480,46 @@ fn process_html_attributes(
 				return capture.at(0).unwrap().to_string();
 			},
 		}
+	});
+}
+
+// Process embedded scripts in HTML.
+fn process_html_scripts(
+	file_string: &mut String,
+	selectors: &mut Selectors,
+	config: &Config,
+) {
+	// Create subset string(s) to process each <script> embed.
+	*file_string = regexes::HTML_SCRIPT_ELEMENT.replace_all(file_string, |capture: &Captures| {
+		let mut embedded_script = capture.at(2).unwrap().to_string();
+		process_js(&mut embedded_script, selectors, config);
+
+		format!(
+			"{tag_open}{script}{tag_close}",
+			tag_open = capture.at(1).unwrap(),
+			script = embedded_script,
+			tag_close = capture.at(3).unwrap()
+		)
+	});
+}
+
+// Processing embedded styles in HTML.
+fn process_html_styles(
+	file_string: &mut String,
+	selectors: &mut Selectors,
+	config: &Config,
+) {
+	// Create subset string(s) to process each <style> embed.
+	*file_string = regexes::HTML_STYLE_ELEMENT.replace_all(file_string, |capture: &Captures| {
+		let mut embedded_style = capture.at(2).unwrap().to_string();
+		process_css(&mut embedded_style, selectors, config);
+
+		format!(
+			"{tag_open}{styles}{tag_close}",
+			tag_open = capture.at(1).unwrap(),
+			styles = embedded_style,
+			tag_close = capture.at(3).unwrap(),
+		)
 	});
 }
 
