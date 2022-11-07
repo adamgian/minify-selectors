@@ -1,5 +1,8 @@
-# v1.x.x
+# v1.7.0
 <sub>TBD</sub>
+
+### Updates
+- Add support for escaped characters in CSS
 
 <br>
 

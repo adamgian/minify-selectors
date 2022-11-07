@@ -117,6 +117,40 @@ fn get_encoded_selector(
 	}
 }
 
+// Convert possibly escaped CSS text to UTF8 String.
+fn unescape_css_chars(text: &str) -> String {
+	let mut unescaped = text.to_string();
+
+	if regexes::ESCAPED_CSS_CHARS.find(text).is_none() {
+		return unescaped;
+	}
+
+	unescaped = regexes::ESCAPED_CSS_CHARS.replace_all(&unescaped, |capture: &Captures| {
+		let mut replacement_char = String::from(
+			if capture.at(1).is_some() {
+				capture.at(1).unwrap()
+			} else {
+				capture.at(2).unwrap()
+			},
+		);
+
+		// Escaped single character, only need to remove the leading blackslash.
+		replacement_char = replacement_char.replace('\\', "");
+
+		// Unicode code point, remove trailing whitespace (if any)
+		// and convert hex codepoint to UTF8 character.
+		if capture.at(1).is_some() {
+			replacement_char = replacement_char.replace(' ', "");
+			replacement_char = char::from_u32(u32::from_str_radix(&replacement_char, 16).unwrap())
+				.unwrap()
+				.to_string();
+		}
+		replacement_char
+	});
+
+	unescaped
+}
+
 
 
 
@@ -262,7 +296,11 @@ fn process_css_selectors(
 			return format!(
 				"{prefix}{identifier}",
 				prefix = &capture.at(1).unwrap(),
-				identifier = get_encoded_selector(capture.at(0).unwrap(), selectors, config),
+				identifier = get_encoded_selector(
+					&unescape_css_chars(capture.at(0).unwrap()),
+					selectors,
+					config,
+				),
 			);
 		}
 		// Matched to an attribute selector, rule block or comment.
@@ -285,12 +323,12 @@ fn process_css_attributes(
 			return capture.at(0).unwrap().to_owned();
 		}
 
-		let attribute_name: &str = capture.at(1).unwrap();
+		let attribute_name: String = unescape_css_chars(capture.at(1).unwrap());
 		let attribute_quote_type: &str = capture.at(3).unwrap_or("");
 		let attribute_flag: &str = capture.at(5).unwrap_or("");
-		let mut attribute_value = capture.at(4).unwrap().to_string();
+		let mut attribute_value: String = unescape_css_chars(capture.at(4).unwrap());
 
-		if ATTRIBUTES_WHITELIST.contains_key(attribute_name) {
+		if ATTRIBUTES_WHITELIST.contains_key(&attribute_name) {
 			// Do not process attribute selector if case-insensitive
 			// flag has been set.
 			if attribute_flag.to_lowercase().ends_with('i') {
@@ -299,7 +337,7 @@ fn process_css_attributes(
 
 			// Work out if value(s) are classes, IDs or selectors.
 			let attribute_type_designation: &str =
-				ATTRIBUTES_WHITELIST.get(attribute_name).unwrap();
+				ATTRIBUTES_WHITELIST.get(&attribute_name).unwrap();
 
 			match attribute_type_designation {
 				"id" | "class" => {
@@ -313,6 +351,9 @@ fn process_css_attributes(
 				"selector" => {
 					process_css(&mut attribute_value, selectors, config);
 				},
+				"anchor" => {
+					process_anchor_links(&mut attribute_value, selectors, config);
+				},
 				_ => {},
 			}
 		} else {
@@ -323,7 +364,7 @@ fn process_css_attributes(
 
 		format!(
 			"[{attribute}{operator}{quote}{value}{quote}{flag}]",
-			attribute = attribute_name,
+			attribute = capture.at(1).unwrap(),
 			operator = capture.at(2).unwrap(),
 			quote = attribute_quote_type,
 			value = attribute_value,

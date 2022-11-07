@@ -42,3 +42,13 @@
 #🗿 { color: yellow }
 #\🚕 { color: yellow }
 #__ignore--foo { color: green }
+#c\+\+ { color: green }
+#c\2b \+ { color: green }
+#c\2b \2B { color: green }
+#c\2b \02B { color: green }
+#c\2b \002B { color: green }
+#c\2b \0002B { color: green }
+#c\2b \00002B { color: green }
+#c\00002B\2b { color: green }
+#c\00002B\2b  { color: green }
+#c\00002B \2b  { color: green }

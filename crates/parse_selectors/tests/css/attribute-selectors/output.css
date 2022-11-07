@@ -1,9 +1,18 @@
+[class=a] {}
+[class="b"] {}
+[class="b"] {}
+[class="b"] {}
+[class="b"] {}
+[class="b"] {}
+[class="b"] {}
+[class="b"] {}
 [class=b] {}
-[class="c"] {}
-[class='d'] {}
-[class~=e] {}
-[class~="f"] {}
-[class~='g'] {}
+[class='c'] {}
+[class=c] {}
+[class='c'] {}
+[class~=d] {}
+[class~="e"] {}
+[class~='f'] {}
 
 [id=a] {}
 [id=foo] {}
@@ -13,14 +22,24 @@
 [id~="e"] {}
 [id~='f'] {}
 
+[xlink\:href="https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/xlink:href#pattern"]
+[xlink\:href="/#a"]
+[xlink\:href="#b"]
+[xlink\3A href="#b"]
+[xlink\03A href="#b"]
+[xlink\003A href="#b"]
+[xlink\0003A href="#b"]
+[xlink\00003A href="#b"]
+[xlink\00003Ahref="#b"]
+
 [class=foo i] {}
 [class="foo" i] {}
 [class="foo"i] {}
 [class="foo" I] {}
-[class=h s] {}
-[class="h" s] {}
-[class="h"s] {}
-[class="h" S] {}
+[class=g s] {}
+[class="g" s] {}
+[class="g"s] {}
+[class="g" S] {}
 [class="bar" x] {}
 
 [aria-describedby~='g'] {}

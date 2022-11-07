@@ -51,6 +51,10 @@
 			<rect class="h k l" height="2" width="2" x="18" y="20.5"/>
 			<rect class="h m" height="2" width="2" x="23" y="20.5"/>
 		</g>
+		<a xlink:href="https://developer.mozilla.org/"></a>
+		<a xlink:href="https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/xlink:href#pattern"></a>
+		<a xlink:href="/#a"></a>
+		<a xlink:href="#b"></a>
 	</g>
 
 </svg>

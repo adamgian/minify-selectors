@@ -129,7 +129,13 @@ lazy_static! {
 			|
 			\[\s*+
 			(?<attribute>
-				[^\f\n\t\ >"'|^$*~=]++
+				(?>
+					[^\f\n\t\ \\>"'|:^$*~=]
+					| (?>
+						\\[0-9A-Fa-f]{1,6}(?>\r\n|[ \n\r\t\f])?
+						| \\[^\n\r\f0-9A-Fa-f]
+					)
+				)++
 			)
 			\s*+
 			(?<operator>
@@ -140,23 +146,37 @@ lazy_static! {
 				(?:\\?["'])?
 			)
 			(?<value>
-				-?
-				(?>
-					[A-Za-z_]
-					| [^\0-\177]
-					| (?>
-						\\[0-9A-Fa-f]{1,6}(?>\r\n|[ \n\r\t\f])?
-						| \\[^\n\r\f0-9A-Fa-f"']
+				(?:
+					| (?:
+						(?<=["'])
+						(?:
+							[^"'\\]
+							| (?>
+								\\[0-9A-Fa-f]{1,6}(?>\r\n|[ \n\r\t\f])?
+								| \\[^\n\r\f0-9A-Fa-f"']
+							)
+						)*
+					)
+					| (?:
+						-?
+						(?>
+							[A-Za-z_]
+							| [^\0-\177]
+							| (?>
+								\\[0-9A-Fa-f]{1,6}(?>\r\n|[ \n\r\t\f])?
+								| \\[^\n\r\f0-9A-Fa-f]
+							)
+						)
+						(?>
+							[\w\-]
+							| [^\0-\177]
+							| (?>
+								\\[0-9A-Fa-f]{1,6}(?>\r\n|[ \n\r\t\f])?
+								| \\[^\n\r\f0-9A-Fa-f]
+							)
+						)*
 					)
 				)
-				(?>
-					[\w\-]
-					| [^\0-\177]
-					| (?>
-						\\[0-9A-Fa-f]{1,6}(?>\r\n|[ \n\r\t\f])?
-						| \\[^\n\r\f0-9A-Fa-f"']
-					)
-				)*
 			)
 			(?>\\?["'])?
 			(?<flag>
@@ -545,6 +565,32 @@ lazy_static! {
 				(?: [^\[\]] | \k<array> )*
 				\]
 			)
+		"##
+	).unwrap();
+
+	pub static ref ESCAPED_CSS_CHARS: Regex = Regex::new(
+		r##"(?x)
+			(?<unicode>
+				\\[0-9A-Fa-f]{1,6}(?>\r\n|[ \n\r\t\f])?
+			)
+			|
+			(?<character>
+				\\[^\n\r\f0-9A-Fa-f]
+			)
+		"##
+	).unwrap();
+
+	// Invalid characters in a selector name are:
+	// -  \0-\54: null to comma
+	// -  \56: period (.)
+	// -  \57: slash (/)
+	// -  \72-\100: colon (:) to at (@)
+	// -  \133-\136: left square bracket ([) to caret (^)
+	// -  \140: backtick (`)
+	// -  \173-\177: left brace ({) to delete
+	static ref INVALID_CSS_CHARACTERS: Regex = Regex::new(
+		r##"(?x)
+			[\0-\54\56\57\72-\100\133-\136\140\173-\177]
 		"##
 	).unwrap();
 

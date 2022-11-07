@@ -60,3 +60,10 @@
 .f:where(aside.a, footer.a) {}
 :is(thead.a, tfoot.a) :is(th.b, td.b) {}
 .f:is(aside.a, footer.a) {}
+
+.b:hover {}
+.b:hover {}
+.b:hover {}
+.b:hover {}
+.b:hover {}
+.b:hover {}

@@ -60,3 +60,10 @@
 .CLASS-6:where(aside.CLASS-1, footer.CLASS-1) {}
 :is(thead.CLASS-1, tfoot.CLASS-1) :is(th.CLASS-2, td.CLASS-2) {}
 .CLASS-6:is(aside.CLASS-1, footer.CLASS-1) {}
+
+.CLASS-\32:hover {}
+.CLASS-\32 :hover {}
+.CLASS-\032:hover {}
+.CLASS-\032 :hover {}
+.CLASS-\000032:hover {}
+.CLASS-\000032 :hover {}

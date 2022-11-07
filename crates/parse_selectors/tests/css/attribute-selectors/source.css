@@ -1,6 +1,15 @@
 [class=CLASS-1] {}
 [class="CLASS-2"] {}
+[class="CLASS-\32 "] {}
+[class="CLASS-\032 "] {}
+[class="CLASS-\0032 "] {}
+[class="CLASS-\00032 "] {}
+[class="CLASS-\000032 "] {}
+[class="CLASS-\000032"] {}
+[class=CLASS-\000032] {}
 [class='CLASS-3'] {}
+[class=CLASS-\33] {}
+[class='CLASS-\33'] {}
 [class~=CLASS-4] {}
 [class~="CLASS-5"] {}
 [class~='CLASS-6'] {}
@@ -12,6 +21,16 @@
 [id~=ID-4] {}
 [id~="ID-5"] {}
 [id~='ID-6'] {}
+
+[xlink\:href="https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/xlink:href#pattern"]
+[xlink\:href="/#ID-1"]
+[xlink\:href="#ID-2"]
+[xlink\3A href="#ID-2"]
+[xlink\03A href="#ID-2"]
+[xlink\003A href="#ID-2"]
+[xlink\0003A href="#ID-2"]
+[xlink\00003A href="#ID-2"]
+[xlink\00003Ahref="#ID-2"]
 
 [class=foo i] {}
 [class="foo" i] {}
@@ -35,6 +54,6 @@
 [class$="baz"],
 [class*="baz"] {}
 
-.SELECTOR-24 {}
+.CLASS-1 {}
 [data-toggle="baz"] {}
 [data-toggle="__id--ID-1"] {}
