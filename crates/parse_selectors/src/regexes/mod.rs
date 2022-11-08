@@ -78,25 +78,25 @@ lazy_static! {
 	// -  This regex will 'ignore'/blackout attibutes selectors completely
 	//    to avoid any false positives.
 	// -  Multiline comments are 'ignored'/blacked out.
+	// -  @import url is ignored.
 	// -  minify-selector specific prefixed selectors are ignored, to prevent
 	//    it being encoded twice.
 	pub static ref CSS_SELECTORS: Regex = Regex::new(
 		r##"(?x)
-			{
-				[^{}]*
-			}
-			|
-			\[
+			{[^{}]*}
+			| \[
 				\s*
 					["']?.*?["']?
 				\s*
 			\]
-			|
-			\/\*[^*]*\*+(?>[^\/*][^*]*\*+)*\/
-			|
-			[\#\.]?__(?:class | id | ignore)?--
-			|
-			(?<type>[\#\.])
+			| \/\*[^*]*\*+(?>[^\/*][^*]*\*+)*\/
+			| @import\s++(?:
+				url\([^)]*\)
+				| (?:"(?:[^"])*")
+				| (?:'(?:[^'])*')
+			)
+			| [\#\.]?__(?:class | id | ignore)?--
+			| (?<type>[\#\.])
 			(?<name>
 				-?
 				(?>

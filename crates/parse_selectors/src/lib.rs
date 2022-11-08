@@ -263,8 +263,8 @@ fn process_css_selectors(
 ) {
 	*file_string = regexes::CSS_SELECTORS.replace_all(file_string, |capture: &Captures| {
 		// Check that capture group 2 exists,
-		// i.e. matched to a class/id name and not an attribute selector,
-		// rule block or comments — which does not have this group.
+		// i.e. matched to a class/id name — and not an attribute selector,
+		// rule block, @import, or comment — which does not have this group.
 		if capture.at(2).is_some() {
 			return format!(
 				"{prefix}{identifier}",
@@ -276,7 +276,7 @@ fn process_css_selectors(
 				),
 			);
 		}
-		// Matched to an attribute selector, rule block or comment.
+		// Matched to an attribute selector, rule block, @import or comment.
 		// Leave it as is.
 		capture.at(0).unwrap().to_owned()
 	});

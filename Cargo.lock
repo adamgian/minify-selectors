@@ -450,7 +450,7 @@ dependencies = [
 
 [[package]]
 name = "minify_selectors"
-version = "1.7.0"
+version = "1.7.1"
 dependencies = [
  "clap 4.0.19",
  "encode_selector",
@@ -546,7 +546,7 @@ checksum = "3baf96e39c5359d2eb0dd6ccb42c62b91d9678aa68160d261b9e0ccbf9e9dea9"
 
 [[package]]
 name = "parse_selectors"
-version = "1.5.0"
+version = "1.5.1"
 dependencies = [
  "criterion",
  "encode_selector",

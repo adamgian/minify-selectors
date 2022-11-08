@@ -1,8 +1,11 @@
-# v1.7.0
+# v1.7.1
 <sub>TBD</sub>
 
 ### Updates
 - Add support for escaped characters in CSS
+
+### Fixes
+- Ignore CSS `@import` URLs
 
 <br>
 
