@@ -39,7 +39,6 @@
 	},
 	"homepage": "https://github.com/adamgian/minify-selectors#readme",
 	"dependencies": {
-		"binary-install": "^1.0.1",
-		"console.table": "^0.10.0"
+		"binary-install": "^1.0.1"
 	}
 }

@@ -1,6 +1,5 @@
 const { Binary } = require('binary-install');
 const os = require('os');
-const cTable = require('console.table');
 const package = require('../package.json');
 
 
@@ -53,16 +52,19 @@ const error = (message) => {
 const getPlatform = () => {
 	const arch = os.arch();
 	const type = os.type();
+	let platforms = '';
 
-	for(let platform of SUPPORTED_PLATFORMS) {
-		if (
-			arch === platform.architecture
-			&& type === platform.type
-		) return platform;
+	for (let platform of SUPPORTED_PLATFORMS) {
+		platforms += `\n   - ${ platform.type } ${ platform.architecture }`;
+		if (arch === platform.architecture && type === platform.type)
+			return platform;
 	}
 
 	error(
-		`Unsupported platform: ${ type } ${ arch }.\nCurrently supported platforms are:\n\n${ cTable.getTable(SUPPORTED_PLATFORMS) }\n\nPlease feel free to notify us by creating an issue here: ${ package.bugs.url }.`
+		`Unsupported platform: ${ type } ${ arch }.`
+		+ `\nCurrently supported platforms are:`
+		+ `${ platforms }`
+		+ `\nPlease feel free to notify us by creating an issue here: ${ package.bugs.url }.`
 	);
 };
 
