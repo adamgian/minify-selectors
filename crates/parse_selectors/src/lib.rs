@@ -298,13 +298,13 @@ fn process_css_attributes(
 
 		let attribute_name: String = unescape_css_chars(capture.at(1).unwrap());
 		let attribute_quote_type: &str = capture.at(3).unwrap_or("");
-		let attribute_flag: &str = capture.at(5).unwrap_or("");
+		let attribute_flag: &str = capture.at(6).unwrap_or("");
 		let mut attribute_value: String = unescape_css_chars(capture.at(4).unwrap());
 
 		if ATTRIBUTES_WHITELIST.contains_key(&attribute_name) {
 			// Do not process attribute selector if case-insensitive
 			// flag has been set.
-			if attribute_flag.to_lowercase().ends_with('i') {
+			if attribute_flag.to_lowercase().contains('i') {
 				return capture.at(0).unwrap().to_string();
 			}
 
@@ -336,11 +336,12 @@ fn process_css_attributes(
 		}
 
 		format!(
-			"[{attribute}{operator}{quote}{value}{quote}{flag}]",
+			"[{attribute}{operator}{quote}{value}{quote}{space}{flag}]",
 			attribute = capture.at(1).unwrap(),
 			operator = capture.at(2).unwrap(),
 			quote = attribute_quote_type,
 			value = attribute_value,
+			space = capture.at(5).unwrap(),
 			flag = attribute_flag,
 		)
 	});
