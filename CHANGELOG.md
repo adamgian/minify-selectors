@@ -1,4 +1,4 @@
-# v1.7.1
+# v1.7.2
 <sub>TBD</sub>
 
 ### Updates
@@ -6,6 +6,7 @@
 
 ### Fixes
 - Ignore CSS `@import` URLs
+- Missing support for `matches()` JS method
 
 <br>
 

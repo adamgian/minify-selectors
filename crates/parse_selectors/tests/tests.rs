@@ -126,6 +126,12 @@ fn js_files() {
 		process_file("js", &dir.clone().join("closest/source.js"))
 	);
 
+	// matches()
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("matches/output.js")).unwrap(),
+		process_file("js", &dir.clone().join("matches/source.js"))
+	);
+
 	// getElementById()
 	assert_eq!(
 		fs::read_to_string(dir.clone().join("get-element-by-id/output.js")).unwrap(),

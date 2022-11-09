@@ -543,7 +543,7 @@ fn process_js_arguments(
 		// Work out function call and its argument pattern:
 		match function.as_str() {
 			// Takes one argument, an CSS selector string.
-			".querySelector" | ".querySelectorAll" | ".closest" => {
+			".querySelector" | ".querySelectorAll" | ".closest" | ".matches" => {
 				// FIXME: rudimentary way to check if arg is a immediate
 				// string value rather than some expression.
 				let quote_type: &str = match replacement_args.chars().next() {

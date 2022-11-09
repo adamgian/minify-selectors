@@ -232,6 +232,7 @@ lazy_static! {
 				| \.querySelectorAll
 				| \.querySelector
 				| \.closest
+				| \.matches
 				| \.getElementById
 				| \.getElementsByClassName
 				| \.classList\s*+\.(?> add | remove | contains | replace | toggle )
