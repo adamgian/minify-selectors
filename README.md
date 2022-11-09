@@ -11,7 +11,7 @@
 
 # minify-selectors
 
-Post-processor that minifies classes and IDs selector names in CSS, HTML, Javascript and SVG files. Each unique selector — and any subsequent occurances elsewhere — is converted into an ultracompact one.
+Post-processor that minifies classes and IDs selector names in CSS, HTML, Javascript and SVG files.
 
 Enhance your front-end assets and build optimisations pipeline — wring even more out from your already minified and optimised payload sizes. Additionally can offer a certain degree of obfuscation to your code.
 
@@ -22,11 +22,7 @@ Enhance your front-end assets and build optimisations pipeline — wring even mo
 
 ## Features
 
-For a full outline of capabilities and current limitations, see [parse_selectors/info.md](crates/parse_selectors/info.md).
-
-### Comprehensive out of the box support
-
-minify-selectors aims to minify all obvious selectors right out of the gate. Any extra work configuring should be to assist minify-selectors to identify additional or ambigious selectors.
+minify-selectors aims to offer comprehensive out of the box support — minifying all obvious selectors right out of the gate with minimal set up.
 
 
 #### CSS and embedded styles
@@ -112,6 +108,39 @@ for (let link of document.querySelectorAll('a.Bd')) {    ‎
     &lt;/div>
   &lt;/nav>
 &lt;/body><!--
+			--></pre>
+		</td>
+	</tr>
+</table>
+<table>
+	<tr>
+		<td>
+			<p><sub>Input</sub></p>
+			<pre lang="html">
+&lt;svg xmlns="http://www.w3.org/2000/svg">                 ‎
+  &lt;style>
+    .icon-background { … }
+  &lt;/style>
+  &lt;g class="icon">
+    &lt;circle class="icon-background" fill="url(#dotted)"
+      />
+  &lt;/g>
+&lt;/svg>
+<!--
+			--></pre>
+		</td>
+		<td valign="top">
+			<p><sub>Output:</sub></p>
+			<pre lang="html">
+&lt;svg xmlns="http://www.w3.org/2000/svg">                 ‎
+  &lt;style>
+    .dz { … }
+  &lt;/style>
+  &lt;g class="d8">
+    &lt;circle class="dz" fill="url(#Y)" />
+  &lt;/g>
+&lt;/svg>
+<!--
 			--></pre>
 		</td>
 	</tr>

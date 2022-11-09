@@ -1,5 +1,5 @@
 # v1.7.2
-<sub>TBD</sub>
+<sub>9 Nov 2022</sub>
 
 ### Updates
 - Add support for escaped characters in CSS
