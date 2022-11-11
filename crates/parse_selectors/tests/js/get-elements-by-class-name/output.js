@@ -18,3 +18,14 @@ document
 document.getElementsByClassName(foo);
 document.getElementsByClassName( bar );
 document.getElementsByClassName( foo.bar );
+
+document.getElementsByClassName('l');
+document.getElementsByClassName('m');
+document.getElementsByClassName('a');
+document.getElementsByClassName('a');
+document.getElementsByClassName('a');
+document.getElementsByClassName('a');
+document.getElementsByClassName('a');
+document.getElementsByClassName('a');
+document.getElementsByClassName('a');
+document.getElementsByClassName('a');

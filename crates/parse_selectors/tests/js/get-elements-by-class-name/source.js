@@ -18,3 +18,14 @@ document
 document.getElementsByClassName(foo);
 document.getElementsByClassName( bar );
 document.getElementsByClassName( foo.bar );
+
+document.getElementsByClassName('\\\\');
+document.getElementsByClassName('\#');
+document.getElementsByClassName('SELECTOR-\31');
+document.getElementsByClassName('SELECTOR-\31 ');
+document.getElementsByClassName('SELECTOR-\031');
+document.getElementsByClassName('SELECTOR-\031 ');
+document.getElementsByClassName('SELECTOR-\0031');
+document.getElementsByClassName('SELECTOR-\0031 ');
+document.getElementsByClassName('SELECTOR-\000031');
+document.getElementsByClassName('SELECTOR-\000031 ');

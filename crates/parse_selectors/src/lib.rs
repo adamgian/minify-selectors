@@ -117,11 +117,11 @@ fn get_encoded_selector(
 	}
 }
 
-// Convert possibly escaped CSS text to UTF8 String.
-fn unescape_css_chars(text: &str) -> String {
-	let mut unescaped = text.to_string();
+// Convert possibly escaped CSS selector string to UTF8 string.
+fn unescape_css_chars(selector_string: &str) -> String {
+	let mut unescaped = selector_string.to_string();
 
-	if regexes::ESCAPED_CSS_CHARS.find(text).is_none() {
+	if regexes::ESCAPED_CSS_CHARS.find(selector_string).is_none() {
 		return unescaped;
 	}
 
@@ -299,7 +299,7 @@ fn process_css_attributes(
 		let attribute_name: String = unescape_css_chars(capture.at(1).unwrap());
 		let attribute_quote_type: &str = capture.at(3).unwrap_or("");
 		let attribute_flag: &str = capture.at(6).unwrap_or("");
-		let mut attribute_value: String = unescape_css_chars(capture.at(4).unwrap());
+		let mut attribute_value: String = capture.at(4).unwrap().to_string();
 
 		if ATTRIBUTES_WHITELIST.contains_key(&attribute_name) {
 			// Do not process attribute selector if case-insensitive
@@ -322,9 +322,11 @@ fn process_css_attributes(
 					);
 				},
 				"selector" => {
+					attribute_value = unescape_css_chars(&attribute_value);
 					process_css(&mut attribute_value, selectors, config);
 				},
 				"anchor" => {
+					attribute_value = unescape_css_chars(&attribute_value);
 					process_anchor_links(&mut attribute_value, selectors, config);
 				},
 				_ => {},
@@ -553,6 +555,9 @@ fn process_js_arguments(
 					Some('`') => "`",
 					_ => "",
 				};
+
+				// Remove additional backslash in JS selector strings.
+				replacement_args = replacement_args.replace("\\\\", "\\");
 
 				if !quote_type.is_empty() {
 					process_css(&mut replacement_args, selectors, config);
@@ -785,7 +790,7 @@ fn process_string_of_tokens(
 				&format!(
 					"{prefix}{token}",
 					prefix = prefix,
-					token = &capture.at(1).unwrap()
+					token = unescape_css_chars(capture.at(1).unwrap())
 				),
 				selectors,
 				config,

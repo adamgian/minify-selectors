@@ -44,3 +44,11 @@ N.querySelectorAll(foo);
 O.querySelectorAll( bar );
 P.querySelectorAll(foo.bar);
 Q.querySelectorAll( foo.bar );
+
+R.querySelectorAll("#d");
+R.querySelectorAll("#d");
+R.querySelectorAll("#d");
+R.querySelectorAll("#d");
+S.querySelectorAll("#e"); // id="ID-5\"
+T.querySelectorAll("#f");
+T.querySelectorAll("[id='f']");

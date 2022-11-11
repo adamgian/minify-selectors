@@ -15,3 +15,14 @@ document
 document.getElementById(foo);
 document.getElementById( bar );
 document.getElementById( foo.bar );
+
+document.getElementById('i');
+document.getElementById('j');
+document.getElementById('a');
+document.getElementById('a');
+document.getElementById('a');
+document.getElementById('a');
+document.getElementById('a');
+document.getElementById('a');
+document.getElementById('a');
+document.getElementById('a');

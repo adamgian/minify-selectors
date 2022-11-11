@@ -15,3 +15,14 @@ document
 document.getElementById(foo);
 document.getElementById( bar );
 document.getElementById( foo.bar );
+
+document.getElementById('\\\\');
+document.getElementById('\#');
+document.getElementById('SELECTOR-\31');
+document.getElementById('SELECTOR-\31 ');
+document.getElementById('SELECTOR-\031');
+document.getElementById('SELECTOR-\031 ');
+document.getElementById('SELECTOR-\0031');
+document.getElementById('SELECTOR-\0031 ');
+document.getElementById('SELECTOR-\000031');
+document.getElementById('SELECTOR-\000031 ');

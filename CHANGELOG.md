@@ -1,3 +1,14 @@
+# v1.8.0
+<sub>TBD</sub>
+
+### Updates
+- Add support for escaped characters in JS selector strings
+
+<br>
+
+
+
+
 # v1.7.2
 <sub>9 Nov 2022</sub>
 
