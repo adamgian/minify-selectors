@@ -7,6 +7,8 @@ window.location.assign('/#b');
 window.location.assign('#c')
 window.location.assign('#c');
 window.location.assign('/#c');
+window.location.assign("#a")
+window.location.assign("#a")
 
 window.location.assign( '#d' )
 window.location.assign( '#d' );

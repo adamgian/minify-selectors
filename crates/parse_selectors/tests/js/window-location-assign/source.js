@@ -7,6 +7,8 @@ window.location.assign('/#SELECTOR-2');
 window.location.assign('#SELECTOR-3')
 window.location.assign('#SELECTOR-3');
 window.location.assign('/#SELECTOR-3');
+window.location.assign("#SELECTOR-%31")
+window.location.assign("#%53ELECTOR-1")
 
 window.location.assign( '#SELECTOR-4' )
 window.location.assign( '#SELECTOR-4' );

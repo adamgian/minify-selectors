@@ -21,3 +21,6 @@ l
 m.closest(foo);
 n.closest(foo.bar);
 o.closest( foo );
+
+a.closest(".SELECTOR-\\31");
+a.closest(".SEL\\45 CTOR-\\31");

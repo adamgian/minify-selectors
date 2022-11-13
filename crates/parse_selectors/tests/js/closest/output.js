@@ -21,3 +21,6 @@ l
 m.closest(foo);
 n.closest(foo.bar);
 o.closest( foo );
+
+a.closest(".a");
+a.closest(".a");

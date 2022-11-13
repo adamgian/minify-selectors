@@ -2,7 +2,10 @@
 <sub>TBD</sub>
 
 ### Updates
-- Add support for escaped characters in JS selector strings
+- Add support for encoded URLs in JS
+
+### Fixes
+- Extend escaped CSS character support to include JS selector strings
 
 <br>
 

@@ -546,6 +546,14 @@ lazy_static! {
 		"##
 	).unwrap();
 
+	pub static ref ESCAPED_JS_CHARS: Regex = Regex::new(
+		r##"(?x)
+			(?<url_encoded_char>
+				%[0-9A-Fa-f]{2}
+			)
+		"##
+	).unwrap();
+
 	// Invalid characters in a selector name are:
 	// -  \0-\54: null to comma
 	// -  \56: period (.)

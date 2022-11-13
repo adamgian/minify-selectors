@@ -117,7 +117,7 @@ fn get_encoded_selector(
 	}
 }
 
-// Convert possibly escaped CSS selector string to UTF8 string.
+// Convert possibly escaped chars in CSS selector string to UTF8 string.
 fn unescape_css_chars(selector_string: &str) -> String {
 	let mut unescaped = selector_string.to_string();
 
@@ -145,6 +145,27 @@ fn unescape_css_chars(selector_string: &str) -> String {
 				.unwrap()
 				.to_string();
 		}
+		replacement_char
+	});
+
+	unescaped
+}
+
+
+// Convert possibly escaped chars in JS string to UTF8 string.
+fn unescape_js_chars(js_string: &str) -> String {
+	let mut unescaped = js_string.to_string();
+
+	if regexes::ESCAPED_JS_CHARS.find(js_string).is_none() {
+		return unescaped;
+	}
+
+	unescaped = regexes::ESCAPED_JS_CHARS.replace_all(&unescaped, |capture: &Captures| {
+		let mut replacement_char = capture.at(1).unwrap().to_string();
+		replacement_char = replacement_char.replace('%', "");
+		replacement_char = char::from_u32(u32::from_str_radix(&replacement_char, 16).unwrap())
+			.unwrap()
+			.to_string();
 		replacement_char
 	});
 
@@ -902,7 +923,11 @@ fn process_anchor_links(
 			format!(
 				"{url}#{target_id}",
 				url = capture.at(1).unwrap_or(""),
-				target_id = get_encoded_selector(capture.at(2).unwrap(), selectors, config),
+				target_id = get_encoded_selector(
+					&unescape_js_chars(capture.at(2).unwrap()),
+					selectors,
+					config
+				),
 			)
 		}),
 		quote = quote_type,
