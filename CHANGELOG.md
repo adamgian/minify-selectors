@@ -1,7 +1,8 @@
-# v1.8.0
+# v1.9.0
 <sub>TBD</sub>
 
 ### Updates
+- Add support for escaped decimal and hexadecimal charater references in HTML
 - Add support for encoded URLs in JS
 
 ### Fixes

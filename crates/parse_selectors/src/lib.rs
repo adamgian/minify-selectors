@@ -117,7 +117,7 @@ fn get_encoded_selector(
 	}
 }
 
-// Convert possibly escaped chars in CSS selector string to UTF8 string.
+// Convert any escaped chars in CSS selector string to UTF8 char.
 fn unescape_css_chars(selector_string: &str) -> String {
 	let mut unescaped = selector_string.to_string();
 
@@ -152,7 +152,7 @@ fn unescape_css_chars(selector_string: &str) -> String {
 }
 
 
-// Convert possibly escaped chars in JS string to UTF8 string.
+// Converts any escaped chars in JS substring to UTF8 char.
 fn unescape_js_chars(js_string: &str) -> String {
 	let mut unescaped = js_string.to_string();
 
@@ -167,6 +167,54 @@ fn unescape_js_chars(js_string: &str) -> String {
 			.unwrap()
 			.to_string();
 		replacement_char
+	});
+
+	unescaped
+}
+
+// Convert any escaped chars in HTML substring to UTF8 char.
+fn unescape_html_chars(substring: &str) -> String {
+	let mut unescaped = substring.to_string();
+
+	if regexes::ESCAPED_HTML_CHARS.find(substring).is_none() {
+		return unescaped;
+	}
+
+	unescaped = regexes::ESCAPED_HTML_CHARS.replace_all(&unescaped, |capture: &Captures| {
+		String::from(
+			if capture.at(1).is_some() {
+				char::from_u32(
+					u32::from_str_radix(
+						capture
+							.at(1)
+							.unwrap()
+							.strip_prefix("&#x")
+							.unwrap()
+							.strip_suffix(';')
+							.unwrap(),
+						16,
+					)
+					.unwrap(),
+				)
+				.unwrap()
+			} else if capture.at(2).is_some() {
+				char::from_u32(
+					capture
+						.at(2)
+						.unwrap()
+						.strip_prefix("&#")
+						.unwrap()
+						.strip_suffix(';')
+						.unwrap()
+						.parse::<u32>()
+						.unwrap()
+				)
+				.unwrap()
+			} else {
+				// TODO: named character references
+				panic!("");
+			},
+		)
 	});
 
 	unescaped
@@ -442,25 +490,18 @@ fn process_html_attributes(
 		}
 
 		let attribute_name: &str = capture.at(1).unwrap();
-		let attribute_quote: &str = capture.at(4).unwrap_or("");
-		let mut attribute_value: String = capture.at(3).unwrap().to_string();
+		let attribute_quote: &str = capture.at(3).unwrap_or("");
+		let mut attribute_value: String = unescape_html_chars(capture.at(4).unwrap());
 
 		// Attributes whitelist of which its values should be processed.
-		match ATTRIBUTES_WHITELIST.contains_key(&attribute_name.to_ascii_lowercase()) {
+		match ATTRIBUTES_WHITELIST
+			.contains_key(&attribute_name.to_ascii_lowercase())
+		{
 			true => {
 				// Work out if value(s) are classes, IDs or selectors.
 				let attribute_type_designation: &str = ATTRIBUTES_WHITELIST
 					.get(&attribute_name.to_ascii_lowercase())
 					.unwrap();
-
-				// attribute_value will need to be cleaned up, as 'regexes::HTML_ATTRIBUTES'
-				// regex will capture the opening quote if it has been used.
-				if !attribute_quote.is_empty() {
-					attribute_value = attribute_value
-						.strip_prefix(attribute_quote)
-						.unwrap()
-						.to_string();
-				}
 
 				match attribute_type_designation {
 					"id" | "class" => {
@@ -490,7 +531,7 @@ fn process_html_attributes(
 				}
 
 				format!(
-					"{attribute}{join}{quote}{value}{quote}",
+					"{attribute}{join}{quote}{value}",
 					attribute = attribute_name,
 					join = capture.at(2).unwrap(),
 					value = attribute_value,

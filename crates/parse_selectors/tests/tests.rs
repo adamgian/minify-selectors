@@ -248,6 +248,12 @@ fn html_files() {
 		process_file("html", &dir.clone().join("body-only/source.html")),
 	);
 
+	// Escaped chars
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("escaped-chars/output.html")).unwrap(),
+		process_file("html", &dir.clone().join("escaped-chars/source.html")),
+	);
+
 	// Edge cases
 	assert_eq!(
 		fs::read_to_string(dir.clone().join("edge-cases/output.html")).unwrap(),

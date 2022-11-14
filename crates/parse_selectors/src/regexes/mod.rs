@@ -417,13 +417,19 @@ lazy_static! {
 			(?<join>
 				\s*=\s*
 			)
-			(?<value>
-				[^\s\\<>"'=]+
-				| \\?"(?:[^\\<>"=] | \\[^"'])+
-				| \\?'(?:[^\\<>'=] | \\[^"'])+
-			)
 			(?<quote>
 				(?:\\?["'])?
+			)
+			(?<value>
+				(?:
+					(?<=")
+					(?:[^\\<>"=] | \\[^"'])+
+				)
+				| (?:
+					(?<=')
+					(?:[^\\<>'=] | \\[^"'])+
+				)
+				| [^\s\\<>"'=]+
 			)
 		"##
 	).unwrap();
@@ -550,6 +556,20 @@ lazy_static! {
 		r##"(?x)
 			(?<url_encoded_char>
 				%[0-9A-Fa-f]{2}
+			)
+		"##
+	).unwrap();
+
+	pub static ref ESCAPED_HTML_CHARS: Regex = Regex::new(
+		r##"(?x)
+			(?<hexdecimal_char_ref>
+				&\#x[0-9A-Fa-f]{1,4};
+			)
+			| (?<decimal_char_ref>
+				&\#[0-9]{1,5};
+			)
+			| (?<named_char_ref>
+				&[A-Fa-f]*+;
 			)
 		"##
 	).unwrap();
