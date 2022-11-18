@@ -11,7 +11,7 @@
 
 # minify-selectors
 
-Post-processor that minifies classes and IDs selector names in CSS, HTML, Javascript and SVG files.
+Post-processor that minifies classes and IDs selector names in CSS, HTML, Javascript and SVG files. minify-selectors aims to offer comprehensive out of the box support with minimal fuss.
 
 Enhance your front-end assets and build optimisations pipeline — wring even more out from your already minified and optimised payload sizes. Additionally can offer a certain degree of obfuscation to your code.
 
@@ -20,59 +20,7 @@ Enhance your front-end assets and build optimisations pipeline — wring even mo
 
 
 
-## Features
-
-minify-selectors aims to offer comprehensive out of the box support — minifying all obvious selectors right out of the gate with minimal set up.
-
-
-#### CSS and embedded styles
-
-<table>
-	<tr>
-		<td>
-			<p><sub>Input</sub></p>
-			<pre lang="scss">
-.sidebar, .site-nav { … }                                ‎
-.sidebar .search:focus-within { … }
-.sidebar--expanded a.is-active { … }
-#page--default { … }<!--
-			--></pre>
-		</td>
-		<td>
-			<p><sub>Output:</sub></p>
-			<pre lang="scss">
-.a, .b { … }                                             ‎
-.a .c:focus-within { … }
-.d a.e { … }
-#a { … }<!--
-			--></pre>
-		</td>
-	</tr>
-</table>
-
-
-#### JS and embedded scripts
-
-<table>
-	<tr>
-		<td><p><sub>Input</sub></p>
-		<pre lang="js">
-for (let link of document.querySelectorAll('a.anchor')) {‎
-  link.classList.remove('is-active');
-}<!--
-			--></pre>
-		</td>
-		<td>
-			<p><sub>Output:</sub></p>
-			<pre lang="js">
-for (let link of document.querySelectorAll('a.Bd')) {    ‎
-  link.classList.remove('e');
-}<!--
-			--></pre>
-		</td>
-	</tr>
-</table>
-
+## What it can do
 
 #### HTML and SVGs
 
@@ -147,7 +95,56 @@ for (let link of document.querySelectorAll('a.Bd')) {    ‎
 </table>
 
 
-### Opt-in/opt-out selector encoding
+#### CSS (and HTML embedded styles)
+
+<table>
+	<tr>
+		<td>
+			<p><sub>Input</sub></p>
+			<pre lang="scss">
+.sidebar, .site-nav { … }                                ‎
+.sidebar .search:focus-within { … }
+.sidebar--expanded a.is-active { … }
+#page--default { … }<!--
+			--></pre>
+		</td>
+		<td>
+			<p><sub>Output:</sub></p>
+			<pre lang="scss">
+.a, .b { … }                                             ‎
+.a .c:focus-within { … }
+.d a.e { … }
+#a { … }<!--
+			--></pre>
+		</td>
+	</tr>
+</table>
+
+
+#### JS (and HTML embedded scripts)
+
+<table>
+	<tr>
+		<td><p><sub>Input</sub></p>
+		<pre lang="js">
+for (let link of document.querySelectorAll('a.anchor')) {‎
+  link.classList.remove('is-active');
+}<!--
+			--></pre>
+		</td>
+		<td>
+			<p><sub>Output:</sub></p>
+			<pre lang="js">
+for (let link of document.querySelectorAll('a.Bd')) {    ‎
+  link.classList.remove('e');
+}<!--
+			--></pre>
+		</td>
+	</tr>
+</table>
+
+
+#### Opt-in or opt-out of selector encoding
 
 In cases where minify-selectors is unable to parse selectors, for example: in custom HTML attributes or JS variables. Or forcing a selector to be encoded when it otherwise would not be, such as in a HTML code element or comments. You can prefix your selector names so that minify-selectors knows to parse it and how to encode it:
 
@@ -226,10 +223,11 @@ Or, you do not want minify-selectors to encode certain selectors (for reasons su
 
 
 
-## Usage
+## How to use
 
 > **Please note:**
-minify-selectors only supports regular CSS, HTML, JS and SVG files. SASS/SCSS, LESS, TypeScript, JQuery, Handlebars, etc. should be compiled or transpiled first into its respective vanilla form.
+> - minify-selectors only supports regular CSS, HTML, JS and SVG files. SASS/SCSS, LESS, TypeScript, JQuery, Handlebars, etc. should be compiled or transpiled first into its respective vanilla form.
+> - minify-selectors is currently limited to UTF-8 encoded files.
 
 ### Via npm and npm scripts
 
@@ -270,7 +268,7 @@ minify-selectors only supports regular CSS, HTML, JS and SVG files. SASS/SCSS, L
 
 
 
-## Options
+## Command line options
 
 <table>
 	<thead>
