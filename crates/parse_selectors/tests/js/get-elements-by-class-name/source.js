@@ -29,3 +29,11 @@ document.getElementsByClassName('SELECTOR-\0031');
 document.getElementsByClassName('SELECTOR-\0031 ');
 document.getElementsByClassName('SELECTOR-\000031');
 document.getElementsByClassName('SELECTOR-\000031 ');
+
+document.getElementsByClassName('\xA9');
+document.getElementsByClassName('\u00A9');
+document.getElementsByClassName('\u00a9');
+document.getElementsByClassName('\u2665');
+document.getElementsByClassName('\u{1D306}');
+document.getElementsByClassName('\u{1d306}');
+document.getElementsByClassName('\u{001d306}');

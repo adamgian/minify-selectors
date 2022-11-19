@@ -557,6 +557,15 @@ lazy_static! {
 			(?<url_encoded_char>
 				%[0-9A-Fa-f]{2}
 			)
+			| (?<hexdecimal>
+				\\x[0-9A-Fa-f]{2}
+			)
+			| (?<unicode>
+				\\u[0-9A-Fa-f]{4}
+			)
+			| (?<unicode_codepoint>
+				\\u{[0-9A-Fa-f]{1,}}
+			)
 		"##
 	).unwrap();
 

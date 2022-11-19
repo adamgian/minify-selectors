@@ -29,3 +29,11 @@ document.getElementsByClassName('a');
 document.getElementsByClassName('a');
 document.getElementsByClassName('a');
 document.getElementsByClassName('a');
+
+document.getElementsByClassName('n');
+document.getElementsByClassName('n');
+document.getElementsByClassName('n');
+document.getElementsByClassName('o');
+document.getElementsByClassName('p');
+document.getElementsByClassName('p');
+document.getElementsByClassName('p');

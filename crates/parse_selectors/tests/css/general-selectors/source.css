@@ -26,9 +26,10 @@
 ._a { color: green }
 .a { color: green }
 .A { color: green }
-.\265F -baz { color: yellow }
-.🗿 { color: yellow }
-.\🚕 { color: yellow }
+.\265F -baz { color: green }
+.🗿 { color: green }
+.🚕 { color: green }
+.\🚕 { color: green }
 #-_ { color: green }
 #-a { color: green }
 #_ { color: green }
@@ -38,9 +39,10 @@
 #_a { color: green }
 #a { color: green }
 #A { color: green }
-#\265F -baz { color: yellow }
-#🗿 { color: yellow }
-#\🚕 { color: yellow }
+#\265F -baz { color: green }
+#🗿 { color: green }
+#🚕 { color: green }
+#\🚕 { color: green }
 #__ignore--foo { color: green }
 #c\+\+ { color: green }
 #c\2b \+ { color: green }

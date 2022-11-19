@@ -126,26 +126,30 @@ fn unescape_css_chars(selector_string: &str) -> String {
 	}
 
 	unescaped = regexes::ESCAPED_CSS_CHARS.replace_all(&unescaped, |capture: &Captures| {
-		let mut replacement_char = String::from(
+		String::from(
 			if capture.at(1).is_some() {
-				capture.at(1).unwrap()
-			} else {
-				capture.at(2).unwrap()
-			},
-		);
-
-		// Escaped single character, only need to remove the leading blackslash.
-		replacement_char = replacement_char.replace('\\', "");
-
-		// Unicode code point, remove trailing whitespace (if any)
-		// and convert hex codepoint to UTF8 character.
-		if capture.at(1).is_some() {
-			replacement_char = replacement_char.replace(' ', "");
-			replacement_char = char::from_u32(u32::from_str_radix(&replacement_char, 16).unwrap())
+				// Unicode code point, remove trailing whitespace (if any)
+				// and convert hex codepoint to UTF8 character.
+				char::from_u32(
+					u32::from_str_radix(
+						capture
+							.at(1)
+							.unwrap()
+							.strip_prefix('\\')
+							.unwrap()
+							.trim_end_matches(' '),
+						16,
+					)
+					.unwrap(),
+				)
 				.unwrap()
-				.to_string();
-		}
-		replacement_char
+			} else if capture.at(2).is_some() {
+				// Escaped single character, only need to disregard the leading blackslash.
+				capture.at(2).unwrap().chars().nth(1).unwrap()
+			} else {
+				panic!("Not any of the known capture groups");
+			},
+		)
 	});
 
 	unescaped
@@ -161,12 +165,44 @@ fn unescape_js_chars(js_string: &str) -> String {
 	}
 
 	unescaped = regexes::ESCAPED_JS_CHARS.replace_all(&unescaped, |capture: &Captures| {
-		let mut replacement_char = capture.at(1).unwrap().to_string();
-		replacement_char = replacement_char.replace('%', "");
-		replacement_char = char::from_u32(u32::from_str_radix(&replacement_char, 16).unwrap())
-			.unwrap()
-			.to_string();
-		replacement_char
+		String::from(
+			if capture.at(1).is_some() {
+				char::from_u32(
+					u32::from_str_radix(capture.at(1).unwrap().strip_prefix('%').unwrap(), 16)
+						.unwrap(),
+				)
+				.unwrap()
+			} else if capture.at(2).is_some() {
+				char::from_u32(
+					u32::from_str_radix(capture.at(2).unwrap().strip_prefix("\\x").unwrap(), 16)
+						.unwrap(),
+				)
+				.unwrap()
+			} else if capture.at(3).is_some() {
+				char::from_u32(
+					u32::from_str_radix(capture.at(3).unwrap().strip_prefix("\\u").unwrap(), 16)
+						.unwrap(),
+				)
+				.unwrap()
+			} else if capture.at(4).is_some() {
+				char::from_u32(
+					u32::from_str_radix(
+						capture
+							.at(4)
+							.unwrap()
+							.strip_prefix("\\u{")
+							.unwrap()
+							.strip_suffix('}')
+							.unwrap(),
+						16,
+					)
+					.unwrap(),
+				)
+				.unwrap()
+			} else {
+				panic!("Not any of the known capture groups");
+			},
+		)
 	});
 
 	unescaped
@@ -207,12 +243,14 @@ fn unescape_html_chars(substring: &str) -> String {
 						.strip_suffix(';')
 						.unwrap()
 						.parse::<u32>()
-						.unwrap()
+						.unwrap(),
 				)
 				.unwrap()
-			} else {
+			} else if capture.at(3).is_some() {
 				// TODO: named character references
-				panic!("");
+				todo!();
+			} else {
+				panic!("Not any of the known capture groups");
 			},
 		)
 	});
@@ -494,9 +532,7 @@ fn process_html_attributes(
 		let mut attribute_value: String = unescape_html_chars(capture.at(4).unwrap());
 
 		// Attributes whitelist of which its values should be processed.
-		match ATTRIBUTES_WHITELIST
-			.contains_key(&attribute_name.to_ascii_lowercase())
-		{
+		match ATTRIBUTES_WHITELIST.contains_key(&attribute_name.to_ascii_lowercase()) {
 			true => {
 				// Work out if value(s) are classes, IDs or selectors.
 				let attribute_type_designation: &str = ATTRIBUTES_WHITELIST
@@ -601,7 +637,7 @@ fn process_js_arguments(
 			return capture.at(0).unwrap().to_string();
 		}
 
-		let mut replacement_args: String = capture.at(3).unwrap().to_string();
+		let mut replacement_args: String = unescape_js_chars(capture.at(3).unwrap());
 		let mut function = capture.at(1).unwrap().to_owned();
 		function.retain(|c| !c.is_whitespace());
 
@@ -767,7 +803,7 @@ fn process_js_properties(
 			return capture.at(0).unwrap().to_string();
 		}
 
-		let mut property_value: String = capture.at(4).unwrap().to_string();
+		let mut property_value: String = unescape_js_chars(capture.at(4).unwrap());
 		let property_name: &str = capture.at(1).unwrap();
 
 		match property_name {
