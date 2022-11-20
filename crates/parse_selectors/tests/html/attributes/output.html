@@ -63,5 +63,9 @@
 		<div style="mask-image: url('foo.svg#c')"></div>
 		<div style="mask-image: url('foo.svg#foo')"></div>
 		<svg class="a" aria-hidden="true"><use xlink:href="#a"></use></svg>
+
+		<!-- JS in event attributes -->
+		<button onclick="((el) => { setTimeout(() => { if (el.classList.contains('a')) { el.classList.add('b'); el.classList.remove('a'); } }, 3000) })(document.querySelector('.c.d'))"></button>
+		<div class="a" onclick="(() => this.classList.toggle('b'))()">
 	</body>
 </html>

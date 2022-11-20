@@ -22,5 +22,5 @@ rayon = "1.5.3"
 walkdir = "2.3.2"
 
 minify_selectors_utils = { version = "0.3.0", path = "../minify_selectors_utils" }
-parse_selectors = { version = "1.7.1", path = "../parse_selectors" }
+parse_selectors = { version = "1.7.2", path = "../parse_selectors" }
 encode_selector = { version = "0.4.0", path = "../encode_selector" }

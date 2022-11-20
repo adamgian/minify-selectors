@@ -63,5 +63,9 @@
 		<div style="mask-image: url('foo.svg#ID-3')"></div>
 		<div style="mask-image: url('foo.svg#__ignore--foo')"></div>
 		<svg class="CLASS-1" aria-hidden="true"><use xlink:href="#ID-1"></use></svg>
+
+		<!-- inline JS -->
+		<button onclick="((el) => { setTimeout(() => { if (el.classList.contains('CLASS-1')) { el.classList.add('CLASS-2'); el.classList.remove('CLASS-1'); } }, 3000) })(document.querySelector('.CLASS-3.CLASS-4'))"></button>
+		<div class="CLASS-1" onclick="(() => this.classList.toggle('CLASS-2'))()">
 	</body>
 </html>

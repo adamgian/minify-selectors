@@ -546,7 +546,7 @@ checksum = "7b5bf27447411e9ee3ff51186bf7a08e16c341efdde93f4d823e8844429bed7e"
 
 [[package]]
 name = "parse_selectors"
-version = "1.7.1"
+version = "1.7.2"
 dependencies = [
  "criterion",
  "encode_selector",

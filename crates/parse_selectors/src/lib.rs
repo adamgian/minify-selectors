@@ -1,9 +1,9 @@
-pub mod regexes;
 pub mod html_attribute_whitelist;
+pub mod regexes;
 
+use html_attribute_whitelist::*;
 use minify_selectors_utils::*;
 use onig::*;
-use html_attribute_whitelist::*;
 
 
 
@@ -499,6 +499,10 @@ fn process_html_attributes(
 
 					"style" => {
 						process_css_functions(&mut attribute_value, selectors, config);
+					},
+
+					"script" => {
+						process_js(&mut attribute_value, selectors, config);
 					},
 
 					"anchor" => {

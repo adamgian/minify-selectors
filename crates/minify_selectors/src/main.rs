@@ -28,7 +28,17 @@ fn minify_selectors() -> Result<(), Box<dyn Error>> {
 	for entry in WalkDir::new(&config.source)
 		.into_iter()
 		.filter_map(|e| e.ok())
-		.filter(|e| is_processable(e))
+		.filter(|e| {
+			// Check that current path is a file
+			if !e.path().is_file() {
+				return false;
+			};
+			// Finally, check file has a extension that can be processed
+			matches!(
+				e.path().extension().and_then(OsStr::to_str),
+				Some("css") | Some("html") | Some("js") | Some("svg")
+			)
+		})
 	{
 		process_file(entry.path(), &mut selectors, &config)?;
 	}
@@ -77,17 +87,4 @@ fn process_file(
 	fs::write(output_path, file_contents)?;
 
 	Ok(())
-}
-
-fn is_processable(entry: &walkdir::DirEntry) -> bool {
-	// Check that current path is a file
-	if !entry.path().is_file() {
-		return false;
-	};
-
-	// Finally, check file has a extension that can be processed
-	matches!(
-		entry.path().extension().and_then(OsStr::to_str),
-		Some("css") | Some("html") | Some("js") | Some("svg")
-	)
 }

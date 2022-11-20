@@ -1,4 +1,4 @@
-# v1.9.1
+# v1.9.2
 <sub>TBD</sub>
 
 ### Updates
@@ -8,6 +8,7 @@
 ### Fixes
 - Extend escaped CSS character support to include JS selector strings
 - Extend escaped JS character support to include additional JS escapes: hexadecimal, unicode and unicode code points
+- Parse HTML and SVG event attribute values as JS
 
 <br>
 
