@@ -31,3 +31,9 @@ document.querySelector('body').classList !== 'f a';
 document.querySelector('body').classList[0] !== 'f';
 document.querySelector('body').classList[99] !== 'f';
 document.querySelector('body').classList[99] !== 'f a';
+
+document.querySelector('body').classList = 'a';
+document.querySelector('body').classList = 'a';
+document.querySelector('body').classList = 'a';
+document.querySelector('body').classList = 'a';
+document.querySelector('body').classList = 'a';

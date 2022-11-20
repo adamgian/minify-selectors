@@ -11,3 +11,8 @@ d
 e.classList.replace(foo, 'b');
 f.classList.replace('a', foo);
 g.classList.replace(foo, bar);
+
+a.classList.replace('a', 'b');
+a.classList.replace('a', 'b');
+a.classList.replace('a', 'b');
+a.classList.replace('a', 'b');

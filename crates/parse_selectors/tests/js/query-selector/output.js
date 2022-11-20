@@ -23,25 +23,31 @@ var foo = ".foo";
 var g = document.querySelector(`${foo}.g`);
 var h = document.querySelector(`${foo} + .g`);
 var i = document.querySelector(`${foo.bar}.h`);
-var j = document.querySelector(`${".SELECTOR-9"}.i`);
+var j = document.querySelector(`${".CLASS-9"}.i`);
 
 var k = document
-	.querySelector(isSomething ? 'SELECTOR-11' : 'SELECTOR-12');
+	.querySelector(isSomething ? '.CLASS-11' : '.CLASS-12');
 var l = document.querySelector(
 	(isSomethingA > 0 && isSomethingB.includes('.com'))
-		? 'SELECTOR-11'
-		: 'SELECTOR-12'
+		? '.CLASS-11'
+		: '.CLASS-12'
 );
 var m = document.querySelector(
 	isSomethingA === 'deleted'
 		? getStuff()
-		: 'SELECTOR-13'
+		: '.CLASS-13'
 );
-var n = document.querySelector(foo.classList.contains('SELECTOR-14') && ".SELECTOR-15");
-var o = document.querySelector(!isSomething ?? ".SELECTOR-16");
-var p = document.querySelector(doSomething() || ".SELECTOR-17");
+var n = document.querySelector(foo.classList.contains('CLASS-14') && ".CLASS-15");
+var o = document.querySelector(!isSomething ?? ".CLASS-16");
+var p = document.querySelector(doSomething() || ".CLASS-17");
 
 var q = document.querySelector(foo);
 var r = document.querySelector( bar );
 var s = document.querySelector(foo.bar);
 var t = document.querySelector( foo.bar );
+
+document.querySelector('.a');
+document.querySelector('.a');
+document.querySelector('.a');
+document.querySelector('.a');
+document.querySelector('.a');

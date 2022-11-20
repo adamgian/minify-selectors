@@ -28,3 +28,10 @@ l.setAttribute(bar.bar, "bar")
 m.setAttribute("class", "")
 n.setAttribute("class", foo)
 o.setAttribute(foo, baz)
+
+p.setAttribute("id", "a");
+p.setAttribute("id", "a");
+p.setAttribute("id", "a");
+p.setAttribute("id", "a");
+p.setAttribute("id", "a");
+p.setAttribute("id", "a");

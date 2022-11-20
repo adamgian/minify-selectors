@@ -1,13 +1,18 @@
-a.classList.replace('SELECTOR-1', 'SELECTOR-2');
-b.classList.replace("SELECTOR-2", "SELECTOR-2");
-c.classList.replace(`SELECTOR-3`, `SELECTOR-4`);
+a.classList.replace('CLASS-1', 'CLASS-2');
+b.classList.replace("CLASS-2", "CLASS-2");
+c.classList.replace(`CLASS-3`, `CLASS-4`);
 d
 	.classList
 	.replace(
-		'SELECTOR-5',
-		'SELECTOR-6',
+		'CLASS-5',
+		'CLASS-6',
 	);
 
-e.classList.replace(foo, 'SELECTOR-2');
-f.classList.replace('SELECTOR-1', foo);
+e.classList.replace(foo, 'CLASS-2');
+f.classList.replace('CLASS-1', foo);
 g.classList.replace(foo, bar);
+
+a.classList.replace('CLAS\x53-1', 'CLASS-2');
+a.classList.replace('CLAS\x53-1', 'CLA\u0053S-2');
+a.classList.replace('CLAS\u{53}-1', 'CLA\u{053}S-2');
+a.classList.replace('CLAS\u{0053}-1', 'CLA\u{000053}S-2');

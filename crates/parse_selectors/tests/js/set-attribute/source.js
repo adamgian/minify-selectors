@@ -28,3 +28,10 @@ l.setAttribute(bar.bar, "bar")
 m.setAttribute("class", "")
 n.setAttribute("class", foo)
 o.setAttribute(foo, baz)
+
+p.setAttribute("id", "SELECTOR-\x31");
+p.setAttribute("id", "SELECTOR-\u0031");
+p.setAttribute("id", "SELECTOR-\u{31}");
+p.setAttribute("id", "SELECTOR-\u{031}");
+p.setAttribute("id", "SELECTOR-\u{0031}");
+p.setAttribute("id", "SELECTOR-\u{00031}");
