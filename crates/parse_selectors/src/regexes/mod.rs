@@ -1,6 +1,5 @@
+use lazy_static::lazy_static;
 use onig::*;
-
-use crate::lazy_static;
 
 
 

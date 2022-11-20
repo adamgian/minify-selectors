@@ -1,65 +1,9 @@
-use std::collections::HashMap;
+pub mod regexes;
+pub mod html_attribute_whitelist;
 
-use lazy_static::lazy_static;
 use minify_selectors_utils::*;
 use onig::*;
-
-pub mod regexes;
-
-
-
-
-lazy_static! {
-	// HTML attributes which its values will contain classes/IDs
-	static ref ATTRIBUTES_WHITELIST: HashMap<String, String> = HashMap::from([
-		// div id="foo"
-		(String::from("id"), String::from("id")),
-
-		// class="foo bar baz"
-		(String::from("class"), String::from("class")),
-
-		// <div id="foo"></div>
-		// <div aria-describedby="foo"></div>
-		(String::from("aria-describedby"), String::from("id")),
-
-		// <div id="foo"></div>
-		// <div aria-labelledby="foo"></div>
-		(String::from("aria-labelledby"), String::from("id")),
-
-		// <input id="foo">
-		// <label for="foo"></label>
-		(String::from("for"), String::from("id")),
-
-		// <form id="foo">
-		// <input form="foo">
-		(String::from("form"), String::from("id")),
-
-		// <rect fill="url(#foo)"></rect>
-		(String::from("fill"), String::from("style")),
-
-		// <th id="foo"></th>
-		// <td headers="foo"></td>
-		(String::from("headers"), String::from("id")),
-
-		// <div id="foo"></div>
-		// <div itemref="foo bar"></div>
-		// <div id="bar"></div>
-		(String::from("itemref"), String::from("id")),
-
-		// <input list="foo">
-		// <datalist id="foo"></datalist>
-		(String::from("list"), String::from("id")),
-
-		// <a href="/#foo"></a>
-		(String::from("href"), String::from("anchor")),
-
-		// <div style="filter: url(#svg-blur)"></div>
-		(String::from("style"), String::from("style")),
-
-		// <a xlink:href="/#foo"></a>
-		(String::from("xlink:href"), String::from("anchor")),
-	]);
-}
+use html_attribute_whitelist::*;
 
 
 
