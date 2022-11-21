@@ -422,11 +422,11 @@ lazy_static! {
 			(?<value>
 				(?:
 					(?<=")
-					(?:[^"] | \\[^"'])+
+					(?:[^"\\] | \\[^"'])+
 				)
 				| (?:
 					(?<=')
-					(?:[^'] | \\[^"'])+
+					(?:[^'\\] | \\[^"'])+
 				)
 				| [^\s\\<>"'=]+
 			)
@@ -482,8 +482,8 @@ lazy_static! {
 	pub static ref STRING_DELIMITED_BY_COMMA: Regex = Regex::new(
 		r##"(?x)
 			(?<token>
-				["'`]
-				(?<string>
+				(?<token_delimiter>["'`])
+				(?<token_string>
 					(?:(?<=")[^"]*)
 					| (?:(?<=')[^']*)
 					| (?:(?<=`)[^`]*)
@@ -574,13 +574,13 @@ lazy_static! {
 				&\#x[0-9A-Fa-f]{1,4};
 			)
 			| (?<decimal_char_ref>
-				&\#[0-9]{1,5};
-			)
-			| (?<named_char_ref>
-				&[A-Fa-f]*+;
+				&\#[0-9]{1,6};
 			)
 		"##
 	).unwrap();
+			// | (?<named_char_ref>
+			// 	&[A-Fa-f]*+;?
+			// )
 
 	// Invalid characters in a selector name are:
 	// -  \0-\54: null to comma

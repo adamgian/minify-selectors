@@ -8,7 +8,7 @@ keywords = [ "CSS", "selectors", "minifier", "CLI" ]
 license = "Apache-2.0"
 name = "minify_selectors"
 repository = "https://github.com/adamgian/minify-selectors.git"
-version = "1.9.0"
+version = "1.9.3"
 
 
 [[bin]]
@@ -22,5 +22,5 @@ rayon = "1.5.3"
 walkdir = "2.3.2"
 
 minify_selectors_utils = { version = "0.3.0", path = "../minify_selectors_utils" }
-parse_selectors = { version = "1.7.2", path = "../parse_selectors" }
+parse_selectors = { version = "1.7.3", path = "../parse_selectors" }
 encode_selector = { version = "0.4.0", path = "../encode_selector" }

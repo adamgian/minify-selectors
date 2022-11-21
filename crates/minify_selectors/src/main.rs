@@ -38,8 +38,7 @@ fn minify_selectors() -> Result<(), Box<dyn Error>> {
 				e.path().extension().and_then(OsStr::to_str),
 				Some("css") | Some("html") | Some("js") | Some("svg")
 			)
-		})
-	{
+		}) {
 		process_file(entry.path(), &mut selectors, &config)?;
 	}
 

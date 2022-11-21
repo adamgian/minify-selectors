@@ -1,4 +1,4 @@
-# v1.9.2
+# v1.9.3
 <sub>TBD</sub>
 
 ### Updates
@@ -9,6 +9,7 @@
 - Extend escaped CSS character support to include JS selector strings
 - Extend escaped JS character support to include additional JS escapes: hexadecimal, unicode and unicode code points
 - Parse HTML and SVG event attribute values as JS
+- Delimiter char that is not a delimiter can be be mistaken for one when delimiters are not supplied
 
 <br>
 

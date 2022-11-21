@@ -190,9 +190,9 @@ fn unescape_html_chars(substring: &str) -> String {
 						.unwrap(),
 				)
 				.unwrap()
-			} else if capture.at(3).is_some() {
+			// } else if capture.at(3).is_some() {
 				// TODO: named character references
-				todo!();
+				// todo!();
 			} else {
 				panic!("Not any of the known capture groups");
 			},
@@ -637,14 +637,14 @@ fn process_js_arguments(
 
 				// Check first arg in function, without the string delimiters
 				// and then trimming any whitespace off ends.
-				let attribute_name: &str = function_args.next().unwrap().at(2).unwrap_or("").trim();
+				let attribute_name: &str = function_args.next().unwrap().at(3).unwrap_or("").trim();
 
 				// Check first argument is an known attribute which its value will have
 				// classses or an id. If it is not, leave value as is (second argument).
 				if ATTRIBUTES_WHITELIST.contains_key(attribute_name) {
 					if let Some(attribute_value) = function_args.next() {
-						if attribute_value.at(2).is_some() {
-							let mut replacement_value = attribute_value.at(2).unwrap().to_string();
+						if attribute_value.at(3).is_some() {
+							let mut replacement_value = attribute_value.at(3).unwrap().to_string();
 							let attribute_type_designation: &str =
 								ATTRIBUTES_WHITELIST.get(attribute_name).unwrap();
 
@@ -663,11 +663,27 @@ fn process_js_arguments(
 									process_css(&mut replacement_value, selectors, config);
 								},
 
+								"style" => {
+									process_css_functions(
+										&mut replacement_value,
+										selectors,
+										config,
+									);
+								},
+
+								"script" => {
+									process_js(&mut replacement_value, selectors, config);
+								},
+
+								"anchor" => {
+									process_anchor_links(&mut replacement_value, selectors, config);
+								},
+
 								_ => return replacement_value,
 							};
 
 							replacement_args = replacement_args
-								.replace(attribute_value.at(2).unwrap(), &replacement_value);
+								.replace(attribute_value.at(3).unwrap(), &replacement_value);
 						}
 					}
 				}
@@ -677,11 +693,12 @@ fn process_js_arguments(
 			// we are only interested in the latter argument.
 			".insertAdjacentHTML" => {
 				if let Some(html) = get_function_arguments(&replacement_args).nth(1) {
-					// Second capture group, which should be the string (without the delimeters).
-					if html.at(2).is_some() {
-						let mut replacement_html = html.at(2).unwrap().to_string();
+					// Third capture group, which should be just the string (without the
+					// delimeters).
+					if html.at(3).is_some() {
+						let mut replacement_html = html.at(3).unwrap().to_string();
 
-						match html.at(2).unwrap().contains("</body>") {
+						match html.at(3).unwrap().contains("</body>") {
 							true => process_html(&mut replacement_html, selectors, config),
 							false => {
 								process_html_attributes(&mut replacement_html, selectors, config)
@@ -689,7 +706,7 @@ fn process_js_arguments(
 						};
 
 						replacement_args =
-							replacement_args.replace(html.at(2).unwrap(), &replacement_html);
+							replacement_args.replace(html.at(3).unwrap(), &replacement_html);
 					}
 				}
 			},
@@ -808,9 +825,9 @@ fn process_string_of_tokens(
 
 	// Handle strings that have quote delimiters included.
 	let quote_type: &str = match string.chars().next() {
-		Some('\'') => "'",
-		Some('"') => "\"",
-		Some('`') => "`",
+		Some('\'') if string.len() >= 2 => "'",
+		Some('"') if string.len() >= 2 => "\"",
+		Some('`') if string.len() >= 2 => "`",
 		_ => "",
 	};
 
@@ -879,40 +896,31 @@ fn process_string_of_arguments(
 		}
 
 		// Check if argument is a string, variable/expression or object/array.
-		//   - 1: simple string argument (with delimiters)
-		//   - 2: simple string argument (without delimiters)
-		//   - 3: variable or expression argument
-		//   - 4: object argument
-		//   - 5: array argument
-		if capture.at(2).is_some() {
-			let mut token: String = capture.at(1).unwrap().to_string();
-
-			// Get quote delimiters from argument.
-			let quote_type: &str = match capture.at(1).unwrap().chars().next() {
-				Some('\'') => "'",
-				Some('"') => "\"",
-				Some('`') => "`",
-				_ => "",
-			};
-
-			// Trim quotes from argument.
-			token.pop();
-			token.remove(0);
-
+		//   - 1: simple string argument (token string and delimiters)
+		//       - 2: token delimiter
+		//       - 3: token string
+		//   - 4: variable or expression argument
+		//   - 5: object argument
+		//   - 6: array argument
+		if capture.at(3).is_some() {
 			format!(
 				"{quote}{argument}{quote}",
 				argument = get_encoded_selector(
-					&format!("{prefix}{token}", prefix = prefix, token = token),
+					&format!(
+						"{prefix}{token}",
+						prefix = prefix,
+						token = capture.at(3).unwrap(),
+					),
 					selectors,
 					config,
 				),
-				quote = quote_type,
+				quote = capture.at(2).unwrap(),
 			)
 		// TODO:
-		//} else if capture.at(3).is_some() {
+		//} else if capture.at(4).is_some() {
 		//	return capture.at(0).unwrap().to_string();
 		} else {
-			// Capture group 4 (<object>) or 5 (<array>) .is_some() evaluates to true
+			// Capture group 5 (<object>) or 6 (<array>) .is_some() evaluates to true
 			// or another case. Either way nothing needs to be done to this argument.
 			return capture.at(0).unwrap().to_string();
 		}

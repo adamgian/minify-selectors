@@ -18,3 +18,6 @@ document.querySelector('body').classList.value != 'e d';
 
 document.querySelector('body').classList.value !== 'f';
 document.querySelector('body').classList.value !== 'f e';
+
+document.querySelector('body').classList.value = '';
+document.querySelector('body').classList.value = "";

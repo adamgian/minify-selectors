@@ -37,3 +37,6 @@ document.querySelector('body').classList = 'a';
 document.querySelector('body').classList = 'a';
 document.querySelector('body').classList = 'a';
 document.querySelector('body').classList = 'a';
+
+document.querySelector('body').classList = '';
+document.querySelector('body').classList = "";

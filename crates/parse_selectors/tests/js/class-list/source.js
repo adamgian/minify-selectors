@@ -37,3 +37,6 @@ document.querySelector('body').classList = 'CLA\u0053S-1';
 document.querySelector('body').classList = 'CLA\u{53}S-1';
 document.querySelector('body').classList = 'CLA\u{0053}S-1';
 document.querySelector('body').classList = 'CLA\u{000053}S-1';
+
+document.querySelector('body').classList = '';
+document.querySelector('body').classList = "";
