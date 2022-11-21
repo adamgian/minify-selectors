@@ -14,7 +14,7 @@ k.insertAdjacentHTML( 'beforebegin' , '<div class="e"></div>' );
 l
 	.insertAdjacentHTML(
 		'beforebegin',
-		'<div class="e"></div>'
+		'<div class="f"></div>'
 	);
 
 m.insertAdjacentHTML("afterbegin",m.content)
@@ -26,3 +26,6 @@ r.insertAdjacentHTML("afterbegin", '')
 s.insertAdjacentHTML("afterbegin", "")
 t.insertAdjacentHTML("afterbegin", ``)
 u.insertAdjacentHTML(foo, bar)
+
+v.insertAdjacentHTML(foo, "<div class=\"a\"></div>")
+v.insertAdjacentHTML(foo, "<div class='' id='a'></div>")
