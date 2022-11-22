@@ -1,6 +1,10 @@
 name: Build binaries
 
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Version tag"
 
 env:
   CARGO_TERM_COLOR: always
@@ -36,6 +40,8 @@ jobs:
           build/minify-selectors-linux-arm64.tar.gz
           build/minify-selectors-linux-64.tar.gz
         draft: true
+        name: "${{ github.event.inputs.tag }}"
+        tag_name: "${{ github.event.inputs.tag }}"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -60,6 +66,8 @@ jobs:
       with:
         files: build/minify-selectors-linux-32.tar.gz
         draft: true
+        name: "${{ github.event.inputs.tag }}"
+        tag_name: "${{ github.event.inputs.tag }}"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -91,6 +99,8 @@ jobs:
           build/minify-selectors-macos-64.tar.gz
           build/minify-selectors-macos-arm64.tar.gz
         draft: true
+        name: "${{ github.event.inputs.tag }}"
+        tag_name: "${{ github.event.inputs.tag }}"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -122,5 +132,7 @@ jobs:
           build/minify-selectors-windows-32.tar.gz
           build/minify-selectors-windows-64.tar.gz
         draft: true
+        name: "${{ github.event.inputs.tag }}"
+        tag_name: "${{ github.event.inputs.tag }}"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
