@@ -33,6 +33,7 @@ window.location =foo;
 window.location= foo;
 window.location=foo;
 window.location = foo.bar;
+window.location = ``;
 
 window.location.hash = "#SELECTOR-%31";
 window.location.hash = "#%53ELECTOR-1";

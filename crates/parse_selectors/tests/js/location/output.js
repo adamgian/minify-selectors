@@ -33,6 +33,7 @@ window.location =foo;
 window.location= foo;
 window.location=foo;
 window.location = foo.bar;
+window.location = ``;
 
 window.location.hash = "#a";
 window.location.hash = "#a";

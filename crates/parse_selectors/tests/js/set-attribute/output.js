@@ -35,3 +35,7 @@ p.setAttribute("id", "a");
 p.setAttribute("id", "a");
 p.setAttribute("id", "a");
 p.setAttribute("id", "a");
+
+q.setAttribute("style", "");
+q.setAttribute("style", "position:absolute; top:0; left:0;");
+q.setAttribute("style", "grid-template: \"a a a\"\"b c c\"");

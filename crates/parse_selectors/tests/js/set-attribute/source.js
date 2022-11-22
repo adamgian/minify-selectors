@@ -35,3 +35,7 @@ p.setAttribute("id", "SELECTOR-\u{31}");
 p.setAttribute("id", "SELECTOR-\u{031}");
 p.setAttribute("id", "SELECTOR-\u{0031}");
 p.setAttribute("id", "SELECTOR-\u{00031}");
+
+q.setAttribute("style", "");
+q.setAttribute("style", "position:absolute; top:0; left:0;");
+q.setAttribute("style", "grid-template: \"a a a\"\"b c c\"");

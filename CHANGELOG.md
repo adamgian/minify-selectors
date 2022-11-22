@@ -1,5 +1,5 @@
-# v1.9.3
-<sub>TBD</sub>
+# v1.9.4
+<sub>22 Nov 2022</sub>
 
 ### Updates
 - Add support for escaped decimal and hexadecimal charater references in HTML

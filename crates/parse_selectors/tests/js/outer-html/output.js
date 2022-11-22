@@ -15,3 +15,7 @@ i.outerHTML = '';
 j.outerHTML = "";
 k.outerHTML = ``;
 l.outerHTML = foo;
+m.outerHTML = "<div id='' class=\"\"></div>";
+m.outerHTML = "<div id='a' class=\"\"></div>";
+m.outerHTML = "<div id='' class=\"a\"></div>";
+m.outerHTML = "<div id='' class=\"a\"></div>";
