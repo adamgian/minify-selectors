@@ -1,3 +1,6 @@
+//! Crate to encode given integers into CSS valid radixes from
+//! a given alphabet.
+
 use lazy_static::lazy_static;
 use onig::*;
 
@@ -10,13 +13,13 @@ lazy_static! {
 	];
 
 	// Invalid characters in a selector name are:
-	// -  \0-\54: null to comma
-	// -  \56: period (.)
-	// -  \57: slash (/)
-	// -  \72-\100: colon (:) to at (@)
-	// -  \133-\136: left square bracket ([) to caret (^)
-	// -  \140: backtick (`)
-	// -  \173-\177: left brace ({) to delete
+	// - \0-\54: null to comma
+	// - \56: period (.)
+	// - \57: slash (/)
+	// - \72-\100: colon (:) to at (@)
+	// - \133-\136: left square bracket ([) to caret (^)
+	// - \140: backtick (`)
+	// - \173-\177: left brace ({) to delete
 	static ref INVALID_CHARACTERS: Regex = Regex::new(
 		r##"(?x)
 			[\0-\54\56\57\72-\100\133-\136\140\173-\177]
@@ -29,10 +32,12 @@ lazy_static! {
 
 /// Converts an ordinal into an encoded radix.
 ///
-/// Function parameters:
-/// - ordinal (&usize) - Integer to encode, must be 0 or greater.
-/// - alphabet (&(Vec<char>, &Vec<usize>)) - A tuple, use into_alphabet_set() to
-///   create this tuple from a processed string such as: "0123456789ABCDEF".
+/// # Usage
+///
+/// ```
+/// use encode_selector::*;
+/// let new_selector = to_radix(&42, &into_alphabet_set("A1B2C3"));
+/// ```
 pub fn to_radix(
 	ordinal: &usize,
 	alphabet: &(Vec<char>, Vec<usize>),
@@ -84,9 +89,37 @@ pub fn to_radix(
 }
 
 
-/// Returns a tuple of:
-///  0. sanitised vector of chars that are all unique
-///  1. vector of the positions of chars a selector name cannot start with.
+/// Processes given alphabet string and returns a tuple.
+///
+/// - `0`. — sanitised vector of chars that are all unique and are
+///   acceptable CSS characters.
+/// - `1`. — supplementary vector of the (zero-based index) positions of
+///   characters from the first vector which a selector name cannot start with.
+///
+/// # Usage
+///
+/// ```
+/// use encode_selector::*;
+/// let alphabet = into_alphabet_set("0123456789ABCDEF");
+/// ```
+///
+/// ## Further examples
+///
+/// ```
+/// # use encode_selector::*;
+/// assert_eq!(
+///     into_alphabet_set("AaBC"),
+///     (vec!['A', 'a', 'B', 'C'], vec![])
+/// );
+/// ```
+///
+/// ```
+/// # use encode_selector::*;
+/// assert_eq!(
+///     into_alphabet_set("AABCD123B"),
+///     (vec!['A', 'B', 'C', 'D', '1', '2', '3'], vec![4, 5, 6])
+/// );
+/// ```
 pub fn into_alphabet_set(alphabet: &str) -> (Vec<char>, Vec<usize>) {
 	let mut alphabet_set: Vec<char> = Vec::new();
 
