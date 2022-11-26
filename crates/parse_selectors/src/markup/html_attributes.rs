@@ -7,7 +7,7 @@ use lazy_static::lazy_static;
 
 lazy_static! {
 	// HTML attributes which its values will contains parsable values
-	pub static ref ATTRIBUTES_WHITELIST: HashMap<String, String> = HashMap::from([
+	pub static ref WHITELIST: HashMap<String, String> = HashMap::from([
 		(String::from("class"), String::from("class")),
 
 		(String::from("id"), String::from("id")),

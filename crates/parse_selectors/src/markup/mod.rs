@@ -1,11 +1,13 @@
+pub mod html_attributes;
+pub mod named_char_refs;
 pub mod regexes;
-pub mod whitelist;
 
 use minify_selectors_utils::*;
 use onig::*;
 
+use crate::markup::html_attributes::WHITELIST;
+use crate::markup::named_char_refs::ENTITIES;
 use crate::markup::regexes as markup_regex;
-use crate::markup::whitelist::*;
 
 
 
@@ -53,12 +55,11 @@ pub fn process_html_attributes(
 		let mut attribute_value: String = unescape_html_chars(capture.at(4).unwrap());
 
 		// Attributes whitelist of which its values should be processed.
-		match ATTRIBUTES_WHITELIST.contains_key(&attribute_name.to_ascii_lowercase()) {
+		match WHITELIST.contains_key(&attribute_name.to_ascii_lowercase()) {
 			true => {
 				// Work out if value(s) are classes, IDs or selectors.
-				let attribute_type_designation: &str = ATTRIBUTES_WHITELIST
-					.get(&attribute_name.to_ascii_lowercase())
-					.unwrap();
+				let attribute_type_designation: &str =
+					WHITELIST.get(&attribute_name.to_ascii_lowercase()).unwrap();
 
 				match attribute_type_designation {
 					"id" | "class" => {
@@ -172,8 +173,8 @@ pub fn unescape_html_chars(substring: &str) -> String {
 	}
 
 	unescaped = markup_regex::ESCAPED_HTML_CHARS.replace_all(&unescaped, |capture: &Captures| {
-		String::from(
-			if capture.at(1).is_some() {
+		if capture.at(1).is_some() {
+			return String::from(
 				char::from_u32(
 					u32::from_str_radix(
 						capture
@@ -187,8 +188,10 @@ pub fn unescape_html_chars(substring: &str) -> String {
 					)
 					.unwrap(),
 				)
-				.unwrap()
-			} else if capture.at(2).is_some() {
+				.unwrap(),
+			);
+		} else if capture.at(2).is_some() {
+			return String::from(
 				char::from_u32(
 					capture
 						.at(2)
@@ -200,14 +203,25 @@ pub fn unescape_html_chars(substring: &str) -> String {
 						.parse::<u32>()
 						.unwrap(),
 				)
-				.unwrap()
-			// } else if capture.at(3).is_some() {
-				// TODO: named character references
-				// todo!();
-			} else {
-				panic!("Not any of the known capture groups");
-			},
-		)
+				.unwrap(),
+			);
+		} else if capture.at(3).is_some() {
+			if !ENTITIES.contains_key(capture.at(3).unwrap()) {
+				println!(
+					"[Warn] Named character reference {:?} may not be a valid entity",
+					capture.at(3).unwrap(),
+				);
+				return capture
+					.at(3)
+					.unwrap()
+					.trim_end_matches(';')
+					.to_string()
+					.replace('&', "\\26");
+			}
+			return ENTITIES.get(capture.at(3).unwrap()).unwrap().to_string();
+		}
+
+		panic!("Not any of the known capture groups");
 	});
 
 	unescaped

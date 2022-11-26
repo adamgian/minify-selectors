@@ -91,8 +91,8 @@ pub fn to_radix(
 
 /// Processes given alphabet string and returns a tuple.
 ///
-/// - `0`. — sanitised vector of chars that are all unique and are
-///   acceptable CSS characters.
+/// - `0`. — sanitised vector of chars that are all unique and are acceptable
+///   CSS characters.
 /// - `1`. — supplementary vector of the (zero-based index) positions of
 ///   characters from the first vector which a selector name cannot start with.
 ///

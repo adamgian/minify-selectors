@@ -1,5 +1,8 @@
-# v1.x.x
+# v1.10.0
 <sub>TBD</sub>
+
+### Updates
+- Add support for named character references in HTML
 
 <br>
 

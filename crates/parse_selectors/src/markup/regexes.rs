@@ -106,10 +106,10 @@ lazy_static! {
 			| (?<decimal_char_ref>
 				&\#[0-9]{1,6};
 			)
+			| (?<named_char_ref>
+				&[A-Za-z]*+;?
+			)
 		"##
 	).unwrap();
-			// | (?<named_char_ref>
-			// 	&[A-Fa-f]*+;?
-			// )
 
 }

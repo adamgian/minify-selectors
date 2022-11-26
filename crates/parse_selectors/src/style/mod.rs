@@ -2,7 +2,8 @@ pub mod regexes;
 
 use minify_selectors_utils::*;
 use onig::*;
-use crate::markup::whitelist::*;
+
+use crate::markup::html_attributes::*;
 use crate::style::regexes as style_regex;
 
 
@@ -66,7 +67,7 @@ pub fn process_css_attributes(
 		let attribute_flag: &str = capture.at(6).unwrap_or("");
 		let mut attribute_value: String = capture.at(4).unwrap().to_string();
 
-		if ATTRIBUTES_WHITELIST.contains_key(&attribute_name) {
+		if WHITELIST.contains_key(&attribute_name) {
 			// Do not process attribute selector if case-insensitive
 			// flag has been set.
 			if attribute_flag.to_lowercase().contains('i') {
@@ -74,8 +75,7 @@ pub fn process_css_attributes(
 			}
 
 			// Work out if value(s) are classes, IDs or selectors.
-			let attribute_type_designation: &str =
-				ATTRIBUTES_WHITELIST.get(&attribute_name).unwrap();
+			let attribute_type_designation: &str = WHITELIST.get(&attribute_name).unwrap();
 
 			match attribute_type_designation {
 				"id" | "class" => {
