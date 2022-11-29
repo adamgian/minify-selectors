@@ -79,7 +79,6 @@ pub fn process_prefixed_selectors(
 	*file_string = regexes::PREFIXED_SELECTORS.replace_all(file_string, |capture: &Captures| {
 		let mut placeholder_value = capture.at(3).unwrap().trim().to_string();
 
-
 		match capture.at(2) {
 			#[rustfmt::skip]
 			// "__class--foo"

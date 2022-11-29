@@ -291,7 +291,7 @@ Or, you do not want minify-selectors to encode certain selectors (for reasons su
 				<code lang="shell">--output</code> (or <code lang="shell">-o</code>)
 			</td>
 			<td>
-				Directory to ouput processed files to. Setting the output path to be the same as the input path will overwrite existing files.
+				Directory to place processed files into. Setting the output path to be the same as the input path will overwrite existing files.
 			</td>
 		</tr>
 		<tr>

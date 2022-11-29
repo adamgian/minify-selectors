@@ -1,5 +1,5 @@
 # v1.10.0
-<sub>TBD</sub>
+<sub>30 Nov 2022</sub>
 
 ### Updates
 - Add support for named character references in HTML
