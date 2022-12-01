@@ -12,10 +12,10 @@ version = "1.8.0"
 
 [dependencies]
 lazy_static = "1.4.0"
-onig = "6.3.1"
+onig = "6.4.0"
 
-minify_selectors_utils = { version = "0.3.1", path = "../minify_selectors_utils" }
-encode_selector = { version = "0.4.0", path = "../encode_selector" }
+minify_selectors_utils = { version = "1.10.2", path = "../minify_selectors_utils" }
+encode_selector = { version = "0.4.1", path = "../encode_selector" }
 
 
 [dev-dependencies]

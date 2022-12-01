@@ -8,7 +8,11 @@ use clap::Parser;
 
 /// Post-processor that minifies classes and IDs in CSS, HTML, JS and SVG files.
 #[derive(Parser, Debug)]
-#[clap(version, about, long_about = None)]
+#[clap(
+	name = "minify-selectors",
+	version,
+	long_about = None,
+)]
 pub struct Cli {
 	/// Directory or file to process
 	#[clap(short = 'i', long = "input")]
