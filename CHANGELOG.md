@@ -1,5 +1,5 @@
 # v1.10.1
-<sub>TBD</sub>
+<sub>1 Dec 2022</sub>
 
 ### Fix
 - `--input` flag not properly defined
