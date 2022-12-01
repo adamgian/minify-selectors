@@ -7,7 +7,7 @@ keywords = []
 license = "Apache-2.0"
 name = "minify_selectors_utils"
 repository = "https://github.com/adamgian/minify-selectors.git"
-version = "0.3.0"
+version = "0.3.1"
 
 
 

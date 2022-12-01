@@ -1,3 +1,14 @@
+# v1.10.1
+<sub>TBD</sub>
+
+### Fix
+- `--input` flag not properly defined
+
+<br>
+
+
+
+
 # v1.10.0
 <sub>30 Nov 2022</sub>
 

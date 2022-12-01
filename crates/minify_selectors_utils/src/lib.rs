@@ -11,7 +11,7 @@ use clap::Parser;
 #[clap(version, about, long_about = None)]
 pub struct Cli {
 	/// Directory or file to process
-	#[clap(short = 'i', long)]
+	#[clap(short = 'i', long = "input")]
 	source: String,
 
 	/// Output directory to save file(s)
