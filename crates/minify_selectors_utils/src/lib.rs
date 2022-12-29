@@ -32,6 +32,8 @@ pub struct Cli {
 }
 
 
+
+
 #[derive(Debug)]
 pub struct Config {
 	pub source: PathBuf,
@@ -66,49 +68,115 @@ impl Default for Config {
 }
 
 
-#[derive(Debug)]
-pub struct Selectors {
-	pub map: HashMap<String, String>,
-	pub class_index: usize,
-	pub id_index: usize,
+
+
+/// Metadata for selector
+#[derive(Clone, Debug)]
+pub struct Selector {
+	pub r#type: SelectorType,
+	pub counter: usize,
+	pub selector_string_counter: usize,
+	pub identifer_counter: usize,
+	pub anchor_counter: usize,
+	pub style_counter: usize,
+	pub script_counter: usize,
 }
 
-impl Selectors {
-	pub fn contains(
-		&self,
-		selector: &str,
-	) -> bool {
-		self.map.contains_key(selector)
-	}
+#[derive(Clone, Debug)]
+pub enum SelectorType {
+	Class,
+	Id,
+	Undefined,
+}
 
-	// Note: assumes that key exists, should check first with contains().
-	pub fn get(
-		&self,
-		selector: &str,
-	) -> String {
-		self.map.get_key_value(selector).unwrap().1.to_string()
-	}
-
-	pub fn new(starting_index: usize) -> Self {
+impl Selector {
+	pub fn new(selector: &str) -> Self {
 		Self {
-			map: HashMap::new(),
-			class_index: starting_index,
-			id_index: starting_index,
+			r#type: match selector.chars().next() {
+				Some('.') => SelectorType::Class,
+				Some('#') => SelectorType::Id,
+				_ => panic!("Missing or unknown selector type"),
+			},
+			..Default::default()
 		}
 	}
 
-	// Note: assumes that this key is unique,
-	// should check first with contains().
+	pub fn count(
+		&mut self,
+		usage: &str,
+	) {
+		self.counter += 1;
+		match usage {
+			"identifer" => self.identifer_counter += 1,
+			"selector" => self.selector_string_counter += 1,
+			"anchor" => self.anchor_counter += 1,
+			"style" => self.style_counter += 1,
+			"script" => self.script_counter += 1,
+			_ => panic!("Missing or unknown selector usage"),
+		}
+	}
+
+	pub fn sum(&mut self, incoming: Selector) {
+		self.counter += incoming.counter;
+		self.identifer_counter += incoming.identifer_counter;
+		self.selector_string_counter += incoming.selector_string_counter;
+		self.anchor_counter += incoming.anchor_counter;
+		self.style_counter += incoming.style_counter;
+		self.script_counter += incoming.script_counter;
+	}
+}
+
+impl Default for Selector {
+	fn default() -> Self {
+		Self {
+			r#type: SelectorType::Undefined,
+			counter: 0,
+			identifer_counter: 0,
+			selector_string_counter: 0,
+			anchor_counter: 0,
+			style_counter: 0,
+			script_counter: 0,
+		}
+	}
+}
+
+
+
+
+#[derive(Debug)]
+pub struct Selectors {
+	pub map: HashMap<String, Selector>,
+}
+
+impl Selectors {
+	pub fn new() -> Self {
+		Self {
+			map: HashMap::new(),
+		}
+	}
+
 	pub fn add(
 		&mut self,
-		key: String,
-		value: String,
+		selector: String,
+		usage: &str,
 	) {
-		self.map.insert(key.clone(), value);
-		match key.chars().next() {
-			Some('.') => self.class_index += 1,
-			Some('#') => self.id_index += 1,
-			_ => panic!("Missing or unknown selector type"),
+		// Create map entry if it does not yet exist
+		if !self.map.contains_key(&selector) {
+			self.map.insert(selector.clone(), Selector::new(&selector));
+		}
+		self.map.get_mut(&selector).unwrap().count(usage);
+	}
+
+	pub fn merge(
+		&mut self,
+		incoming: Selectors,
+	) {
+		for (key, val) in incoming.map {
+			if self.map.contains_key(&key) {
+				self.map.get_mut(&key).unwrap().sum(val);
+			} else {
+				self.map.insert(key.clone(), val.clone());
+			}
 		}
 	}
 }

@@ -39,6 +39,15 @@ pub fn from_js(
 
 
 
+pub fn add_selector_to_map(
+	selector: &str,
+	selectors: &mut Selectors,
+	usage: &str,
+) {
+	selectors.add(selector.to_owned(), usage);
+}
+
+/// FIXME:
 /// Fetch encoded selector from selectors hashmap.
 /// If selector is new and unique, generate one for it
 /// and add it to selectors.
@@ -47,22 +56,10 @@ pub fn get_encoded_selector(
 	selectors: &mut Selectors,
 	config: &Config,
 ) -> String {
-	match selectors.contains(selector) {
-		true => selectors.get(selector),
-
-		false => {
-			let encoded_selector: String = encode_selector::to_radix(
-				match selector.chars().next() {
-					Some('.') => &selectors.class_index,
-					Some('#') => &selectors.id_index,
-					_ => panic!("Missing or unknown selector type"),
-				},
-				&config.alphabet,
-			);
-			selectors.add(selector.to_owned(), encoded_selector.clone());
-			encoded_selector
-		},
-	}
+	let encoded_selector: String = "FIXME".to_string();
+	// TODO: usage
+	selectors.add(selector.to_owned(), "selector");
+	encoded_selector
 }
 
 /// Returns an iterator of function arguments.

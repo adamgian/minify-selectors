@@ -1,7 +1,9 @@
-# v1.x.x
+# v2.0.0
 <sub>TBD</sub>
 
 ### Updates
+- Switch from a single-pass to multi-pass proccess
+
 ### Fixes
 
 <br>

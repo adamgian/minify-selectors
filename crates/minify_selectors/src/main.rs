@@ -23,7 +23,7 @@ fn main() {
 fn minify_selectors() -> Result<(), Box<dyn Error>> {
 	let stopwatch = Instant::now();
 	let config = Config::new();
-	let mut selectors = Selectors::new(config.start_index);
+	let mut selectors = Selectors::new();
 
 	for entry in WalkDir::new(&config.source)
 		.into_iter()
@@ -39,9 +39,12 @@ fn minify_selectors() -> Result<(), Box<dyn Error>> {
 				Some("css") | Some("html") | Some("js") | Some("svg")
 			)
 		}) {
-		process_file(entry.path(), &mut selectors, &config)?;
+		let mut selectors_in_file = Selectors::new();
+		process_file(entry.path(), &mut selectors_in_file, &config)?;
+		selectors.merge(selectors_in_file);
 	}
 
+	println!("{:#?}", selectors);
 	println!("minify-selectors finished in: {:.2?}", stopwatch.elapsed());
 
 	Ok(())
