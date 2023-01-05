@@ -294,20 +294,16 @@ fn process_file(
 	let mut file = fs::read_to_string(file_path).unwrap();
 
 	let config = Config {
-		source: PathBuf::from(""),
-		output: PathBuf::from(""),
 		alphabet: encode_selector::into_alphabet_set(concat!(
 			"0123456789",
 			"abcdefghijklmnopqrstuvwxyz",
 			"ABCDEFGHIJKLMNOPQRSTUVWXYZ",
 		)),
-		start_index: 0,
+		..Default::default()
 	};
 
 	let mut selectors = Selectors {
 		map: HashMap::new(),
-		class_index: config.start_index,
-		id_index: config.start_index,
 	};
 
 	if file_type == "css" {

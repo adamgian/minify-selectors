@@ -42,7 +42,7 @@ pub fn from_js(
 pub fn add_selector_to_map(
 	selector: &str,
 	selectors: &mut Selectors,
-	usage: &str,
+	usage: SelectorUsage,
 ) {
 	selectors.add(selector.to_owned(), usage);
 }
@@ -58,7 +58,7 @@ pub fn get_encoded_selector(
 ) -> String {
 	let encoded_selector: String = "FIXME".to_string();
 	// TODO: usage
-	selectors.add(selector.to_owned(), "selector");
+	selectors.add(selector.to_owned(), SelectorUsage::Selector);
 	encoded_selector
 }
 

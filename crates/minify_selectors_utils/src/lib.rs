@@ -40,30 +40,46 @@ pub struct Config {
 	pub output: PathBuf,
 	pub alphabet: (Vec<char>, Vec<usize>),
 	pub start_index: usize,
+	pub current_step: ProcessingSteps,
+}
+
+#[derive(Clone, Debug)]
+pub enum ProcessingSteps {
+	ReadingFromFiles,
+	EncodingSelectors,
+	WritingToFiles,
 }
 
 impl Config {
 	pub fn new() -> Self {
 		let args = Cli::parse();
+		let mut config: Config = Default::default();
 
-		Self {
-			source: PathBuf::from(&args.source),
-			output: PathBuf::from(&args.output),
-			alphabet: encode_selector::into_alphabet_set(match &args.alphabet {
-				Some(alphabet) => alphabet,
-				None => "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
-			}),
-			start_index: match &args.start_index {
-				Some(index) => *index,
-				None => 0,
-			},
+		if let Some(alphabet) = args.alphabet {
+			config.alphabet = encode_selector::into_alphabet_set(&alphabet);
 		}
+		if let Some(index) = args.start_index {
+			config.start_index = index;
+		}
+
+		config.source = PathBuf::from(&args.source);
+		config.output = PathBuf::from(&args.output);
+
+		config
 	}
 }
 
 impl Default for Config {
 	fn default() -> Self {
-		Self::new()
+		Self {
+			source: PathBuf::from(""),
+			output: PathBuf::from(""),
+			alphabet: encode_selector::into_alphabet_set(
+				"0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+			),
+			start_index: 0,
+			current_step: ProcessingSteps::ReadingFromFiles,
+		}
 	}
 }
 
@@ -76,7 +92,7 @@ pub struct Selector {
 	pub r#type: SelectorType,
 	pub counter: usize,
 	pub selector_string_counter: usize,
-	pub identifer_counter: usize,
+	pub identifier_counter: usize,
 	pub anchor_counter: usize,
 	pub style_counter: usize,
 	pub script_counter: usize,
@@ -87,6 +103,15 @@ pub enum SelectorType {
 	Class,
 	Id,
 	Undefined,
+}
+
+#[derive(Clone, Debug)]
+pub enum SelectorUsage {
+	Identifier,
+	Selector,
+	Anchor,
+	Style,
+	Script,
 }
 
 impl Selector {
@@ -103,22 +128,21 @@ impl Selector {
 
 	pub fn count(
 		&mut self,
-		usage: &str,
+		usage: SelectorUsage,
 	) {
 		self.counter += 1;
 		match usage {
-			"identifer" => self.identifer_counter += 1,
-			"selector" => self.selector_string_counter += 1,
-			"anchor" => self.anchor_counter += 1,
-			"style" => self.style_counter += 1,
-			"script" => self.script_counter += 1,
-			_ => panic!("Missing or unknown selector usage"),
+			SelectorUsage::Identifier => self.identifier_counter += 1,
+			SelectorUsage::Selector => self.selector_string_counter += 1,
+			SelectorUsage::Anchor => self.anchor_counter += 1,
+			SelectorUsage::Style => self.style_counter += 1,
+			SelectorUsage::Script => self.script_counter += 1,
 		}
 	}
 
 	pub fn sum(&mut self, incoming: Selector) {
 		self.counter += incoming.counter;
-		self.identifer_counter += incoming.identifer_counter;
+		self.identifier_counter += incoming.identifier_counter;
 		self.selector_string_counter += incoming.selector_string_counter;
 		self.anchor_counter += incoming.anchor_counter;
 		self.style_counter += incoming.style_counter;
@@ -131,7 +155,7 @@ impl Default for Selector {
 		Self {
 			r#type: SelectorType::Undefined,
 			counter: 0,
-			identifer_counter: 0,
+			identifier_counter: 0,
 			selector_string_counter: 0,
 			anchor_counter: 0,
 			style_counter: 0,
@@ -158,7 +182,7 @@ impl Selectors {
 	pub fn add(
 		&mut self,
 		selector: String,
-		usage: &str,
+		usage: SelectorUsage,
 	) {
 		// Create map entry if it does not yet exist
 		if !self.map.contains_key(&selector) {

@@ -21,7 +21,6 @@ pub fn parse_selectors_benchmarks(c: &mut Criterion) {
 			"abcdefghijklmnopqrstuvwxyz",
 			"ABCDEFGHIJKLMNOPQRSTUVWXYZ",
 		)),
-		start_index: 0,
 	};
 
 
@@ -93,8 +92,6 @@ pub fn parse_selectors_benchmarks(c: &mut Criterion) {
 
 	let mut css_sample_selectors = Selectors {
 		map: HashMap::new(),
-		class_index: config.start_index,
-		id_index: config.start_index,
 	};
 
 	c.bench_function("parse_selectors::from_css fn", |b| {
@@ -110,8 +107,6 @@ pub fn parse_selectors_benchmarks(c: &mut Criterion) {
 
 	let mut html_sample_selectors = Selectors {
 		map: HashMap::new(),
-		class_index: config.start_index,
-		id_index: config.start_index,
 	};
 
 	let mut html_sample = String::from(
