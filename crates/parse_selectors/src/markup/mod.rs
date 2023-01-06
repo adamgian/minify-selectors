@@ -68,6 +68,7 @@ pub fn process_html_attributes(
 							selectors,
 							config,
 							attribute_type_designation,
+							SelectorUsage::Identifier,
 						);
 					},
 

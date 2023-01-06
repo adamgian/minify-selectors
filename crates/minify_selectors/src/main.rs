@@ -25,7 +25,7 @@ fn minify_selectors() -> Result<(), Box<dyn Error>> {
 	let mut config = Config::new();
 	let mut selectors = Selectors::new();
 
-	for entry in WalkDir::new(&config.source)
+	let files_to_process = WalkDir::new(&config.source)
 		.into_iter()
 		.filter_map(|e| e.ok())
 		.filter(|e| {
@@ -38,11 +38,27 @@ fn minify_selectors() -> Result<(), Box<dyn Error>> {
 				e.path().extension().and_then(OsStr::to_str),
 				Some("css") | Some("html") | Some("js") | Some("svg")
 			)
-		}) {
+		});
+
+	// Multi-step process (stage 1/3):
+	// Read files and note down selectors and their occurrences.
+	for entry in files_to_process {
 		let mut selectors_in_file = Selectors::new();
 		process_file(entry.path(), &mut selectors_in_file, &config)?;
 		selectors.merge(selectors_in_file);
 	}
+
+	// Multi-step process (stage 2/3):
+	// Process selectors list and encode into a minified identifier.
+
+	// Multi-step process (stage 3/3):
+	// Open files again and subsituite encoded selectors in place.
+	// TODO:
+	// for entry in files_to_process {
+	// 	let mut selectors_in_file = Selectors::new();
+	// 	process_file(entry.path(), &mut selectors_in_file, &config)?;
+	// 	selectors.merge(selectors_in_file);
+	// }
 
 	println!("{:#?}", selectors);
 	println!("minify-selectors finished in: {:.2?}", stopwatch.elapsed());
@@ -56,7 +72,8 @@ fn process_file(
 	config: &Config,
 ) -> Result<(), std::io::Error> {
 	let mut file_contents = fs::read_to_string(file_path)?;
-	println!("Processing file: {}", file_path.display());
+	println!("Reading file: {}", file_path.display());
+	// println!("Processing file: {}", file_path.display());
 
 	match file_path.extension().and_then(OsStr::to_str) {
 		Some("css") => parse_selectors::from_css(&mut file_contents, selectors, config),

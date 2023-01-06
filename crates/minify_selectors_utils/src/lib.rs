@@ -43,7 +43,7 @@ pub struct Config {
 	pub current_step: ProcessingSteps,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum ProcessingSteps {
 	ReadingFromFiles,
 	EncodingSelectors,
@@ -96,6 +96,7 @@ pub struct Selector {
 	pub anchor_counter: usize,
 	pub style_counter: usize,
 	pub script_counter: usize,
+	pub prefix_counter: usize,
 }
 
 #[derive(Clone, Debug)]
@@ -105,13 +106,14 @@ pub enum SelectorType {
 	Undefined,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Copy, Debug)]
 pub enum SelectorUsage {
 	Identifier,
 	Selector,
 	Anchor,
 	Style,
 	Script,
+	Prefix,
 }
 
 impl Selector {
@@ -137,16 +139,21 @@ impl Selector {
 			SelectorUsage::Anchor => self.anchor_counter += 1,
 			SelectorUsage::Style => self.style_counter += 1,
 			SelectorUsage::Script => self.script_counter += 1,
+			SelectorUsage::Prefix => self.prefix_counter += 1,
 		}
 	}
 
-	pub fn sum(&mut self, incoming: Selector) {
+	pub fn sum(
+		&mut self,
+		incoming: Selector,
+	) {
 		self.counter += incoming.counter;
 		self.identifier_counter += incoming.identifier_counter;
 		self.selector_string_counter += incoming.selector_string_counter;
 		self.anchor_counter += incoming.anchor_counter;
 		self.style_counter += incoming.style_counter;
 		self.script_counter += incoming.script_counter;
+		self.prefix_counter += incoming.prefix_counter;
 	}
 }
 
@@ -160,6 +167,7 @@ impl Default for Selector {
 			anchor_counter: 0,
 			style_counter: 0,
 			script_counter: 0,
+			prefix_counter: 0,
 		}
 	}
 }

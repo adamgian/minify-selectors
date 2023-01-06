@@ -70,6 +70,7 @@ pub fn process_js_arguments(
 						selectors,
 						config,
 						"class",
+						SelectorUsage::Script,
 					);
 				}
 				// TODO: handle expressions?
@@ -79,7 +80,13 @@ pub fn process_js_arguments(
 			".getElementById" => {
 				// Checking that argument is a string
 				if capture.at(4).is_some() {
-					super::process_string_of_tokens(&mut replacement_args, selectors, config, "id");
+					super::process_string_of_tokens(
+						&mut replacement_args,
+						selectors,
+						config,
+						"id",
+						SelectorUsage::Script,
+					);
 				};
 				// TODO: handle expressions?
 			},
@@ -111,6 +118,7 @@ pub fn process_js_arguments(
 										selectors,
 										config,
 										attribute_type_designation,
+										SelectorUsage::Script,
 									);
 								},
 
@@ -204,6 +212,7 @@ pub fn process_js_arguments(
 					selectors,
 					config,
 					"class",
+					SelectorUsage::Script,
 				);
 			},
 
@@ -236,12 +245,6 @@ pub fn process_js_properties(
 		let property_name: &str = capture.at(1).unwrap();
 
 		match property_name {
-			".id" => {
-				super::process_string_of_tokens(&mut property_value, selectors, config, "id");
-			},
-			".className" => {
-				super::process_string_of_tokens(&mut property_value, selectors, config, "class");
-			},
 			".innerHTML" | ".outerHTML" => {
 				if property_value.contains("</body>") {
 					super::process_html(&mut property_value, selectors, config);
@@ -252,8 +255,23 @@ pub fn process_js_properties(
 			"window.location.hash" | "window.location.href" | "window.location" => {
 				super::process_anchor_links(&mut property_value, selectors, config);
 			},
-			_ if property_name.starts_with(".classList") => {
-				super::process_string_of_tokens(&mut property_value, selectors, config, "class");
+			".id" => {
+				super::process_string_of_tokens(
+					&mut property_value,
+					selectors,
+					config,
+					"id",
+					SelectorUsage::Script,
+				);
+			},
+			".className" | _ if property_name.starts_with(".classList") => {
+				super::process_string_of_tokens(
+					&mut property_value,
+					selectors,
+					config,
+					"class",
+					SelectorUsage::Script,
+				);
 			},
 			_ => {},
 		}

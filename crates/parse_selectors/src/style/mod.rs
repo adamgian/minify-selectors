@@ -84,6 +84,7 @@ pub fn process_css_attributes(
 						selectors,
 						config,
 						attribute_type_designation,
+						SelectorUsage::Style,
 					);
 				},
 				"selector" => {

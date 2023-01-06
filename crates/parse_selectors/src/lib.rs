@@ -57,8 +57,7 @@ pub fn get_encoded_selector(
 	config: &Config,
 ) -> String {
 	let encoded_selector: String = "FIXME".to_string();
-	// TODO: usage
-	selectors.add(selector.to_owned(), SelectorUsage::Selector);
+	selectors.add(selector.to_owned(), SelectorUsage::Anchor);
 	encoded_selector
 }
 
@@ -67,67 +66,118 @@ pub fn get_function_arguments<'r, 't>(string: &'t str) -> FindCaptures<'r, 't> {
 	regexes::STRING_DELIMITED_BY_COMMA.captures_iter(string)
 }
 
+/// Checks if a (minify-selector specific) prefixed selector
+/// is used in the given string snippet.
+pub fn is_prefixed_selector(string: &str) -> bool {
+	regexes::PREFIXED_SELECTORS.find(string).is_some()
+}
+
+
+
+
 /// Process minify-selectors specific prefixed selectors.
 pub fn process_prefixed_selectors(
 	file_string: &mut String,
 	selectors: &mut Selectors,
 	config: &Config,
 ) {
-	*file_string = regexes::PREFIXED_SELECTORS.replace_all(file_string, |capture: &Captures| {
-		let mut placeholder_value = capture.at(3).unwrap().trim().to_string();
+	if config.current_step == ProcessingSteps::WritingToFiles {
+		handle_file_write(file_string, selectors, config);
+	} else {
+		handle_file_read(file_string, selectors);
+	}
 
-		match capture.at(2) {
-			#[rustfmt::skip]
-			// "__class--foo"
-			Some("class") => {
-				placeholder_value = get_encoded_selector(
-					&format!(".{}", placeholder_value),
-					selectors,
-					config
-				);
-			},
+	fn handle_file_read(
+		file_string: &str,
+		selectors: &mut Selectors,
+	) {
+		for capture in regexes::PREFIXED_SELECTORS.captures_iter(file_string) {
+			// "#__ignore--foo", ".__ignore--bar" or "__ignore--baz"
+			// Note: no need to add a selector that has been marked as ignore
+			// to selectors map.
+			if capture.at(2) == Some("ignore") {
+				return;
+			}
 
-			#[rustfmt::skip]
-			// "__id--foo"
-			Some("id") => {
-				placeholder_value = get_encoded_selector(
-					&format!("#{}", placeholder_value),
-					selectors,
-					config
-				);
-			},
+			let mut indentifier = capture.at(3).unwrap().trim().to_string();
 
-			// Prefix (if any # or .) prefixed to value capture group
-			// will replace the entire match.
-			Some("ignore") => {
-				placeholder_value = format!(
-					"{prefix}{name}",
-					prefix = capture.at(1).unwrap_or(""),
-					name = placeholder_value
-				);
-			},
+			match capture.at(2) {
+				// "__class--foo"
+				Some("class") => indentifier = format!(".{}", indentifier),
+				// "__id--foo"
+				Some("id") => indentifier = format!("#{}", indentifier),
+				// "#__--foo" or ".__--bar"
+				Some(&_) | None => {
+					indentifier = format!(
+						"{prefix}{name}",
+						prefix = capture.at(1).unwrap(),
+						name = capture.at(1).unwrap(),
+					)
+				},
+			}
 
-			// "#__--foo" or ".__--bar"
-			Some(&_) | None => {
-				placeholder_value = format!(
-					"{prefix}{name}",
-					prefix = capture.at(1).unwrap(),
-					name = get_encoded_selector(
-						&format!(
-							"{prefix}{name}",
-							prefix = capture.at(1).unwrap(),
-							name = placeholder_value,
-						),
+			add_selector_to_map(&indentifier, selectors, SelectorUsage::Prefix);
+		}
+	}
+
+	fn handle_file_write(
+		file_string: &mut String,
+		selectors: &mut Selectors,
+		config: &Config,
+	) {
+		*file_string = regexes::PREFIXED_SELECTORS.replace_all(file_string, |capture: &Captures| {
+			let mut placeholder_value = capture.at(3).unwrap().trim().to_string();
+
+			match capture.at(2) {
+				#[rustfmt::skip]
+				// "__class--foo"
+				Some("class") => {
+					placeholder_value = get_encoded_selector(
+						&format!(".{}", placeholder_value),
 						selectors,
 						config
-					)
-				);
-			},
-		}
+					);
+				},
+				#[rustfmt::skip]
+				// "__id--foo"
+				Some("id") => {
+					placeholder_value = get_encoded_selector(
+						&format!("#{}", placeholder_value),
+						selectors,
+						config
+					);
+				},
+				// "#__ignore--foo", ".__ignore--bar" or "__ignore--baz"
+				Some("ignore") => {
+					placeholder_value = format!(
+						"{prefix}{name}",
+						prefix = capture.at(1).unwrap_or(""),
+						name = placeholder_value
+					);
+				},
+				// "#__--foo" or ".__--bar"
+				Some(&_) | None => {
+					placeholder_value = format!(
+						"{prefix}{name}",
+						prefix = capture.at(1).unwrap(),
+						name = get_encoded_selector(
+							&format!(
+								"{prefix}{name}",
+								prefix = capture.at(1).unwrap(),
+								name = placeholder_value,
+							),
+							selectors,
+							config
+						)
+					);
+				},
+			}
 
-		placeholder_value
-	});
+			placeholder_value
+		});
+	}
 }
+
 
 /// Process string with tokens delimited by whitespaces.
 ///
@@ -142,6 +192,7 @@ pub fn process_string_of_tokens(
 	selectors: &mut Selectors,
 	config: &Config,
 	context: &str,
+	usage: SelectorUsage,
 ) {
 	let prefix: &str = match context {
 		"class" => ".",
@@ -163,30 +214,65 @@ pub fn process_string_of_tokens(
 		string.remove(0);
 	}
 
-	*string = format!(
-		"{quote}{tokens}{quote}",
-		tokens = regexes::STRING_DELIMITED_BY_SPACE.replace_all(string, |capture: &Captures| {
+	if config.current_step == ProcessingSteps::WritingToFiles {
+		handle_file_write(string, prefix, quote_type, selectors, config);
+	} else {
+		handle_file_read(string, prefix, usage, selectors);
+	}
+
+	fn handle_file_read(
+		string: &str,
+		prefix: &str,
+		usage: SelectorUsage,
+		selectors: &mut Selectors,
+	) {
+		for capture in regexes::STRING_DELIMITED_BY_SPACE.captures_iter(string) {
 			// Check if token has a minify-selectors specific prefix,
 			// It should be handled with process_prefixed_selectors().
-			if regexes::PREFIXED_SELECTORS
-				.find(capture.at(0).unwrap())
-				.is_some()
-			{
-				return capture.at(0).unwrap().to_string();
+			if !is_prefixed_selector(capture.at(0).unwrap()) {
+				add_selector_to_map(
+					&format!(
+						"{prefix}{token}",
+						prefix = prefix,
+						token = unescape_css_chars(capture.at(1).unwrap()),
+					),
+					selectors,
+					usage,
+				);
 			}
+		}
+	}
 
-			get_encoded_selector(
-				&format!(
-					"{prefix}{token}",
-					prefix = prefix,
-					token = unescape_css_chars(capture.at(1).unwrap())
-				),
-				selectors,
-				config,
-			)
-		}),
-		quote = quote_type,
-	);
+	fn handle_file_write(
+		string: &mut String,
+		prefix: &str,
+		quote: &str,
+		selectors: &mut Selectors,
+		config: &Config,
+	) {
+		*string = format!(
+			"{quote}{tokens}{quote}",
+			tokens = regexes::STRING_DELIMITED_BY_SPACE.replace_all(string, |capture: &Captures| {
+				// Check if token has a minify-selectors specific prefix,
+				// It should be handled with process_prefixed_selectors().
+				if is_prefixed_selector(capture.at(0).unwrap()) {
+					return capture.at(0).unwrap().to_string();
+				}
+
+				get_encoded_selector(
+					&format!(
+						"{prefix}{token}",
+						prefix = prefix,
+						token = unescape_css_chars(capture.at(1).unwrap())
+					),
+					selectors,
+					config,
+				)
+			}),
+			quote = quote,
+		);
+	}
+
 }
 
 /// Process function arguments, delimited by commas.
@@ -199,6 +285,7 @@ pub fn process_string_of_arguments(
 	selectors: &mut Selectors,
 	config: &Config,
 	context: &str,
+	usage: SelectorUsage,
 ) {
 	let prefix: &str = match context {
 		"class" => ".",
@@ -206,46 +293,84 @@ pub fn process_string_of_arguments(
 		_ => "",
 	};
 
-	*string = regexes::STRING_DELIMITED_BY_COMMA.replace_all(string, |capture: &Captures| {
-		// Check if argument has a minify-selectors specific prefix,
-		// It should be handled with process_prefixed_selectors().
-		if regexes::PREFIXED_SELECTORS
-			.find(capture.at(0).unwrap())
-			.is_some()
-		{
-			return capture.at(0).unwrap().to_string();
-		}
+	if config.current_step == ProcessingSteps::WritingToFiles {
+		handle_file_write(string, prefix, selectors, config);
+	} else {
+		handle_file_read(string, prefix, usage, selectors);
+	}
 
-		// Check if argument is a string, variable/expression or object/array.
-		//   - 1: simple string argument (token string and delimiters)
-		//       - 2: token delimiter
-		//       - 3: token string
-		//   - 4: variable or expression argument
-		//   - 5: object argument
-		//   - 6: array argument
-		if capture.at(3).is_some() {
-			format!(
-				"{quote}{argument}{quote}",
-				argument = get_encoded_selector(
+	fn handle_file_read(
+		string: &str,
+		prefix: &str,
+		usage: SelectorUsage,
+		selectors: &mut Selectors,
+	) {
+		for capture in regexes::STRING_DELIMITED_BY_COMMA.captures_iter(string) {
+			// Check if argument has a minify-selectors specific prefix,
+			// It should be handled with process_prefixed_selectors().
+			if is_prefixed_selector(capture.at(0).unwrap()) {
+				return;
+			}
+
+			// String argument
+			if capture.at(3).is_some() {
+				add_selector_to_map(
 					&format!(
 						"{prefix}{token}",
 						prefix = prefix,
 						token = capture.at(3).unwrap(),
 					),
 					selectors,
-					config,
-				),
-				quote = capture.at(2).unwrap(),
-			)
-		// TODO:
-		//} else if capture.at(4).is_some() {
-		//	return capture.at(0).unwrap().to_string();
-		} else {
-			// Capture group 5 (<object>) or 6 (<array>) .is_some() evaluates to true
-			// or another case. Either way nothing needs to be done to this argument.
-			return capture.at(0).unwrap().to_string();
+					usage,
+				);
+			}
 		}
-	});
+	}
+
+	fn handle_file_write(
+		string: &mut String,
+		prefix: &str,
+		selectors: &mut Selectors,
+		config: &Config,
+	) {
+		*string = regexes::STRING_DELIMITED_BY_COMMA.replace_all(string, |capture: &Captures| {
+			// Check if argument has a minify-selectors specific prefix,
+			// It should be handled with process_prefixed_selectors().
+			if is_prefixed_selector(capture.at(0).unwrap()) {
+				return capture.at(0).unwrap().to_string();
+			}
+
+			// Check if argument is a string, variable/expression or object/array.
+			//   - 1: simple string argument (token string and delimiters)
+			//       - 2: token delimiter
+			//       - 3: token string
+			//   - 4: variable or expression argument
+			//   - 5: object argument
+			//   - 6: array argument
+			if capture.at(3).is_some() {
+				format!(
+					"{quote}{argument}{quote}",
+					argument = get_encoded_selector(
+						&format!(
+							"{prefix}{token}",
+							prefix = prefix,
+							token = capture.at(3).unwrap(),
+						),
+						selectors,
+						config,
+					),
+					quote = capture.at(2).unwrap(),
+				)
+			// TODO:
+			//} else if capture.at(4).is_some() {
+			//	return capture.at(0).unwrap().to_string();
+			} else {
+				// Capture group 5 (<object>) or 6 (<array>) .is_some() evaluates to true
+				// or another case. Either way nothing needs to be done to this argument.
+				return capture.at(0).unwrap().to_string();
+			}
+		});
+	}
 }
 
 // Process target IDs in anchor link URLs.
@@ -268,22 +393,56 @@ pub fn process_anchor_links(
 		string.remove(0);
 	}
 
-	*string = format!(
-		"{quote}{url}{quote}",
-		url = regexes::INTERNAL_ANCHOR_TARGET_ID.replace(string, |capture: &Captures| {
+	if config.current_step == ProcessingSteps::WritingToFiles {
+		handle_file_read(string, selectors);
+	} else {
+		handle_file_write(string, quote_type, selectors, config);
+	}
+
+	fn handle_file_read(
+		string: &str,
+		selectors: &mut Selectors,
+	) {
+		for capture in regexes::INTERNAL_ANCHOR_TARGET_ID.captures_iter(string) {
 			if capture.at(1).is_none() {
-				return capture.at(0).unwrap().to_string();
+				return;
 			}
-			format!(
-				"{url}#{target_id}",
-				url = capture.at(1).unwrap_or(""),
-				target_id = get_encoded_selector(
-					&unescape_js_chars(capture.at(2).unwrap()),
-					selectors,
-					config
+
+			add_selector_to_map(
+				&format!(
+					"{url}#{target_id}",
+					url = capture.at(1).unwrap_or(""),
+					target_id = &unescape_js_chars(capture.at(2).unwrap()),
 				),
-			)
-		}),
-		quote = quote_type,
-	);
+				selectors,
+				SelectorUsage::Anchor,
+			);
+		}
+	}
+
+	fn handle_file_write(
+		string: &mut String,
+		quote: &str,
+		selectors: &mut Selectors,
+		config: &Config,
+	) {
+		*string = format!(
+			"{quote}{url}{quote}",
+			url = regexes::INTERNAL_ANCHOR_TARGET_ID.replace(string, |capture: &Captures| {
+				if capture.at(1).is_none() {
+					return capture.at(0).unwrap().to_string();
+				}
+				format!(
+					"{url}#{target_id}",
+					url = capture.at(1).unwrap_or(""),
+					target_id = get_encoded_selector(
+						&unescape_js_chars(capture.at(2).unwrap()),
+						selectors,
+						&config
+					),
+				)
+			}),
+			quote = quote,
+		);
+	}
 }
