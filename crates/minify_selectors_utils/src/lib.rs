@@ -34,7 +34,7 @@ pub struct Cli {
 
 
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Config {
 	pub source: PathBuf,
 	pub output: PathBuf,
@@ -90,6 +90,7 @@ impl Default for Config {
 #[derive(Clone, Debug)]
 pub struct Selector {
 	pub r#type: SelectorType,
+	pub replacement: Option<String>,
 	pub counter: usize,
 	pub selector_string_counter: usize,
 	pub identifier_counter: usize,
@@ -99,7 +100,7 @@ pub struct Selector {
 	pub prefix_counter: usize,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum SelectorType {
 	Class,
 	Id,
@@ -155,12 +156,20 @@ impl Selector {
 		self.script_counter += incoming.script_counter;
 		self.prefix_counter += incoming.prefix_counter;
 	}
+
+	pub fn set_replacement(
+		&mut self,
+		replacement: String,
+	) {
+		self.replacement = Some(replacement);
+	}
 }
 
 impl Default for Selector {
 	fn default() -> Self {
 		Self {
 			r#type: SelectorType::Undefined,
+			replacement: None,
 			counter: 0,
 			identifier_counter: 0,
 			selector_string_counter: 0,
@@ -178,12 +187,16 @@ impl Default for Selector {
 #[derive(Debug)]
 pub struct Selectors {
 	pub map: HashMap<String, Selector>,
+	pub class_counter: usize,
+	pub id_counter: usize,
 }
 
 impl Selectors {
 	pub fn new() -> Self {
 		Self {
 			map: HashMap::new(),
+			class_counter: 0,
+			id_counter: 0,
 		}
 	}
 
@@ -210,5 +223,35 @@ impl Selectors {
 				self.map.insert(key.clone(), val.clone());
 			}
 		}
+	}
+
+	pub fn process(
+		&mut self,
+		config: &mut Config,
+	) {
+		for val in self.map.values_mut() {
+			val.set_replacement(encode_selector::to_radix(
+				match val.r#type {
+					SelectorType::Class => &self.class_counter,
+					SelectorType::Id => &self.id_counter,
+					SelectorType::Undefined => {
+						panic!("Trying to encode a selector with undefined type.")
+					},
+				},
+				&config.alphabet,
+			));
+
+			if val.r#type == SelectorType::Class {
+				self.class_counter += 1;
+			} else if val.r#type == SelectorType::Id {
+				self.id_counter += 1;
+			}
+		}
+	}
+}
+
+impl Default for Selectors {
+	fn default() -> Self {
+		Self::new()
 	}
 }

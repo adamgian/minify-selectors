@@ -54,7 +54,7 @@ pub fn add_selector_to_map(
 pub fn get_encoded_selector(
 	selector: &str,
 	selectors: &mut Selectors,
-	config: &Config,
+	_config: &Config,
 ) -> String {
 	let encoded_selector: String = "FIXME".to_string();
 	selectors.add(selector.to_owned(), SelectorUsage::Anchor);
@@ -125,56 +125,55 @@ pub fn process_prefixed_selectors(
 		selectors: &mut Selectors,
 		config: &Config,
 	) {
-		*file_string = regexes::PREFIXED_SELECTORS.replace_all(file_string, |capture: &Captures| {
-			let mut placeholder_value = capture.at(3).unwrap().trim().to_string();
+		*file_string =
+			regexes::PREFIXED_SELECTORS.replace_all(file_string, |capture: &Captures| {
+				let mut placeholder_value = capture.at(3).unwrap().trim().to_string();
 
-			match capture.at(2) {
-				#[rustfmt::skip]
-				// "__class--foo"
-				Some("class") => {
-					placeholder_value = get_encoded_selector(
-						&format!(".{}", placeholder_value),
-						selectors,
-						config
-					);
-				},
-				#[rustfmt::skip]
-				// "__id--foo"
-				Some("id") => {
-					placeholder_value = get_encoded_selector(
-						&format!("#{}", placeholder_value),
-						selectors,
-						config
-					);
-				},
-				// "#__ignore--foo", ".__ignore--bar" or "__ignore--baz"
-				Some("ignore") => {
-					placeholder_value = format!(
-						"{prefix}{name}",
-						prefix = capture.at(1).unwrap_or(""),
-						name = placeholder_value
-					);
-				},
-				// "#__--foo" or ".__--bar"
-				Some(&_) | None => {
-					placeholder_value = format!(
-						"{prefix}{name}",
-						prefix = capture.at(1).unwrap(),
-						name = get_encoded_selector(
-							&format!(
-								"{prefix}{name}",
-								prefix = capture.at(1).unwrap(),
-								name = placeholder_value,
-							),
+				match capture.at(2) {
+					// "__class--foo"
+					Some("class") => {
+						placeholder_value = get_encoded_selector(
+							&format!(".{}", placeholder_value),
 							selectors,
-							config
-						)
-					);
-				},
-			}
+							config,
+						);
+					},
+					// "__id--foo"
+					Some("id") => {
+						placeholder_value = get_encoded_selector(
+							&format!("#{}", placeholder_value),
+							selectors,
+							config,
+						);
+					},
+					// "#__ignore--foo", ".__ignore--bar" or "__ignore--baz"
+					Some("ignore") => {
+						placeholder_value = format!(
+							"{prefix}{name}",
+							prefix = capture.at(1).unwrap_or(""),
+							name = placeholder_value,
+						);
+					},
+					// "#__--foo" or ".__--bar"
+					Some(&_) | None => {
+						placeholder_value = format!(
+							"{prefix}{name}",
+							prefix = capture.at(1).unwrap(),
+							name = get_encoded_selector(
+								&format!(
+									"{prefix}{name}",
+									prefix = capture.at(1).unwrap(),
+									name = placeholder_value,
+								),
+								selectors,
+								config,
+							)
+						);
+					},
+				}
 
-			placeholder_value
-		});
+				placeholder_value
+			});
 	}
 }
 
@@ -252,27 +251,27 @@ pub fn process_string_of_tokens(
 	) {
 		*string = format!(
 			"{quote}{tokens}{quote}",
-			tokens = regexes::STRING_DELIMITED_BY_SPACE.replace_all(string, |capture: &Captures| {
-				// Check if token has a minify-selectors specific prefix,
-				// It should be handled with process_prefixed_selectors().
-				if is_prefixed_selector(capture.at(0).unwrap()) {
-					return capture.at(0).unwrap().to_string();
-				}
+			tokens =
+				regexes::STRING_DELIMITED_BY_SPACE.replace_all(string, |capture: &Captures| {
+					// Check if token has a minify-selectors specific prefix,
+					// It should be handled with process_prefixed_selectors().
+					if is_prefixed_selector(capture.at(0).unwrap()) {
+						return capture.at(0).unwrap().to_string();
+					}
 
-				get_encoded_selector(
-					&format!(
-						"{prefix}{token}",
-						prefix = prefix,
-						token = unescape_css_chars(capture.at(1).unwrap())
-					),
-					selectors,
-					config,
-				)
-			}),
+					get_encoded_selector(
+						&format!(
+							"{prefix}{token}",
+							prefix = prefix,
+							token = unescape_css_chars(capture.at(1).unwrap())
+						),
+						selectors,
+						config,
+					)
+				}),
 			quote = quote,
 		);
 	}
-
 }
 
 /// Process function arguments, delimited by commas.
@@ -438,7 +437,7 @@ pub fn process_anchor_links(
 					target_id = get_encoded_selector(
 						&unescape_js_chars(capture.at(2).unwrap()),
 						selectors,
-						&config
+						config,
 					),
 				)
 			}),

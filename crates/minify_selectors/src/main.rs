@@ -50,17 +50,19 @@ fn minify_selectors() -> Result<(), Box<dyn Error>> {
 
 	// Multi-step process (stage 2/3):
 	// Process selectors list and encode into a minified identifier.
+	config.current_step = ProcessingSteps::EncodingSelectors;
+	selectors.process(&mut config);
 
 	// Multi-step process (stage 3/3):
 	// Open files again and subsituite encoded selectors in place.
 	// TODO:
+	config.current_step = ProcessingSteps::WritingToFiles;
 	// for entry in files_to_process {
 	// 	let mut selectors_in_file = Selectors::new();
 	// 	process_file(entry.path(), &mut selectors_in_file, &config)?;
 	// 	selectors.merge(selectors_in_file);
 	// }
 
-	println!("{:#?}", selectors);
 	println!("minify-selectors finished in: {:.2?}", stopwatch.elapsed());
 
 	Ok(())
@@ -72,8 +74,12 @@ fn process_file(
 	config: &Config,
 ) -> Result<(), std::io::Error> {
 	let mut file_contents = fs::read_to_string(file_path)?;
-	println!("Reading file: {}", file_path.display());
-	// println!("Processing file: {}", file_path.display());
+
+	if config.current_step == ProcessingSteps::WritingToFiles {
+		println!("Processing file: {}", file_path.display());
+	} else {
+		println!("Reading file: {}", file_path.display());
+	}
 
 	match file_path.extension().and_then(OsStr::to_str) {
 		Some("css") => parse_selectors::from_css(&mut file_contents, selectors, config),

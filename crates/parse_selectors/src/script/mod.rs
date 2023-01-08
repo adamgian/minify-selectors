@@ -244,36 +244,33 @@ pub fn process_js_properties(
 		let mut property_value: String = unescape_js_chars(capture.at(4).unwrap());
 		let property_name: &str = capture.at(1).unwrap();
 
-		match property_name {
-			".innerHTML" | ".outerHTML" => {
-				if property_value.contains("</body>") {
-					super::process_html(&mut property_value, selectors, config);
-				} else {
-					process_html_attributes(&mut property_value, selectors, config);
-				}
-			},
-			"window.location.hash" | "window.location.href" | "window.location" => {
-				super::process_anchor_links(&mut property_value, selectors, config);
-			},
-			".id" => {
-				super::process_string_of_tokens(
-					&mut property_value,
-					selectors,
-					config,
-					"id",
-					SelectorUsage::Script,
-				);
-			},
-			".className" | _ if property_name.starts_with(".classList") => {
-				super::process_string_of_tokens(
-					&mut property_value,
-					selectors,
-					config,
-					"class",
-					SelectorUsage::Script,
-				);
-			},
-			_ => {},
+		if property_name == ".innerHTML" || property_name == ".outerHTML" {
+			if property_value.contains("</body>") {
+				super::process_html(&mut property_value, selectors, config);
+			} else {
+				process_html_attributes(&mut property_value, selectors, config);
+			}
+		} else if property_name == "window.location"
+			|| property_name == "window.location.href"
+			|| property_name == "window.location.hash"
+		{
+			super::process_anchor_links(&mut property_value, selectors, config);
+		} else if property_name == ".id" {
+			super::process_string_of_tokens(
+				&mut property_value,
+				selectors,
+				config,
+				"id",
+				SelectorUsage::Script,
+			);
+		} else if property_name == ".className" || property_name.starts_with(".classList") {
+			super::process_string_of_tokens(
+				&mut property_value,
+				selectors,
+				config,
+				"class",
+				SelectorUsage::Script,
+			);
 		}
 
 		format!(
