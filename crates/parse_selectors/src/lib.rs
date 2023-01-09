@@ -56,8 +56,15 @@ pub fn get_encoded_selector(
 	selectors: &mut Selectors,
 	_config: &Config,
 ) -> String {
-	let encoded_selector: String = "FIXME".to_string();
-	selectors.add(selector.to_owned(), SelectorUsage::Anchor);
+	println!("{:#?}", selector);
+	// println!("{:?}", fixme);
+	println!("");
+	let encoded_selector: String = if selectors.map.get(selector).is_some() {
+		// &selectors.map.get(selector).unwrap().replacement.unwrap();
+		selectors.map.get(selector).unwrap().replacement.clone().unwrap_or("FIXME".to_string())
+	} else {
+		"FIXME".to_string()
+	};
 	encoded_selector
 }
 
@@ -393,9 +400,9 @@ pub fn process_anchor_links(
 	}
 
 	if config.current_step == ProcessingSteps::WritingToFiles {
-		handle_file_read(string, selectors);
-	} else {
 		handle_file_write(string, quote_type, selectors, config);
+	} else {
+		handle_file_read(string, selectors);
 	}
 
 	fn handle_file_read(
@@ -408,11 +415,7 @@ pub fn process_anchor_links(
 			}
 
 			add_selector_to_map(
-				&format!(
-					"{url}#{target_id}",
-					url = capture.at(1).unwrap_or(""),
-					target_id = &unescape_js_chars(capture.at(2).unwrap()),
-				),
+				&unescape_js_chars(capture.at(2).unwrap()),
 				selectors,
 				SelectorUsage::Anchor,
 			);
@@ -431,6 +434,7 @@ pub fn process_anchor_links(
 				if capture.at(1).is_none() {
 					return capture.at(0).unwrap().to_string();
 				}
+
 				format!(
 					"{url}#{target_id}",
 					url = capture.at(1).unwrap_or(""),

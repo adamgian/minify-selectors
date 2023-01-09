@@ -292,7 +292,7 @@ fn process_file(
 	file_path: &PathBuf,
 ) -> String {
 	let mut file = fs::read_to_string(file_path).unwrap();
-
+	let mut selectors = Selectors::new();
 	let config = Config {
 		alphabet: encode_selector::into_alphabet_set(concat!(
 			"0123456789",
@@ -300,10 +300,6 @@ fn process_file(
 			"ABCDEFGHIJKLMNOPQRSTUVWXYZ",
 		)),
 		..Default::default()
-	};
-
-	let mut selectors = Selectors {
-		map: HashMap::new(),
 	};
 
 	if file_type == "css" {

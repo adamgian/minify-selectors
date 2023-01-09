@@ -25,7 +25,9 @@ fn minify_selectors() -> Result<(), Box<dyn Error>> {
 	let mut config = Config::new();
 	let mut selectors = Selectors::new();
 
-	let files_to_process = WalkDir::new(&config.source)
+	// Multi-step process (stage 1/3):
+	// Read files and note down selectors and their occurrences.
+	for entry in WalkDir::new(&config.source)
 		.into_iter()
 		.filter_map(|e| e.ok())
 		.filter(|e| {
@@ -38,11 +40,8 @@ fn minify_selectors() -> Result<(), Box<dyn Error>> {
 				e.path().extension().and_then(OsStr::to_str),
 				Some("css") | Some("html") | Some("js") | Some("svg")
 			)
-		});
-
-	// Multi-step process (stage 1/3):
-	// Read files and note down selectors and their occurrences.
-	for entry in files_to_process {
+		})
+	{
 		let mut selectors_in_file = Selectors::new();
 		process_file(entry.path(), &mut selectors_in_file, &config)?;
 		selectors.merge(selectors_in_file);
@@ -55,13 +54,24 @@ fn minify_selectors() -> Result<(), Box<dyn Error>> {
 
 	// Multi-step process (stage 3/3):
 	// Open files again and subsituite encoded selectors in place.
-	// TODO:
 	config.current_step = ProcessingSteps::WritingToFiles;
-	// for entry in files_to_process {
-	// 	let mut selectors_in_file = Selectors::new();
-	// 	process_file(entry.path(), &mut selectors_in_file, &config)?;
-	// 	selectors.merge(selectors_in_file);
-	// }
+	for entry in WalkDir::new(&config.source)
+		.into_iter()
+		.filter_map(|e| e.ok())
+		.filter(|e| {
+			// Check that current path is a file
+			if !e.path().is_file() {
+				return false;
+			};
+			// Finally, check file has a extension that can be processed
+			matches!(
+				e.path().extension().and_then(OsStr::to_str),
+				Some("css") | Some("html") | Some("js") | Some("svg")
+			)
+		})
+	{
+		process_file(entry.path(), &mut selectors, &config)?;
+	}
 
 	println!("minify-selectors finished in: {:.2?}", stopwatch.elapsed());
 
@@ -88,6 +98,10 @@ fn process_file(
 		},
 		Some("js") => parse_selectors::from_js(&mut file_contents, selectors, config),
 		_ => (),
+	}
+
+	if config.current_step == ProcessingSteps::ReadingFromFiles {
+		return Ok(());
 	}
 
 	let output_path = match &config.source.is_dir() {
