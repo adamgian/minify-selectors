@@ -28,204 +28,428 @@ pub fn process_js_arguments(
 	selectors: &mut Selectors,
 	config: &Config,
 ) {
-	*file_string = script_regex::JS_ARGUMENTS.replace_all(file_string, |capture: &Captures| {
-		// Matched string is a multiline or single line comment
-		// i.e. it does not have any further capture groups
-		if capture.at(1).is_none() {
-			return capture.at(0).unwrap().to_string();
-		}
+	if config.current_step == ProcessingSteps::WritingToFiles {
+		handle_file_write(file_string, selectors, config);
+	} else {
+		handle_file_read(file_string, selectors, config);
+	}
 
-		let mut replacement_args: String = unescape_js_chars(capture.at(3).unwrap());
-		let mut function = capture.at(1).unwrap().to_owned();
-		function.retain(|c| !c.is_whitespace());
+	fn handle_file_read(
+		file_string: &str,
+		selectors: &mut Selectors,
+		config: &Config,
+	) {
+		for capture in regexes::JS_ARGUMENTS.captures_iter(file_string) {
+			// Matched string is a multiline or single line comment
+			// i.e. it does not have any further capture groups
+			if capture.at(1).is_none() {
+				return;
+			}
 
-		// Work out function call and its argument pattern:
-		match function.as_str() {
-			// Takes one argument, an CSS selector string.
-			".querySelector" | ".querySelectorAll" | ".closest" | ".matches" => {
-				// FIXME: rudimentary way to check if arg is a immediate
-				// string value rather than some expression.
-				let quote_type: &str = match replacement_args.chars().next() {
-					Some('\'') => "'",
-					Some('"') => "\"",
-					Some('`') => "`",
-					_ => "",
-				};
+			let mut replacement_args: String = unescape_js_chars(capture.at(3).unwrap());
+			let mut function = capture.at(1).unwrap().to_owned();
+			function.retain(|c| !c.is_whitespace());
 
-				// Remove additional backslash in JS selector strings.
-				replacement_args = replacement_args.replace("\\\\", "\\");
+			// Work out function call and its argument pattern:
+			match function.as_str() {
+				// Takes one argument, an CSS selector string.
+				".querySelector" | ".querySelectorAll" | ".closest" | ".matches" => {
+					// FIXME: rudimentary way to check if arg is a immediate
+					// string value rather than some expression.
+					let quote_type: &str = match replacement_args.chars().next() {
+						Some('\'') => "'",
+						Some('"') => "\"",
+						Some('`') => "`",
+						_ => "",
+					};
 
-				if !quote_type.is_empty() {
-					super::process_css(&mut replacement_args, selectors, config);
-				}
-			},
+					// Remove any additional backslash in JS selector strings.
+					replacement_args = replacement_args.replace("\\\\", "\\");
 
-			// Takes one argument, a string of classes (no period prefixed)
-			// separated by spaces (if more than one) —
-			".getElementsByClassName" => {
-				// Checking that argument is a string
-				if capture.at(4).is_some() {
-					super::process_string_of_tokens(
+					if !quote_type.is_empty() {
+						super::process_css(&mut replacement_args, selectors, config);
+					}
+				},
+
+				// Takes one argument, a string of classes (no period prefixed)
+				// separated by spaces (if more than one) —
+				".getElementsByClassName" => {
+					// Checking that argument is a string
+					if capture.at(4).is_some() {
+						super::process_string_of_tokens(
+							&mut replacement_args,
+							selectors,
+							config,
+							"class",
+							SelectorUsage::Script,
+						);
+					}
+					// TODO: handle expressions?
+				},
+
+				// Takes one argument, an ID (no hash prefixed).
+				".getElementById" => {
+					// Checking that argument is a string
+					if capture.at(4).is_some() {
+						super::process_string_of_tokens(
+							&mut replacement_args,
+							selectors,
+							config,
+							"id",
+							SelectorUsage::Script,
+						);
+					};
+					// TODO: handle expressions?
+				},
+
+				// Takes two arguments: attribute name and value,
+				// process value if attribute is whitelisted.
+				".setAttribute" => {
+					// Go over the (two) function arguments
+					let mut function_args = super::get_function_arguments(&replacement_args);
+
+					// Check first arg in function, without the string delimiters
+					// and then trimming any whitespace off ends.
+					let attribute_name: &str =
+						function_args.next().unwrap().at(3).unwrap_or("").trim();
+
+					// Check first argument is an known attribute which its value will have
+					// classses or an id. If it is not, leave value as is (second argument).
+					if WHITELIST.contains_key(attribute_name) {
+						if let Some(attribute_value) = function_args.next() {
+							if attribute_value.at(3).is_some() {
+								let mut replacement_value =
+									attribute_value.at(3).unwrap().to_string();
+								let attribute_type_designation: &str =
+									WHITELIST.get(attribute_name).unwrap();
+
+
+								match attribute_type_designation {
+									"id" | "class" => {
+										super::process_string_of_tokens(
+											&mut replacement_value,
+											selectors,
+											config,
+											attribute_type_designation,
+											SelectorUsage::Script,
+										);
+									},
+
+									"selector" => {
+										super::process_css(
+											&mut replacement_value,
+											selectors,
+											config,
+										);
+									},
+
+									"style" => {
+										process_css_functions(
+											&mut replacement_value,
+											selectors,
+											config,
+										);
+									},
+
+									"script" => {
+										process_js(&mut replacement_value, selectors, config);
+									},
+
+									"anchor" => {
+										super::process_anchor_links(
+											&mut replacement_value,
+											selectors,
+											config,
+										);
+									},
+
+									_ => return,
+								};
+							}
+						}
+					}
+				},
+
+				// Takes two arguments: position and html,
+				// we are only interested in the latter argument.
+				".insertAdjacentHTML" => {
+					if let Some(html) = super::get_function_arguments(&replacement_args).nth(1) {
+						// Third capture group, which should be just the string (without the
+						// delimeters).
+						if html.at(3).is_some() {
+							let mut replacement_html = html.at(3).unwrap().to_string();
+
+							match html.at(3).unwrap().contains("</body>") {
+								true => {
+									super::process_html(&mut replacement_html, selectors, config)
+								},
+								false => {
+									process_html_attributes(
+										&mut replacement_html,
+										selectors,
+										config,
+									)
+								},
+							};
+						}
+					}
+				},
+
+				// Takes either only one argument or up to two arguments:
+				// we are only ever interested in argument number 1.
+				"window.open" | "window.location.assign" | "window.location.replace" => {
+					if let Some(link) = super::get_function_arguments(&replacement_args).next() {
+						let mut replacement_link = link.at(0).unwrap().to_string();
+						super::process_anchor_links(&mut replacement_link, selectors, config);
+					}
+				},
+
+				// Takes two or three arguments, the final argument which
+				// is an optional URL is the one that we are interested in.
+				"history.pushState" | "history.replaceState" => {
+					if let Some(link) = super::get_function_arguments(&replacement_args).nth(2) {
+						let mut replacement_link = link.at(0).unwrap().to_string();
+						super::process_anchor_links(&mut replacement_link, selectors, config);
+					}
+				},
+
+				// Takes one or more arguments, each argument is for
+				// an individual class name (no period prefix).
+				".classList.add"
+				| ".classList.contains"
+				| ".classList.remove"
+				| ".classList.replace"
+				| ".classList.toggle" => {
+					super::process_string_of_arguments(
 						&mut replacement_args,
 						selectors,
 						config,
 						"class",
 						SelectorUsage::Script,
 					);
-				}
-				// TODO: handle expressions?
-			},
+				},
 
-			// Takes one argument, an ID (no hash prefixed).
-			".getElementById" => {
-				// Checking that argument is a string
-				if capture.at(4).is_some() {
-					super::process_string_of_tokens(
+				_ => {},
+			}
+		}
+	}
+
+	fn handle_file_write(
+		file_string: &mut String,
+		selectors: &mut Selectors,
+		config: &Config,
+	) {
+		*file_string = script_regex::JS_ARGUMENTS.replace_all(file_string, |capture: &Captures| {
+			// Matched string is a multiline or single line comment
+			// i.e. it does not have any further capture groups
+			if capture.at(1).is_none() {
+				return capture.at(0).unwrap().to_string();
+			}
+
+			let mut replacement_args: String = unescape_js_chars(capture.at(3).unwrap());
+			let mut function = capture.at(1).unwrap().to_owned();
+			function.retain(|c| !c.is_whitespace());
+
+			// Work out function call and its argument pattern:
+			match function.as_str() {
+				// Takes one argument, an CSS selector string.
+				".querySelector" | ".querySelectorAll" | ".closest" | ".matches" => {
+					// FIXME: rudimentary way to check if arg is a immediate
+					// string value rather than some expression.
+					let quote_type: &str = match replacement_args.chars().next() {
+						Some('\'') => "'",
+						Some('"') => "\"",
+						Some('`') => "`",
+						_ => "",
+					};
+
+					// Remove any additional backslash in JS selector strings.
+					replacement_args = replacement_args.replace("\\\\", "\\");
+
+					if !quote_type.is_empty() {
+						super::process_css(&mut replacement_args, selectors, config);
+					}
+				},
+
+				// Takes one argument, a string of classes (no period prefixed)
+				// separated by spaces (if more than one) —
+				".getElementsByClassName" => {
+					// Checking that argument is a string
+					if capture.at(4).is_some() {
+						super::process_string_of_tokens(
+							&mut replacement_args,
+							selectors,
+							config,
+							"class",
+							SelectorUsage::Script,
+						);
+					}
+					// TODO: handle expressions?
+				},
+
+				// Takes one argument, an ID (no hash prefixed).
+				".getElementById" => {
+					// Checking that argument is a string
+					if capture.at(4).is_some() {
+						super::process_string_of_tokens(
+							&mut replacement_args,
+							selectors,
+							config,
+							"id",
+							SelectorUsage::Script,
+						);
+					};
+					// TODO: handle expressions?
+				},
+
+				// Takes two arguments: attribute name and value,
+				// process value if attribute is whitelisted.
+				".setAttribute" => {
+					// Go over the (two) function arguments
+					let mut function_args = super::get_function_arguments(&replacement_args);
+
+					// Check first arg in function, without the string delimiters
+					// and then trimming any whitespace off ends.
+					let attribute_name: &str =
+						function_args.next().unwrap().at(3).unwrap_or("").trim();
+
+					// Check first argument is an known attribute which its value will have
+					// classses or an id. If it is not, leave value as is (second argument).
+					if WHITELIST.contains_key(attribute_name) {
+						if let Some(attribute_value) = function_args.next() {
+							if attribute_value.at(3).is_some() {
+								let mut replacement_value =
+									attribute_value.at(3).unwrap().to_string();
+								let attribute_type_designation: &str =
+									WHITELIST.get(attribute_name).unwrap();
+
+
+								match attribute_type_designation {
+									"id" | "class" => {
+										super::process_string_of_tokens(
+											&mut replacement_value,
+											selectors,
+											config,
+											attribute_type_designation,
+											SelectorUsage::Script,
+										);
+									},
+
+									"selector" => {
+										super::process_css(
+											&mut replacement_value,
+											selectors,
+											config,
+										);
+									},
+
+									"style" => {
+										process_css_functions(
+											&mut replacement_value,
+											selectors,
+											config,
+										);
+									},
+
+									"script" => {
+										process_js(&mut replacement_value, selectors, config);
+									},
+
+									"anchor" => {
+										super::process_anchor_links(
+											&mut replacement_value,
+											selectors,
+											config,
+										);
+									},
+
+									_ => return replacement_value,
+								};
+
+								replacement_args = replacement_args
+									.replace(attribute_value.at(3).unwrap(), &replacement_value);
+							}
+						}
+					}
+				},
+
+				// Takes two arguments: position and html,
+				// we are only interested in the latter argument.
+				".insertAdjacentHTML" => {
+					if let Some(html) = super::get_function_arguments(&replacement_args).nth(1) {
+						// Third capture group, which should be just the string (without the
+						// delimeters).
+						if html.at(3).is_some() {
+							let mut replacement_html = html.at(3).unwrap().to_string();
+
+							match html.at(3).unwrap().contains("</body>") {
+								true => {
+									super::process_html(&mut replacement_html, selectors, config)
+								},
+								false => {
+									process_html_attributes(
+										&mut replacement_html,
+										selectors,
+										config,
+									)
+								},
+							};
+
+							replacement_args =
+								replacement_args.replace(html.at(3).unwrap(), &replacement_html);
+						}
+					}
+				},
+
+				// Takes either only one argument or up to two arguments:
+				// we are only ever interested in argument number 1.
+				"window.open" | "window.location.assign" | "window.location.replace" => {
+					if let Some(link) = super::get_function_arguments(&replacement_args).next() {
+						let mut replacement_link = link.at(0).unwrap().to_string();
+						super::process_anchor_links(&mut replacement_link, selectors, config);
+						replacement_args =
+							replacement_args.replace(link.at(0).unwrap(), &replacement_link);
+					}
+				},
+
+				// Takes two or three arguments, the final argument which
+				// is an optional URL is the one that we are interested in.
+				"history.pushState" | "history.replaceState" => {
+					if let Some(link) = super::get_function_arguments(&replacement_args).nth(2) {
+						let mut replacement_link = link.at(0).unwrap().to_string();
+						super::process_anchor_links(&mut replacement_link, selectors, config);
+						replacement_args =
+							replacement_args.replace(link.at(0).unwrap(), &replacement_link);
+					}
+				},
+
+				// Takes one or more arguments, each argument is for
+				// an individual class name (no period prefix).
+				".classList.add"
+				| ".classList.contains"
+				| ".classList.remove"
+				| ".classList.replace"
+				| ".classList.toggle" => {
+					super::process_string_of_arguments(
 						&mut replacement_args,
 						selectors,
 						config,
-						"id",
+						"class",
 						SelectorUsage::Script,
 					);
-				};
-				// TODO: handle expressions?
-			},
+				},
 
-			// Takes two arguments: attribute name and value,
-			// process value if attribute is whitelisted.
-			".setAttribute" => {
-				// Go over the (two) function arguments
-				let mut function_args = super::get_function_arguments(&replacement_args);
+				_ => {},
+			}
 
-				// Check first arg in function, without the string delimiters
-				// and then trimming any whitespace off ends.
-				let attribute_name: &str = function_args.next().unwrap().at(3).unwrap_or("").trim();
-
-				// Check first argument is an known attribute which its value will have
-				// classses or an id. If it is not, leave value as is (second argument).
-				if WHITELIST.contains_key(attribute_name) {
-					if let Some(attribute_value) = function_args.next() {
-						if attribute_value.at(3).is_some() {
-							let mut replacement_value = attribute_value.at(3).unwrap().to_string();
-							let attribute_type_designation: &str =
-								WHITELIST.get(attribute_name).unwrap();
-
-
-							match attribute_type_designation {
-								"id" | "class" => {
-									super::process_string_of_tokens(
-										&mut replacement_value,
-										selectors,
-										config,
-										attribute_type_designation,
-										SelectorUsage::Script,
-									);
-								},
-
-								"selector" => {
-									super::process_css(&mut replacement_value, selectors, config);
-								},
-
-								"style" => {
-									process_css_functions(
-										&mut replacement_value,
-										selectors,
-										config,
-									);
-								},
-
-								"script" => {
-									process_js(&mut replacement_value, selectors, config);
-								},
-
-								"anchor" => {
-									super::process_anchor_links(
-										&mut replacement_value,
-										selectors,
-										config,
-									);
-								},
-
-								_ => return replacement_value,
-							};
-
-							replacement_args = replacement_args
-								.replace(attribute_value.at(3).unwrap(), &replacement_value);
-						}
-					}
-				}
-			},
-
-			// Takes two arguments: position and html,
-			// we are only interested in the latter argument.
-			".insertAdjacentHTML" => {
-				if let Some(html) = super::get_function_arguments(&replacement_args).nth(1) {
-					// Third capture group, which should be just the string (without the
-					// delimeters).
-					if html.at(3).is_some() {
-						let mut replacement_html = html.at(3).unwrap().to_string();
-
-						match html.at(3).unwrap().contains("</body>") {
-							true => super::process_html(&mut replacement_html, selectors, config),
-							false => {
-								process_html_attributes(&mut replacement_html, selectors, config)
-							},
-						};
-
-						replacement_args =
-							replacement_args.replace(html.at(3).unwrap(), &replacement_html);
-					}
-				}
-			},
-
-			// Takes either only one argument or up to two arguments:
-			// we are only ever interested in argument number 1.
-			"window.open" | "window.location.assign" | "window.location.replace" => {
-				if let Some(link) = super::get_function_arguments(&replacement_args).next() {
-					let mut replacement_link = link.at(0).unwrap().to_string();
-					super::process_anchor_links(&mut replacement_link, selectors, config);
-					replacement_args =
-						replacement_args.replace(link.at(0).unwrap(), &replacement_link);
-				}
-			},
-
-			// Takes two or three arguments, the final argument which
-			// is an optional URL is the one that we are interested in.
-			"history.pushState" | "history.replaceState" => {
-				if let Some(link) = super::get_function_arguments(&replacement_args).nth(2) {
-					let mut replacement_link = link.at(0).unwrap().to_string();
-					super::process_anchor_links(&mut replacement_link, selectors, config);
-					replacement_args =
-						replacement_args.replace(link.at(0).unwrap(), &replacement_link);
-				}
-			},
-
-			// Takes one or more arguments, each argument is for
-			// an individual class name (no period prefix).
-			".classList.add"
-			| ".classList.contains"
-			| ".classList.remove"
-			| ".classList.replace"
-			| ".classList.toggle" => {
-				super::process_string_of_arguments(
-					&mut replacement_args,
-					selectors,
-					config,
-					"class",
-					SelectorUsage::Script,
-				);
-			},
-
-			_ => {},
-		}
-
-		format!(
-			"{function}{join}{arguments}",
-			function = capture.at(1).unwrap(),
-			join = capture.at(2).unwrap(),
-			arguments = replacement_args
-		)
-	});
+			format!(
+				"{function}{join}{arguments}",
+				function = capture.at(1).unwrap(),
+				join = capture.at(2).unwrap(),
+				arguments = replacement_args
+			)
+		});
+	}
 }
 
 /// Process JS property operation values.
@@ -234,52 +458,111 @@ pub fn process_js_properties(
 	selectors: &mut Selectors,
 	config: &Config,
 ) {
-	*file_string = script_regex::JS_PROPERTIES.replace_all(file_string, |capture: &Captures| {
-		// Matched string is a multiline or single line comment
-		// i.e. it does not have any further capture groups
-		if capture.at(1).is_none() {
-			return capture.at(0).unwrap().to_string();
-		}
+	if config.current_step == ProcessingSteps::WritingToFiles {
+		handle_file_write(file_string, selectors, config);
+	} else {
+		handle_file_read(file_string, selectors, config);
+	}
 
-		let mut property_value: String = unescape_js_chars(capture.at(4).unwrap());
-		let property_name: &str = capture.at(1).unwrap();
-
-		if property_name == ".innerHTML" || property_name == ".outerHTML" {
-			if property_value.contains("</body>") {
-				super::process_html(&mut property_value, selectors, config);
-			} else {
-				process_html_attributes(&mut property_value, selectors, config);
+	fn handle_file_read(
+		file_string: &str,
+		selectors: &mut Selectors,
+		config: &Config,
+	) {
+		for capture in regexes::JS_PROPERTIES.captures_iter(file_string) {
+			// Matched string is a multiline or single line comment
+			// i.e. it does not have any further capture groups
+			if capture.at(1).is_none() {
+				return;
 			}
-		} else if property_name == "window.location"
-			|| property_name == "window.location.href"
-			|| property_name == "window.location.hash"
-		{
-			super::process_anchor_links(&mut property_value, selectors, config);
-		} else if property_name == ".id" {
-			super::process_string_of_tokens(
-				&mut property_value,
-				selectors,
-				config,
-				"id",
-				SelectorUsage::Script,
-			);
-		} else if property_name == ".className" || property_name.starts_with(".classList") {
-			super::process_string_of_tokens(
-				&mut property_value,
-				selectors,
-				config,
-				"class",
-				SelectorUsage::Script,
-			);
-		}
 
-		format!(
-			"{name}{operator}{value}",
-			name = property_name,
-			operator = capture.at(3).unwrap(),
-			value = property_value,
-		)
-	});
+			let mut property_value: String = unescape_js_chars(capture.at(4).unwrap());
+			let property_name: &str = capture.at(1).unwrap();
+
+			if property_name == ".innerHTML" || property_name == ".outerHTML" {
+				if property_value.contains("</body>") {
+					super::process_html(&mut property_value, selectors, config);
+				} else {
+					process_html_attributes(&mut property_value, selectors, config);
+				}
+			} else if property_name == "window.location"
+				|| property_name == "window.location.href"
+				|| property_name == "window.location.hash"
+			{
+				super::process_anchor_links(&mut property_value, selectors, config);
+			} else if property_name == ".id" {
+				super::process_string_of_tokens(
+					&mut property_value,
+					selectors,
+					config,
+					"id",
+					SelectorUsage::Script,
+				);
+			} else if property_name == ".className" || property_name.starts_with(".classList") {
+				super::process_string_of_tokens(
+					&mut property_value,
+					selectors,
+					config,
+					"class",
+					SelectorUsage::Script,
+				);
+			}
+		}
+	}
+
+	fn handle_file_write(
+		file_string: &mut String,
+		selectors: &mut Selectors,
+		config: &Config,
+	) {
+		*file_string =
+			script_regex::JS_PROPERTIES.replace_all(file_string, |capture: &Captures| {
+				// Matched string is a multiline or single line comment
+				// i.e. it does not have any further capture groups
+				if capture.at(1).is_none() {
+					return capture.at(0).unwrap().to_string();
+				}
+
+				let mut property_value: String = unescape_js_chars(capture.at(4).unwrap());
+				let property_name: &str = capture.at(1).unwrap();
+
+				if property_name == ".innerHTML" || property_name == ".outerHTML" {
+					if property_value.contains("</body>") {
+						super::process_html(&mut property_value, selectors, config);
+					} else {
+						process_html_attributes(&mut property_value, selectors, config);
+					}
+				} else if property_name == "window.location"
+					|| property_name == "window.location.href"
+					|| property_name == "window.location.hash"
+				{
+					super::process_anchor_links(&mut property_value, selectors, config);
+				} else if property_name == ".id" {
+					super::process_string_of_tokens(
+						&mut property_value,
+						selectors,
+						config,
+						"id",
+						SelectorUsage::Script,
+					);
+				} else if property_name == ".className" || property_name.starts_with(".classList") {
+					super::process_string_of_tokens(
+						&mut property_value,
+						selectors,
+						config,
+						"class",
+						SelectorUsage::Script,
+					);
+				}
+
+				format!(
+					"{name}{operator}{value}",
+					name = property_name,
+					operator = capture.at(3).unwrap(),
+					value = property_value,
+				)
+			});
+	}
 }
 
 // Converts any escaped chars in JS substring to UTF8 char.
