@@ -54,14 +54,18 @@ pub fn add_selector_to_map(
 pub fn get_encoded_selector(
 	selector: &str,
 	selectors: &mut Selectors,
-	_config: &Config,
 ) -> String {
-	println!("{:#?}", selector);
-	// println!("{:?}", fixme);
-	println!("");
+	// println!("{:#?}", selector);
+	// println!("");
 	let encoded_selector: String = if selectors.map.get(selector).is_some() {
 		// &selectors.map.get(selector).unwrap().replacement.unwrap();
-		selectors.map.get(selector).unwrap().replacement.clone().unwrap_or("FIXME".to_string())
+		selectors
+			.map
+			.get(selector)
+			.unwrap()
+			.replacement
+			.clone()
+			.unwrap_or_else(|| "FIXME".to_string())
 	} else {
 		"FIXME".to_string()
 	};
@@ -89,7 +93,7 @@ pub fn process_prefixed_selectors(
 	config: &Config,
 ) {
 	if config.current_step == ProcessingSteps::WritingToFiles {
-		handle_file_write(file_string, selectors, config);
+		handle_file_write(file_string, selectors);
 	} else {
 		handle_file_read(file_string, selectors);
 	}
@@ -130,7 +134,6 @@ pub fn process_prefixed_selectors(
 	fn handle_file_write(
 		file_string: &mut String,
 		selectors: &mut Selectors,
-		config: &Config,
 	) {
 		*file_string =
 			regexes::PREFIXED_SELECTORS.replace_all(file_string, |capture: &Captures| {
@@ -139,19 +142,13 @@ pub fn process_prefixed_selectors(
 				match capture.at(2) {
 					// "__class--foo"
 					Some("class") => {
-						placeholder_value = get_encoded_selector(
-							&format!(".{}", placeholder_value),
-							selectors,
-							config,
-						);
+						placeholder_value =
+							get_encoded_selector(&format!(".{}", placeholder_value), selectors);
 					},
 					// "__id--foo"
 					Some("id") => {
-						placeholder_value = get_encoded_selector(
-							&format!("#{}", placeholder_value),
-							selectors,
-							config,
-						);
+						placeholder_value =
+							get_encoded_selector(&format!("#{}", placeholder_value), selectors);
 					},
 					// "#__ignore--foo", ".__ignore--bar" or "__ignore--baz"
 					Some("ignore") => {
@@ -173,7 +170,6 @@ pub fn process_prefixed_selectors(
 									name = placeholder_value,
 								),
 								selectors,
-								config,
 							)
 						);
 					},
@@ -221,7 +217,7 @@ pub fn process_string_of_tokens(
 	}
 
 	if config.current_step == ProcessingSteps::WritingToFiles {
-		handle_file_write(string, prefix, quote_type, selectors, config);
+		handle_file_write(string, prefix, quote_type, selectors);
 	} else {
 		handle_file_read(string, prefix, usage, selectors);
 	}
@@ -254,7 +250,6 @@ pub fn process_string_of_tokens(
 		prefix: &str,
 		quote: &str,
 		selectors: &mut Selectors,
-		config: &Config,
 	) {
 		*string = format!(
 			"{quote}{tokens}{quote}",
@@ -273,7 +268,6 @@ pub fn process_string_of_tokens(
 							token = unescape_css_chars(capture.at(1).unwrap())
 						),
 						selectors,
-						config,
 					)
 				}),
 			quote = quote,
@@ -300,7 +294,7 @@ pub fn process_string_of_arguments(
 	};
 
 	if config.current_step == ProcessingSteps::WritingToFiles {
-		handle_file_write(string, prefix, selectors, config);
+		handle_file_write(string, prefix, selectors);
 	} else {
 		handle_file_read(string, prefix, usage, selectors);
 	}
@@ -337,7 +331,6 @@ pub fn process_string_of_arguments(
 		string: &mut String,
 		prefix: &str,
 		selectors: &mut Selectors,
-		config: &Config,
 	) {
 		*string = regexes::STRING_DELIMITED_BY_COMMA.replace_all(string, |capture: &Captures| {
 			// Check if argument has a minify-selectors specific prefix,
@@ -363,7 +356,6 @@ pub fn process_string_of_arguments(
 							token = capture.at(3).unwrap(),
 						),
 						selectors,
-						config,
 					),
 					quote = capture.at(2).unwrap(),
 				)
@@ -400,7 +392,7 @@ pub fn process_anchor_links(
 	}
 
 	if config.current_step == ProcessingSteps::WritingToFiles {
-		handle_file_write(string, quote_type, selectors, config);
+		handle_file_write(string, quote_type, selectors);
 	} else {
 		handle_file_read(string, selectors);
 	}
@@ -426,7 +418,6 @@ pub fn process_anchor_links(
 		string: &mut String,
 		quote: &str,
 		selectors: &mut Selectors,
-		config: &Config,
 	) {
 		*string = format!(
 			"{quote}{url}{quote}",
@@ -441,7 +432,6 @@ pub fn process_anchor_links(
 					target_id = get_encoded_selector(
 						&unescape_js_chars(capture.at(2).unwrap()),
 						selectors,
-						config,
 					),
 				)
 			}),

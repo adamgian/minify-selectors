@@ -40,8 +40,7 @@ fn minify_selectors() -> Result<(), Box<dyn Error>> {
 				e.path().extension().and_then(OsStr::to_str),
 				Some("css") | Some("html") | Some("js") | Some("svg")
 			)
-		})
-	{
+		}) {
 		let mut selectors_in_file = Selectors::new();
 		process_file(entry.path(), &mut selectors_in_file, &config)?;
 		selectors.merge(selectors_in_file);
@@ -68,8 +67,7 @@ fn minify_selectors() -> Result<(), Box<dyn Error>> {
 				e.path().extension().and_then(OsStr::to_str),
 				Some("css") | Some("html") | Some("js") | Some("svg")
 			)
-		})
-	{
+		}) {
 		process_file(entry.path(), &mut selectors, &config)?;
 	}
 
