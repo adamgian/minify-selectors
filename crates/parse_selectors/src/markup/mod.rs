@@ -52,10 +52,9 @@ pub fn process_html_attributes(
 					.unwrap()
 					.split_once('>')
 					.unwrap();
-
 				let mut code_tag_attributes = code_element.0.to_string();
-
 				process_html_attributes(&mut code_tag_attributes, selectors, config);
+				continue;
 			}
 
 			// Matched string is a <script>/<style> element or HTML comment, leave as is.

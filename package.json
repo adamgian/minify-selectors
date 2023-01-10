@@ -1,6 +1,6 @@
 {
 	"name": "minify-selectors",
-	"version": "1.10.2",
+	"version": "2.0.0",
 	"description": "Post-processor that minifies classes and IDs in CSS, HTML, Javascript and SVG files.",
 	"author": {
 		"name": "Adam Gian",

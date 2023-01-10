@@ -1,0 +1,61 @@
+.bd-masthead {
+	--bd-pink-rgb: 214, 51, 132;
+	padding: 3rem 0;
+	background-image: linear-gradient(
+			180deg,
+			rgba(var(--bs-body-bg-rgb), 0.01),
+			rgba(var(--bs-body-bg-rgb), 1) 85%
+		),
+		radial-gradient(
+			ellipse at top left,
+			rgba(var(--bs-primary-rgb), 0.5),
+			transparent 50%
+		),
+		radial-gradient(
+			ellipse at top right,
+			rgba(var(--bd-accent-rgb), 0.5),
+			transparent 50%
+		),
+		radial-gradient(
+			ellipse at center right,
+			rgba(var(--bd-violet-rgb), 0.5),
+			transparent 50%
+		),
+		radial-gradient(
+			ellipse at center left,
+			rgba(var(--bd-pink-rgb), 0.5),
+			transparent 50%
+		);
+}
+
+.bd-masthead h1 {
+	font-size: calc(1.525rem + 3.3vw);
+	line-height: 1;
+}
+
+@media (min-width: 1200px) {
+	.bd-masthead h1 {
+		font-size: 4rem;
+	}
+}
+
+.bd-masthead .lead {
+	font-size: 1rem;
+	font-weight: 400;
+	color: #495057;
+}
+
+.bd-masthead .bd-code-snippet {
+	margin: 0;
+	border-radius: 0.5rem;
+}
+
+.bd-masthead .highlight {
+	width: 100%;
+	padding: 0.5rem 1rem;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	background-color: rgba(var(--bs-body-color-rgb), 0.075);
+	border-radius: 0.5rem;
+}
