@@ -41,36 +41,32 @@ pub fn process_html_attributes(
 		selectors: &mut Selectors,
 		config: &Config,
 	) {
-		for capture in regexes::HTML_ATTRIBUTES.captures_iter(file_string) {
-			// Matched string is a <code>/<script>/<style> element
-			// or a HTML comment.
-			if capture.at(1).is_none() {
-				match capture.at(0).unwrap().starts_with("<code") {
-					// <script>/<style> element or HTML comment, leave as is.
-					false => return,
+		for capture in markup_regex::HTML_ATTRIBUTES.captures_iter(file_string) {
+			// Matched string is a <code>/<script>/<style> element or a HTML comment.
+			if capture.at(1).is_none() && capture.at(0).unwrap().starts_with("<code") {
+				// Check for attributes to encode on the opening tag.
+				let code_element = capture
+					.at(0)
+					.unwrap()
+					.strip_prefix("<code")
+					.unwrap()
+					.split_once('>')
+					.unwrap();
 
-					// <code> element.
-					// Check for attributes to encode on the opening tag.
-					true => {
-						let code_element = capture
-							.at(0)
-							.unwrap()
-							.strip_prefix("<code")
-							.unwrap()
-							.split_once('>')
-							.unwrap();
+				let mut code_tag_attributes = code_element.0.to_string();
 
-						let mut code_tag_attributes = code_element.0.to_string();
+				process_html_attributes(&mut code_tag_attributes, selectors, config);
+			}
 
-						process_html_attributes(&mut code_tag_attributes, selectors, config);
-					},
-				};
+			// Matched string is a <script>/<style> element or HTML comment, leave as is.
+			if capture.at(1).is_none() && !capture.at(0).unwrap().starts_with("<code") {
+				continue;
 			}
 
 			// Attribute does not contain classes and/or IDs.
 			// Leave it as is.
 			if !WHITELIST.contains_key(&capture.at(1).unwrap().to_ascii_lowercase()) {
-				return;
+				continue;
 			}
 
 			let attribute_name: &str = capture.at(1).unwrap();
@@ -107,7 +103,7 @@ pub fn process_html_attributes(
 					super::process_anchor_links(&mut attribute_value, selectors, config);
 				},
 
-				_ => return,
+				_ => continue,
 			}
 		}
 	}
@@ -119,35 +115,31 @@ pub fn process_html_attributes(
 	) {
 		*file_string =
 			markup_regex::HTML_ATTRIBUTES.replace_all(file_string, |capture: &Captures| {
-				// Matched string is a <code>/<script>/<style> element
-				// or a HTML comment.
-				if capture.at(1).is_none() {
-					return match capture.at(0).unwrap().starts_with("<code") {
-						// <script>/<style> element or HTML comment, leave as is.
-						false => capture.at(0).unwrap().to_string(),
+				// Matched string is a <code>/<script>/<style> element or a HTML comment.
+				if capture.at(1).is_none() && capture.at(0).unwrap().starts_with("<code") {
+					// Check for attributes to encode on the opening tag.
+					let code_element = capture
+						.at(0)
+						.unwrap()
+						.strip_prefix("<code")
+						.unwrap()
+						.split_once('>')
+						.unwrap();
 
-						// <code> element.
-						// Check for attributes to encode on the opening tag.
-						true => {
-							let code_element = capture
-								.at(0)
-								.unwrap()
-								.strip_prefix("<code")
-								.unwrap()
-								.split_once('>')
-								.unwrap();
+					let mut code_tag_attributes = code_element.0.to_string();
 
-							let mut code_tag_attributes = code_element.0.to_string();
+					process_html_attributes(&mut code_tag_attributes, selectors, config);
 
-							process_html_attributes(&mut code_tag_attributes, selectors, config);
+					return format!(
+						"<code{attributes}>{inner_html}",
+						attributes = code_tag_attributes,
+						inner_html = code_element.1,
+					);
+				}
 
-							format!(
-								"<code{attributes}>{inner_html}",
-								attributes = code_tag_attributes,
-								inner_html = code_element.1,
-							)
-						},
-					};
+				// Matched string is a <script>/<style> element or HTML comment, leave as is.
+				if capture.at(1).is_none() && !capture.at(0).unwrap().starts_with("<code") {
+					return capture.at(0).unwrap().to_string();
 				}
 
 				// Attribute does not contain classes and/or IDs.
@@ -224,7 +216,7 @@ pub fn process_html_scripts(
 		selectors: &mut Selectors,
 		config: &Config,
 	) {
-		for capture in regexes::HTML_SCRIPT_ELEMENT.captures_iter(file_string) {
+		for capture in markup_regex::HTML_SCRIPT_ELEMENT.captures_iter(file_string) {
 			let mut embedded_script = capture.at(2).unwrap().to_string();
 			super::process_js(&mut embedded_script, selectors, config);
 		}
@@ -267,7 +259,7 @@ pub fn process_html_styles(
 		selectors: &mut Selectors,
 		config: &Config,
 	) {
-		for capture in regexes::HTML_STYLE_ELEMENT.captures_iter(file_string) {
+		for capture in markup_regex::HTML_STYLE_ELEMENT.captures_iter(file_string) {
 			let mut embedded_style = capture.at(2).unwrap().to_string();
 			super::process_css(&mut embedded_style, selectors, config);
 		}

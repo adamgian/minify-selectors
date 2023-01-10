@@ -47,28 +47,18 @@ pub fn add_selector_to_map(
 	selectors.add(selector.to_owned(), usage);
 }
 
-/// FIXME:
-/// Fetch encoded selector from selectors hashmap.
-/// If selector is new and unique, generate one for it
-/// and add it to selectors.
+/// Fetch replacement encoded selector from selectors hashmap.
 pub fn get_encoded_selector(
 	selector: &str,
 	selectors: &mut Selectors,
 ) -> String {
-	// println!("{:#?}", selector);
-	// println!("");
-	let encoded_selector: String = if selectors.map.get(selector).is_some() {
-		// &selectors.map.get(selector).unwrap().replacement.unwrap();
-		selectors
-			.map
-			.get(selector)
-			.unwrap()
-			.replacement
-			.clone()
-			.unwrap_or_else(|| "FIXME".to_string())
-	} else {
-		"FIXME".to_string()
-	};
+	let encoded_selector: String = selectors
+		.map
+		.get(selector)
+		.unwrap()
+		.replacement
+		.clone()
+		.unwrap();
 	encoded_selector
 }
 
@@ -107,7 +97,7 @@ pub fn process_prefixed_selectors(
 			// Note: no need to add a selector that has been marked as ignore
 			// to selectors map.
 			if capture.at(2) == Some("ignore") {
-				return;
+				continue;
 			}
 
 			let mut indentifier = capture.at(3).unwrap().trim().to_string();
@@ -309,7 +299,7 @@ pub fn process_string_of_arguments(
 			// Check if argument has a minify-selectors specific prefix,
 			// It should be handled with process_prefixed_selectors().
 			if is_prefixed_selector(capture.at(0).unwrap()) {
-				return;
+				continue;
 			}
 
 			// String argument
@@ -403,7 +393,7 @@ pub fn process_anchor_links(
 	) {
 		for capture in regexes::INTERNAL_ANCHOR_TARGET_ID.captures_iter(string) {
 			if capture.at(1).is_none() {
-				return;
+				continue;
 			}
 
 			add_selector_to_map(

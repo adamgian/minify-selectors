@@ -39,11 +39,11 @@ pub fn process_js_arguments(
 		selectors: &mut Selectors,
 		config: &Config,
 	) {
-		for capture in regexes::JS_ARGUMENTS.captures_iter(file_string) {
+		for capture in script_regex::JS_ARGUMENTS.captures_iter(file_string) {
 			// Matched string is a multiline or single line comment
 			// i.e. it does not have any further capture groups
 			if capture.at(1).is_none() {
-				return;
+				continue;
 			}
 
 			let mut replacement_args: String = unescape_js_chars(capture.at(3).unwrap());
@@ -163,7 +163,7 @@ pub fn process_js_arguments(
 										);
 									},
 
-									_ => return,
+									_ => continue,
 								};
 							}
 						}
@@ -469,11 +469,11 @@ pub fn process_js_properties(
 		selectors: &mut Selectors,
 		config: &Config,
 	) {
-		for capture in regexes::JS_PROPERTIES.captures_iter(file_string) {
+		for capture in script_regex::JS_PROPERTIES.captures_iter(file_string) {
 			// Matched string is a multiline or single line comment
 			// i.e. it does not have any further capture groups
 			if capture.at(1).is_none() {
-				return;
+				continue;
 			}
 
 			let mut property_value: String = unescape_js_chars(capture.at(4).unwrap());

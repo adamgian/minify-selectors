@@ -37,7 +37,7 @@ pub fn process_css_selectors(
 		file_string: &str,
 		selectors: &mut Selectors,
 	) {
-		for capture in regexes::CSS_SELECTORS.captures_iter(file_string) {
+		for capture in style_regex::CSS_SELECTORS.captures_iter(file_string) {
 			// Check that capture group 2 exists,
 			// i.e. matched to a class/id name — and not an attribute selector,
 			// rule block, @import, or comment — which does not have this group.
@@ -97,23 +97,82 @@ pub fn process_css_attributes(
 		selectors: &mut Selectors,
 		config: &Config,
 	) {
-		for capture in regexes::CSS_ATTRIBUTES.captures_iter(file_string) {
+		for capture in style_regex::CSS_ATTRIBUTES.captures_iter(file_string) {
 			// Check that capture group 2 exists — if it doesn't, it is matched
 			// to an incomplete attribute selector (no value), rule block or comment.
 			// Leave it as is.
 			if capture.at(2).is_none() {
-				return;
+				continue;
 			}
 
 			let attribute_name: String = unescape_css_chars(capture.at(1).unwrap());
 			let attribute_flag: &str = capture.at(6).unwrap_or("");
 			let mut attribute_value: String = capture.at(4).unwrap().to_string();
 
-			if WHITELIST.contains_key(&attribute_name) {
+			if !WHITELIST.contains_key(&attribute_name) {
+				continue;
+			}
+
+			// Do not process attribute selector if case-insensitive
+			// flag has been set.
+			if attribute_flag.to_lowercase().contains('i') {
+				continue;
+			}
+
+			// Work out if value(s) are classes, IDs or selectors.
+			let attribute_type_designation: &str = WHITELIST.get(&attribute_name).unwrap();
+
+			match attribute_type_designation {
+				"id" | "class" => {
+					super::process_string_of_tokens(
+						&mut attribute_value,
+						selectors,
+						config,
+						attribute_type_designation,
+						SelectorUsage::Style,
+					);
+				},
+				"selector" => {
+					attribute_value = unescape_css_chars(&attribute_value);
+					process_css(&mut attribute_value, selectors, config);
+				},
+				"anchor" => {
+					attribute_value = unescape_css_chars(&attribute_value);
+					super::process_anchor_links(&mut attribute_value, selectors, config);
+				},
+				_ => {},
+			}
+		}
+	}
+
+	fn handle_file_write(
+		file_string: &mut String,
+		selectors: &mut Selectors,
+		config: &Config,
+	) {
+		*file_string =
+			style_regex::CSS_ATTRIBUTES.replace_all(file_string, |capture: &Captures| {
+				// Check that capture group 2 exists — if it doesn't, it is matched
+				// to an incomplete attribute selector (no value), rule block or comment.
+				// Leave it as is.
+				if capture.at(2).is_none() {
+					return capture.at(0).unwrap().to_owned();
+				}
+
+				let attribute_name: String = unescape_css_chars(capture.at(1).unwrap());
+				let attribute_quote_type: &str = capture.at(3).unwrap_or("");
+				let attribute_flag: &str = capture.at(6).unwrap_or("");
+				let mut attribute_value: String = capture.at(4).unwrap().to_string();
+
+				// Attribute does not contain classes and/or IDs. Leave it as is.
+				if !WHITELIST.contains_key(&attribute_name) {
+					return capture.at(0).unwrap().to_string();
+				}
+
 				// Do not process attribute selector if case-insensitive
 				// flag has been set.
 				if attribute_flag.to_lowercase().contains('i') {
-					return;
+					return capture.at(0).unwrap().to_string();
 				}
 
 				// Work out if value(s) are classes, IDs or selectors.
@@ -138,64 +197,6 @@ pub fn process_css_attributes(
 						super::process_anchor_links(&mut attribute_value, selectors, config);
 					},
 					_ => {},
-				}
-			}
-		}
-	}
-
-	fn handle_file_write(
-		file_string: &mut String,
-		selectors: &mut Selectors,
-		config: &Config,
-	) {
-		*file_string =
-			style_regex::CSS_ATTRIBUTES.replace_all(file_string, |capture: &Captures| {
-				// Check that capture group 2 exists — if it doesn't, it is matched
-				// to an incomplete attribute selector (no value), rule block or comment.
-				// Leave it as is.
-				if capture.at(2).is_none() {
-					return capture.at(0).unwrap().to_owned();
-				}
-
-				let attribute_name: String = unescape_css_chars(capture.at(1).unwrap());
-				let attribute_quote_type: &str = capture.at(3).unwrap_or("");
-				let attribute_flag: &str = capture.at(6).unwrap_or("");
-				let mut attribute_value: String = capture.at(4).unwrap().to_string();
-
-				if WHITELIST.contains_key(&attribute_name) {
-					// Do not process attribute selector if case-insensitive
-					// flag has been set.
-					if attribute_flag.to_lowercase().contains('i') {
-						return capture.at(0).unwrap().to_string();
-					}
-
-					// Work out if value(s) are classes, IDs or selectors.
-					let attribute_type_designation: &str = WHITELIST.get(&attribute_name).unwrap();
-
-					match attribute_type_designation {
-						"id" | "class" => {
-							super::process_string_of_tokens(
-								&mut attribute_value,
-								selectors,
-								config,
-								attribute_type_designation,
-								SelectorUsage::Style,
-							);
-						},
-						"selector" => {
-							attribute_value = unescape_css_chars(&attribute_value);
-							process_css(&mut attribute_value, selectors, config);
-						},
-						"anchor" => {
-							attribute_value = unescape_css_chars(&attribute_value);
-							super::process_anchor_links(&mut attribute_value, selectors, config);
-						},
-						_ => {},
-					}
-				} else {
-					// Attribute does not contain classes and/or IDs.
-					// Leave it as is.
-					return capture.at(0).unwrap().to_string();
 				}
 
 				format!(
@@ -228,10 +229,10 @@ pub fn process_css_functions(
 		selectors: &mut Selectors,
 		config: &Config,
 	) {
-		for capture in regexes::CSS_FUNCTIONS.captures_iter(file_string) {
+		for capture in style_regex::CSS_FUNCTIONS.captures_iter(file_string) {
 			// Check that capture group 4 (argument) exists
 			if capture.at(4).is_none() {
-				return;
+				continue;
 			}
 
 			// let function_name: &str = capture.at(1).unwrap();

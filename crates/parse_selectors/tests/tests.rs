@@ -1,8 +1,6 @@
-use std::collections::HashMap;
 use std::fs;
 use std::path::PathBuf;
 
-use encode_selector;
 use minify_selectors_utils::*;
 use parse_selectors;
 
@@ -274,13 +272,13 @@ fn svg_files() {
 	// General selector names
 	assert_eq!(
 		fs::read_to_string(dir.clone().join("general-selectors/output.svg")).unwrap(),
-		process_file("html", &dir.clone().join("general-selectors/source.svg")),
+		process_file("svg", &dir.clone().join("general-selectors/source.svg")),
 	);
 
 	// Attributes
 	assert_eq!(
 		fs::read_to_string(dir.clone().join("attributes/output.svg")).unwrap(),
-		process_file("html", &dir.clone().join("attributes/source.svg")),
+		process_file("svg", &dir.clone().join("attributes/source.svg")),
 	);
 }
 
@@ -293,21 +291,24 @@ fn process_file(
 ) -> String {
 	let mut file = fs::read_to_string(file_path).unwrap();
 	let mut selectors = Selectors::new();
-	let config = Config {
-		alphabet: encode_selector::into_alphabet_set(concat!(
-			"0123456789",
-			"abcdefghijklmnopqrstuvwxyz",
-			"ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-		)),
-		..Default::default()
-	};
+	let mut config = Config::default();
 
-	if file_type == "css" {
-		parse_selectors::from_css(&mut file, &mut selectors, &config);
-	} else if file_type == "js" {
-		parse_selectors::from_js(&mut file, &mut selectors, &config);
-	} else if file_type == "html" {
-		parse_selectors::from_html(&mut file, &mut selectors, &config);
+	match file_type {
+		"css" => parse_selectors::from_css(&mut file, &mut selectors, &config),
+		"js" => parse_selectors::from_js(&mut file, &mut selectors, &config),
+		"html" | "svg" => parse_selectors::from_html(&mut file, &mut selectors, &config),
+		_ => panic!("file_type not one of the following: css, js, html or svg."),
+	}
+
+	config.current_step = ProcessingSteps::EncodingSelectors;
+	selectors.process(&mut config);
+	config.current_step = ProcessingSteps::WritingToFiles;
+
+	match file_type {
+		"css" => parse_selectors::from_css(&mut file, &mut selectors, &config),
+		"js" => parse_selectors::from_js(&mut file, &mut selectors, &config),
+		"html" | "svg" => parse_selectors::from_html(&mut file, &mut selectors, &config),
+		_ => panic!("file_type not one of the following: css, js, html or svg."),
 	}
 
 	file.to_owned()
