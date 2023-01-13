@@ -48,18 +48,18 @@ pub fn add_selector_to_map(
 }
 
 /// Fetch replacement encoded selector from selectors hashmap.
+// In the event selector has been removed from the mapping because
+// it is deemed not worth encoding, leave it as is by returning
+// the selector right back.
 pub fn get_encoded_selector(
 	selector: &str,
 	selectors: &mut Selectors,
 ) -> String {
-	let encoded_selector: String = selectors
-		.map
-		.get(selector)
-		.unwrap()
-		.replacement
-		.clone()
-		.unwrap();
-	encoded_selector
+	if let Some(encoded_selector) = selectors.map.get(selector) {
+		return encoded_selector.replacement.clone().unwrap();
+	} else {
+		return selector.to_owned();
+	}
 }
 
 /// Returns an iterator of function arguments.
@@ -112,7 +112,7 @@ pub fn process_prefixed_selectors(
 					indentifier = format!(
 						"{prefix}{name}",
 						prefix = capture.at(1).unwrap(),
-						name = capture.at(1).unwrap(),
+						name = indentifier,
 					)
 				},
 			}

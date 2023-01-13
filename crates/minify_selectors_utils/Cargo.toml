@@ -14,5 +14,6 @@ version = "2.0.0"
 
 [dependencies]
 clap = { version = "4.0.15", features = ["derive"] }
+indexmap = { version = "1.9.2" }
 
 encode_selector = { version = "0.4.0", path = "../encode_selector" }

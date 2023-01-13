@@ -1,10 +1,8 @@
 # v2.0.0
-<sub>TBD</sub>
+<sub>13 Jan 2023</sub>
 
 ### Updates
 - Switch from a single-pass to multi-pass proccess
-
-### Fixes
 
 <br>
 

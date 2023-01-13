@@ -1,7 +1,7 @@
-use std::collections::HashMap;
 use std::path::PathBuf;
 
 use clap::Parser;
+use indexmap::IndexMap;
 
 
 
@@ -186,7 +186,7 @@ impl Default for Selector {
 
 #[derive(Debug)]
 pub struct Selectors {
-	pub map: HashMap<String, Selector>,
+	pub map: IndexMap<String, Selector>,
 	pub class_counter: usize,
 	pub id_counter: usize,
 }
@@ -194,7 +194,7 @@ pub struct Selectors {
 impl Selectors {
 	pub fn new() -> Self {
 		Self {
-			map: HashMap::new(),
+			map: IndexMap::new(),
 			class_counter: 0,
 			id_counter: 0,
 		}
