@@ -25,7 +25,12 @@ pub fn from_html(
 	selectors: &mut Selectors,
 	config: &Config,
 ) {
-	process_html(file_string, selectors, config, SelectorUsage::Identifier);
+	process_html(
+		file_string,
+		selectors,
+		config,
+		Some(SelectorUsage::Identifier),
+	);
 }
 
 pub fn from_js(
@@ -42,7 +47,7 @@ pub fn from_js(
 pub fn add_selector_to_map(
 	selector: &str,
 	selectors: &mut Selectors,
-	usage: SelectorUsage,
+	usage: Option<SelectorUsage>,
 ) {
 	selectors.add(selector.to_owned(), usage);
 }
@@ -121,7 +126,7 @@ pub fn process_prefixed_selectors(
 				},
 			}
 
-			add_selector_to_map(&indentifier, selectors, SelectorUsage::Prefix);
+			add_selector_to_map(&indentifier, selectors, Some(SelectorUsage::Prefix));
 		}
 	}
 
@@ -191,7 +196,7 @@ pub fn process_string_of_tokens(
 	selectors: &mut Selectors,
 	config: &Config,
 	context: &str,
-	usage: SelectorUsage,
+	usage: Option<SelectorUsage>,
 ) {
 	let prefix: &str = match context {
 		"class" => ".",
@@ -222,7 +227,7 @@ pub fn process_string_of_tokens(
 	fn handle_file_read(
 		string: &str,
 		prefix: &str,
-		usage: SelectorUsage,
+		usage: Option<SelectorUsage>,
 		selectors: &mut Selectors,
 	) {
 		for capture in regexes::STRING_DELIMITED_BY_SPACE.captures_iter(string) {
@@ -283,7 +288,7 @@ pub fn process_string_of_arguments(
 	selectors: &mut Selectors,
 	config: &Config,
 	context: &str,
-	usage: SelectorUsage,
+	usage: Option<SelectorUsage>,
 ) {
 	let prefix: &str = match context {
 		"class" => ".",
@@ -300,7 +305,7 @@ pub fn process_string_of_arguments(
 	fn handle_file_read(
 		string: &str,
 		prefix: &str,
-		usage: SelectorUsage,
+		usage: Option<SelectorUsage>,
 		selectors: &mut Selectors,
 	) {
 		for capture in regexes::STRING_DELIMITED_BY_COMMA.captures_iter(string) {
@@ -408,7 +413,7 @@ pub fn process_anchor_links(
 			add_selector_to_map(
 				&unescape_js_chars(capture.at(2).unwrap()),
 				selectors,
-				SelectorUsage::Anchor,
+				Some(SelectorUsage::Anchor),
 			);
 		}
 	}

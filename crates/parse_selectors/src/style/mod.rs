@@ -49,7 +49,7 @@ pub fn process_css_selectors(
 						identifier = &unescape_css_chars(capture.at(2).unwrap()),
 					),
 					selectors,
-					SelectorUsage::Style,
+					Some(SelectorUsage::Style),
 				);
 			}
 		}
@@ -130,7 +130,7 @@ pub fn process_css_attributes(
 						selectors,
 						config,
 						attribute_type_designation,
-						SelectorUsage::Style,
+						Some(SelectorUsage::Style),
 					);
 				},
 				"selector" => {
@@ -186,7 +186,7 @@ pub fn process_css_attributes(
 							selectors,
 							config,
 							attribute_type_designation,
-							SelectorUsage::Style,
+							None,
 						);
 					},
 					"selector" => {

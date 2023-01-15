@@ -131,16 +131,19 @@ impl Selector {
 
 	pub fn count(
 		&mut self,
-		usage: SelectorUsage,
+		usage: Option<SelectorUsage>,
 	) {
-		self.counter += 1;
+		if usage.is_some() {
+			self.counter += 1;
+		}
 		match usage {
-			SelectorUsage::Identifier => self.identifier_counter += 1,
-			SelectorUsage::Selector => self.selector_string_counter += 1,
-			SelectorUsage::Anchor => self.anchor_counter += 1,
-			SelectorUsage::Style => self.style_counter += 1,
-			SelectorUsage::Script => self.script_counter += 1,
-			SelectorUsage::Prefix => self.prefix_counter += 1,
+			Some(SelectorUsage::Identifier) => self.identifier_counter += 1,
+			Some(SelectorUsage::Selector) => self.selector_string_counter += 1,
+			Some(SelectorUsage::Anchor) => self.anchor_counter += 1,
+			Some(SelectorUsage::Style) => self.style_counter += 1,
+			Some(SelectorUsage::Script) => self.script_counter += 1,
+			Some(SelectorUsage::Prefix) => self.prefix_counter += 1,
+			None => {},
 		}
 	}
 
@@ -203,7 +206,7 @@ impl Selectors {
 	pub fn add(
 		&mut self,
 		selector: String,
-		usage: SelectorUsage,
+		usage: Option<SelectorUsage>,
 	) {
 		// Create map entry if it does not yet exist
 		if !self.map.contains_key(&selector) {

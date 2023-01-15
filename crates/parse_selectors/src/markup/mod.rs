@@ -17,7 +17,7 @@ pub fn process_html(
 	file_string: &mut String,
 	selectors: &mut Selectors,
 	config: &Config,
-	usage: SelectorUsage,
+	usage: Option<SelectorUsage>,
 ) {
 	process_html_attributes(file_string, selectors, config, usage);
 	process_html_scripts(file_string, selectors, config);
@@ -30,7 +30,7 @@ pub fn process_html_attributes(
 	file_string: &mut String,
 	selectors: &mut Selectors,
 	config: &Config,
-	usage: SelectorUsage,
+	usage: Option<SelectorUsage>,
 ) {
 	if config.current_step == ProcessingSteps::WritingToFiles {
 		handle_file_write(file_string, selectors, config);
@@ -42,7 +42,7 @@ pub fn process_html_attributes(
 		file_string: &str,
 		selectors: &mut Selectors,
 		config: &Config,
-		usage: SelectorUsage,
+		usage: Option<SelectorUsage>,
 	) {
 		for capture in markup_regex::HTML_ATTRIBUTES.captures_iter(file_string) {
 			// Matched string is a <code>/<script>/<style> element or a HTML comment.
@@ -130,12 +130,7 @@ pub fn process_html_attributes(
 
 					let mut code_tag_attributes = code_element.0.to_string();
 
-					process_html_attributes(
-						&mut code_tag_attributes,
-						selectors,
-						config,
-						SelectorUsage::Identifier, // TODO: refactor to Option<SelectorUsage>
-					);
+					process_html_attributes(&mut code_tag_attributes, selectors, config, None);
 
 					return format!(
 						"<code{attributes}>{inner_html}",
@@ -170,7 +165,7 @@ pub fn process_html_attributes(
 							selectors,
 							config,
 							attribute_type_designation,
-							SelectorUsage::Identifier,
+							None,
 						);
 					},
 

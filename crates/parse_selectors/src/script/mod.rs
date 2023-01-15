@@ -81,7 +81,7 @@ pub fn process_js_arguments(
 							selectors,
 							config,
 							"class",
-							SelectorUsage::Script,
+							Some(SelectorUsage::Script),
 						);
 					}
 					// TODO: handle expressions?
@@ -96,7 +96,7 @@ pub fn process_js_arguments(
 							selectors,
 							config,
 							"id",
-							SelectorUsage::Script,
+							Some(SelectorUsage::Script),
 						);
 					};
 					// TODO: handle expressions?
@@ -131,7 +131,7 @@ pub fn process_js_arguments(
 											selectors,
 											config,
 											attribute_type_designation,
-											SelectorUsage::Script,
+											Some(SelectorUsage::Script),
 										);
 									},
 
@@ -185,7 +185,7 @@ pub fn process_js_arguments(
 										&mut replacement_html,
 										selectors,
 										config,
-										SelectorUsage::Script,
+										Some(SelectorUsage::Script),
 									)
 								},
 								false => {
@@ -193,7 +193,7 @@ pub fn process_js_arguments(
 										&mut replacement_html,
 										selectors,
 										config,
-										SelectorUsage::Script,
+										Some(SelectorUsage::Script),
 									)
 								},
 							};
@@ -231,7 +231,7 @@ pub fn process_js_arguments(
 						selectors,
 						config,
 						"class",
-						SelectorUsage::Script,
+						Some(SelectorUsage::Script),
 					);
 				},
 
@@ -287,7 +287,7 @@ pub fn process_js_arguments(
 							selectors,
 							config,
 							"class",
-							SelectorUsage::Script,
+							None,
 						);
 					}
 					// TODO: handle expressions?
@@ -302,7 +302,7 @@ pub fn process_js_arguments(
 							selectors,
 							config,
 							"id",
-							SelectorUsage::Script,
+							None,
 						);
 					};
 					// TODO: handle expressions?
@@ -337,7 +337,7 @@ pub fn process_js_arguments(
 											selectors,
 											config,
 											attribute_type_designation,
-											SelectorUsage::Script,
+											None,
 										);
 									},
 
@@ -394,7 +394,7 @@ pub fn process_js_arguments(
 										&mut replacement_html,
 										selectors,
 										config,
-										SelectorUsage::Script,
+										None,
 									)
 								},
 								false => {
@@ -402,7 +402,7 @@ pub fn process_js_arguments(
 										&mut replacement_html,
 										selectors,
 										config,
-										SelectorUsage::Script,
+										None,
 									)
 								},
 							};
@@ -447,7 +447,7 @@ pub fn process_js_arguments(
 						selectors,
 						config,
 						"class",
-						SelectorUsage::Script,
+						None,
 					);
 				},
 
@@ -497,14 +497,14 @@ pub fn process_js_properties(
 						&mut property_value,
 						selectors,
 						config,
-						SelectorUsage::Script,
+						Some(SelectorUsage::Script),
 					);
 				} else {
 					process_html_attributes(
 						&mut property_value,
 						selectors,
 						config,
-						SelectorUsage::Script,
+						Some(SelectorUsage::Script),
 					);
 				}
 			} else if property_name == "window.location"
@@ -518,7 +518,7 @@ pub fn process_js_properties(
 					selectors,
 					config,
 					"id",
-					SelectorUsage::Script,
+					Some(SelectorUsage::Script),
 				);
 			} else if property_name == ".className" || property_name.starts_with(".classList") {
 				super::process_string_of_tokens(
@@ -526,7 +526,7 @@ pub fn process_js_properties(
 					selectors,
 					config,
 					"class",
-					SelectorUsage::Script,
+					Some(SelectorUsage::Script),
 				);
 			}
 		}
@@ -550,19 +550,9 @@ pub fn process_js_properties(
 
 				if property_name == ".innerHTML" || property_name == ".outerHTML" {
 					if property_value.contains("</body>") {
-						super::process_html(
-							&mut property_value,
-							selectors,
-							config,
-							SelectorUsage::Script,
-						);
+						super::process_html(&mut property_value, selectors, config, None);
 					} else {
-						process_html_attributes(
-							&mut property_value,
-							selectors,
-							config,
-							SelectorUsage::Script,
-						);
+						process_html_attributes(&mut property_value, selectors, config, None);
 					}
 				} else if property_name == "window.location"
 					|| property_name == "window.location.href"
@@ -575,7 +565,7 @@ pub fn process_js_properties(
 						selectors,
 						config,
 						"id",
-						SelectorUsage::Script,
+						None,
 					);
 				} else if property_name == ".className" || property_name.starts_with(".classList") {
 					super::process_string_of_tokens(
@@ -583,7 +573,7 @@ pub fn process_js_properties(
 						selectors,
 						config,
 						"class",
-						SelectorUsage::Script,
+						None,
 					);
 				}
 
