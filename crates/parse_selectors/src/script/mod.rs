@@ -181,13 +181,19 @@ pub fn process_js_arguments(
 
 							match html.at(3).unwrap().contains("</body>") {
 								true => {
-									super::process_html(&mut replacement_html, selectors, config)
+									super::process_html(
+										&mut replacement_html,
+										selectors,
+										config,
+										SelectorUsage::Script,
+									)
 								},
 								false => {
 									process_html_attributes(
 										&mut replacement_html,
 										selectors,
 										config,
+										SelectorUsage::Script,
 									)
 								},
 							};
@@ -384,13 +390,19 @@ pub fn process_js_arguments(
 
 							match html.at(3).unwrap().contains("</body>") {
 								true => {
-									super::process_html(&mut replacement_html, selectors, config)
+									super::process_html(
+										&mut replacement_html,
+										selectors,
+										config,
+										SelectorUsage::Script,
+									)
 								},
 								false => {
 									process_html_attributes(
 										&mut replacement_html,
 										selectors,
 										config,
+										SelectorUsage::Script,
 									)
 								},
 							};
@@ -481,9 +493,19 @@ pub fn process_js_properties(
 
 			if property_name == ".innerHTML" || property_name == ".outerHTML" {
 				if property_value.contains("</body>") {
-					super::process_html(&mut property_value, selectors, config);
+					super::process_html(
+						&mut property_value,
+						selectors,
+						config,
+						SelectorUsage::Script,
+					);
 				} else {
-					process_html_attributes(&mut property_value, selectors, config);
+					process_html_attributes(
+						&mut property_value,
+						selectors,
+						config,
+						SelectorUsage::Script,
+					);
 				}
 			} else if property_name == "window.location"
 				|| property_name == "window.location.href"
@@ -528,9 +550,19 @@ pub fn process_js_properties(
 
 				if property_name == ".innerHTML" || property_name == ".outerHTML" {
 					if property_value.contains("</body>") {
-						super::process_html(&mut property_value, selectors, config);
+						super::process_html(
+							&mut property_value,
+							selectors,
+							config,
+							SelectorUsage::Script,
+						);
 					} else {
-						process_html_attributes(&mut property_value, selectors, config);
+						process_html_attributes(
+							&mut property_value,
+							selectors,
+							config,
+							SelectorUsage::Script,
+						);
 					}
 				} else if property_name == "window.location"
 					|| property_name == "window.location.href"

@@ -230,6 +230,12 @@ impl Selectors {
 		config: &mut Config,
 	) {
 		for val in self.map.values_mut() {
+			// Quick way to check if selectors are only being used in HTML
+			// attributes and no where else. Skip generating a replacement.
+			if val.identifier_counter == val.counter {
+				continue;
+			}
+
 			val.set_replacement(encode_selector::to_radix(
 				match val.r#type {
 					SelectorType::Class => &self.class_counter,

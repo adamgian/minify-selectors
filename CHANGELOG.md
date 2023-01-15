@@ -1,3 +1,14 @@
+# v2.1.0
+<sub>TBD</sub>
+
+### Updates
+- Skip replacing selectors if they are only used in HTML
+
+<br>
+
+
+
+
 # v2.0.0
 <sub>13 Jan 2023</sub>
 

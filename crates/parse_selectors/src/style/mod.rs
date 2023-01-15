@@ -70,7 +70,8 @@ pub fn process_css_selectors(
 					identifier = super::get_encoded_selector(
 						&unescape_css_chars(capture.at(0).unwrap()),
 						selectors,
-					),
+					)
+					.unwrap_or_else(|| capture.at(0).unwrap().to_string()),
 				);
 			}
 			// Matched to an attribute selector, rule block, @import or comment.

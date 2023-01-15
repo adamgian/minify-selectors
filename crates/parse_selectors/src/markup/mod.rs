@@ -17,8 +17,9 @@ pub fn process_html(
 	file_string: &mut String,
 	selectors: &mut Selectors,
 	config: &Config,
+	usage: SelectorUsage,
 ) {
-	process_html_attributes(file_string, selectors, config);
+	process_html_attributes(file_string, selectors, config, usage);
 	process_html_scripts(file_string, selectors, config);
 	process_html_styles(file_string, selectors, config);
 	super::process_prefixed_selectors(file_string, selectors, config);
@@ -29,17 +30,19 @@ pub fn process_html_attributes(
 	file_string: &mut String,
 	selectors: &mut Selectors,
 	config: &Config,
+	usage: SelectorUsage,
 ) {
 	if config.current_step == ProcessingSteps::WritingToFiles {
 		handle_file_write(file_string, selectors, config);
 	} else {
-		handle_file_read(file_string, selectors, config);
+		handle_file_read(file_string, selectors, config, usage);
 	}
 
 	fn handle_file_read(
 		file_string: &str,
 		selectors: &mut Selectors,
 		config: &Config,
+		usage: SelectorUsage,
 	) {
 		for capture in markup_regex::HTML_ATTRIBUTES.captures_iter(file_string) {
 			// Matched string is a <code>/<script>/<style> element or a HTML comment.
@@ -53,7 +56,7 @@ pub fn process_html_attributes(
 					.split_once('>')
 					.unwrap();
 				let mut code_tag_attributes = code_element.0.to_string();
-				process_html_attributes(&mut code_tag_attributes, selectors, config);
+				process_html_attributes(&mut code_tag_attributes, selectors, config, usage);
 				continue;
 			}
 
@@ -82,7 +85,7 @@ pub fn process_html_attributes(
 						selectors,
 						config,
 						attribute_type_designation,
-						SelectorUsage::Identifier,
+						usage,
 					);
 				},
 
@@ -127,7 +130,12 @@ pub fn process_html_attributes(
 
 					let mut code_tag_attributes = code_element.0.to_string();
 
-					process_html_attributes(&mut code_tag_attributes, selectors, config);
+					process_html_attributes(
+						&mut code_tag_attributes,
+						selectors,
+						config,
+						SelectorUsage::Identifier, // TODO: refactor to Option<SelectorUsage>
+					);
 
 					return format!(
 						"<code{attributes}>{inner_html}",
@@ -327,10 +335,6 @@ pub fn unescape_html_chars(substring: &str) -> String {
 			);
 		} else if capture.at(3).is_some() {
 			if !ENTITIES.contains_key(capture.at(3).unwrap()) {
-				println!(
-					"[Warn] Named character reference {:?} may not be a valid entity",
-					capture.at(3).unwrap(),
-				);
 				return capture
 					.at(3)
 					.unwrap()

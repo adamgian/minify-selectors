@@ -25,7 +25,7 @@ pub fn from_html(
 	selectors: &mut Selectors,
 	config: &Config,
 ) {
-	process_html(file_string, selectors, config);
+	process_html(file_string, selectors, config, SelectorUsage::Identifier);
 }
 
 pub fn from_js(
@@ -54,11 +54,15 @@ pub fn add_selector_to_map(
 pub fn get_encoded_selector(
 	selector: &str,
 	selectors: &mut Selectors,
-) -> String {
+) -> Option<String> {
 	if let Some(encoded_selector) = selectors.map.get(selector) {
-		return encoded_selector.replacement.clone().unwrap();
+		if encoded_selector.replacement.is_some() {
+			encoded_selector.replacement.clone()
+		} else {
+			None
+		}
 	} else {
-		return selector.to_owned();
+		Some(selector.to_owned())
 	}
 }
 
@@ -133,12 +137,14 @@ pub fn process_prefixed_selectors(
 					// "__class--foo"
 					Some("class") => {
 						placeholder_value =
-							get_encoded_selector(&format!(".{}", placeholder_value), selectors);
+							get_encoded_selector(&format!(".{}", placeholder_value), selectors)
+								.unwrap_or(placeholder_value);
 					},
 					// "__id--foo"
 					Some("id") => {
 						placeholder_value =
-							get_encoded_selector(&format!("#{}", placeholder_value), selectors);
+							get_encoded_selector(&format!("#{}", placeholder_value), selectors)
+								.unwrap_or(placeholder_value);
 					},
 					// "#__ignore--foo", ".__ignore--bar" or "__ignore--baz"
 					Some("ignore") => {
@@ -161,6 +167,7 @@ pub fn process_prefixed_selectors(
 								),
 								selectors,
 							)
+							.unwrap_or(placeholder_value)
 						);
 					},
 				}
@@ -259,6 +266,7 @@ pub fn process_string_of_tokens(
 						),
 						selectors,
 					)
+					.unwrap_or_else(|| capture.at(1).unwrap().to_string())
 				}),
 			quote = quote,
 		);
@@ -346,7 +354,8 @@ pub fn process_string_of_arguments(
 							token = capture.at(3).unwrap(),
 						),
 						selectors,
-					),
+					)
+					.unwrap_or_else(|| capture.at(3).unwrap().to_string()),
 					quote = capture.at(2).unwrap(),
 				)
 			// TODO:
@@ -422,7 +431,8 @@ pub fn process_anchor_links(
 					target_id = get_encoded_selector(
 						&unescape_js_chars(capture.at(2).unwrap()),
 						selectors,
-					),
+					)
+					.unwrap_or_else(|| capture.at(2).unwrap().to_string()),
 				)
 			}),
 			quote = quote,

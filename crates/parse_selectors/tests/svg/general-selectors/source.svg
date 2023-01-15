@@ -1,6 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36">
 
 	<style>
+		.CLASS-2, .CLASS-4, .CLASS-5, .CLASS-6, .CLASS-7, .CLASS-9 {}
+
 		.CLASS-3 {
 			fill: white;
 		}
