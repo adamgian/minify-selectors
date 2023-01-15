@@ -141,15 +141,13 @@ pub fn process_prefixed_selectors(
 				match capture.at(2) {
 					// "__class--foo"
 					Some("class") => {
-						indentifier =
-							get_encoded_selector(&format!(".{}", indentifier), selectors)
-								.unwrap_or(indentifier);
+						indentifier = get_encoded_selector(&format!(".{}", indentifier), selectors)
+							.unwrap_or(indentifier);
 					},
 					// "__id--foo"
 					Some("id") => {
-						indentifier =
-							get_encoded_selector(&format!("#{}", indentifier), selectors)
-								.unwrap_or(indentifier);
+						indentifier = get_encoded_selector(&format!("#{}", indentifier), selectors)
+							.unwrap_or(indentifier);
 					},
 					// "#__ignore--foo", ".__ignore--bar" or "__ignore--baz"
 					Some("ignore") => {

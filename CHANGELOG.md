@@ -1,8 +1,12 @@
-# v2.1.0
+# v2.1.2
 <sub>TBD</sub>
 
 ### Updates
 - Skip replacing selectors if they are only used in HTML
+
+### Fixes
+- Convert any CSS escapes in prefixed selectors before adding to map
+- HTML closing comment tag being errantly included as part of prefixed selector
 
 <br>
 
