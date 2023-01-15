@@ -333,8 +333,8 @@ pub fn unescape_html_chars(substring: &str) -> String {
 				return capture
 					.at(3)
 					.unwrap()
-					.trim_end_matches(';')
 					.to_string()
+					.replace(';', "\\3B")
 					.replace('&', "\\26");
 			}
 			return ENTITIES.get(capture.at(3).unwrap()).unwrap().to_string();

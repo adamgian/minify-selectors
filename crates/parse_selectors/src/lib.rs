@@ -109,7 +109,7 @@ pub fn process_prefixed_selectors(
 				continue;
 			}
 
-			let mut indentifier = capture.at(3).unwrap().trim().to_string();
+			let mut indentifier = unescape_css_chars(capture.at(3).unwrap().trim());
 
 			match capture.at(2) {
 				// "__class--foo"
@@ -136,48 +136,48 @@ pub fn process_prefixed_selectors(
 	) {
 		*file_string =
 			regexes::PREFIXED_SELECTORS.replace_all(file_string, |capture: &Captures| {
-				let mut placeholder_value = capture.at(3).unwrap().trim().to_string();
+				let mut indentifier = unescape_css_chars(capture.at(3).unwrap().trim());
 
 				match capture.at(2) {
 					// "__class--foo"
 					Some("class") => {
-						placeholder_value =
-							get_encoded_selector(&format!(".{}", placeholder_value), selectors)
-								.unwrap_or(placeholder_value);
+						indentifier =
+							get_encoded_selector(&format!(".{}", indentifier), selectors)
+								.unwrap_or(indentifier);
 					},
 					// "__id--foo"
 					Some("id") => {
-						placeholder_value =
-							get_encoded_selector(&format!("#{}", placeholder_value), selectors)
-								.unwrap_or(placeholder_value);
+						indentifier =
+							get_encoded_selector(&format!("#{}", indentifier), selectors)
+								.unwrap_or(indentifier);
 					},
 					// "#__ignore--foo", ".__ignore--bar" or "__ignore--baz"
 					Some("ignore") => {
-						placeholder_value = format!(
+						indentifier = format!(
 							"{prefix}{name}",
 							prefix = capture.at(1).unwrap_or(""),
-							name = placeholder_value,
+							name = indentifier,
 						);
 					},
 					// "#__--foo" or ".__--bar"
 					Some(&_) | None => {
-						placeholder_value = format!(
+						indentifier = format!(
 							"{prefix}{name}",
 							prefix = capture.at(1).unwrap(),
 							name = get_encoded_selector(
 								&format!(
 									"{prefix}{name}",
 									prefix = capture.at(1).unwrap(),
-									name = placeholder_value,
+									name = indentifier,
 								),
 								selectors,
 							)
-							.unwrap_or(placeholder_value)
+							.unwrap_or(indentifier)
 						);
 					},
 				}
 
-				placeholder_value
+				indentifier
 			});
 	}
 }

@@ -189,6 +189,7 @@ impl Default for Selector {
 
 #[derive(Debug)]
 pub struct Selectors {
+	// Note: map key should not have any escaped characters,
 	pub map: IndexMap<String, Selector>,
 	pub class_counter: usize,
 	pub id_counter: usize,
