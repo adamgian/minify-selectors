@@ -1,4 +1,4 @@
-# v2.1.2
+# v2.1.3
 <sub>TBD</sub>
 
 ### Updates
@@ -7,6 +7,7 @@
 ### Fixes
 - Convert any CSS escapes in prefixed selectors before adding to map
 - HTML closing comment tag being errantly included as part of prefixed selector
+- Accept characters that would be invalid CSS characters in HTML attributes
 
 <br>
 

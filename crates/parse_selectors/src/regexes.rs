@@ -67,23 +67,11 @@ lazy_static! {
 	pub static ref STRING_DELIMITED_BY_SPACE: Regex = Regex::new(
 		r##"(?x)
 			(?<token>
-				-?
 				(?>
-					[A-Za-z_]
-					| [^\0-\177]
-					| (?>
-						\\[0-9A-Fa-f]{1,6}(?>\r\n|[ \n\r\t\f])?
-						| \\[^\n\r\f0-9A-Fa-f]
-					)
-				)
-				(?>
-					[\w\-]
-					| [^\0-\177]
-					| (?>
-						\\[0-9A-Fa-f]{1,6}(?>\r\n|[ \n\r\t\f])?
-						| \\[^\n\r\f0-9A-Fa-f]
-					)
-				)*
+					\\[0-9A-Fa-f]{1,6}(?>\r\n|[ \n\r\t\f])?
+					| \\[^\n\r\f0-9A-Fa-f]
+					| [^\s]
+				)+
 			)
 		"##
 	).unwrap();
