@@ -1,8 +1,9 @@
-# v2.2.0
+# v2.3.0
 <sub>TBD</sub>
 
 ### Updates
 - Add `--parallel` option to enable concurrent file processing
+- Sort selectors by frequency before generating minified identifiers
 
 <br>
 

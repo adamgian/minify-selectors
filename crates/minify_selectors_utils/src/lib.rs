@@ -33,6 +33,10 @@ pub struct Cli {
 	/// Run processing operations concurrently where possible
 	#[clap(long)]
 	parallel: Option<Option<bool>>,
+
+	/// Skip reordering of selectors by frequency before minifying
+	#[clap(long = "disable-sort")]
+	disable_sort: Option<Option<bool>>,
 }
 
 
@@ -46,6 +50,7 @@ pub struct Config {
 	pub start_index: usize,
 	pub current_step: ProcessingSteps,
 	pub parallel: bool,
+	pub disable_sort: bool,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -75,6 +80,12 @@ impl Config {
 			Some(Some(true)) => true,   // --parallel=true
 			Some(Some(false)) => false, // --parallel=false
 		};
+		config.disable_sort = match &args.disable_sort {
+			None => false,
+			Some(None) => true,         // --disable-sort
+			Some(Some(true)) => true,   // --disable-sort=true
+			Some(Some(false)) => false, // --disable-sort=false
+		};
 
 		config
 	}
@@ -91,6 +102,7 @@ impl Default for Config {
 			start_index: 0,
 			current_step: ProcessingSteps::ReadingFromFiles,
 			parallel: false,
+			disable_sort: false,
 		}
 	}
 }
@@ -269,6 +281,12 @@ impl Selectors {
 				self.id_counter += 1;
 			}
 		}
+	}
+
+	/// Reorder selectors map, by highest frenquency first.
+	pub fn sort_by_frequency(&mut self) {
+		self.map
+			.sort_by(|_x_key, x_val, _y_key, y_val| y_val.counter.cmp(&x_val.counter));
 	}
 }
 
