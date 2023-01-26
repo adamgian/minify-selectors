@@ -11,7 +11,7 @@
 
 # minify-selectors
 
-Post-processor that minifies classes and IDs selector names in CSS, HTML, Javascript and SVG files. minify-selectors aims to offer comprehensive out of the box support with minimal fuss.
+Post-processor that minifies class and ID selector names in CSS, HTML, Javascript and SVG files. minify-selectors aims to offer comprehensive out of the box support with minimal fuss.
 
 Enhance your front-end assets and build optimisations pipeline — wring even more out from your already minified and optimised payload sizes. Additionally can offer a certain degree of obfuscation to your code.
 
@@ -231,7 +231,7 @@ Or, you do not want minify-selectors to encode certain selectors (for reasons su
 
 ### Via npm and npm scripts
 
-1. Install via npm:
+1. Install [minify-selectors](https://www.npmjs.com/package/minify-selectors) via npm:
 	```shell
 	npm i minify-selectors
 	```

@@ -14,11 +14,11 @@ use indexmap::IndexMap;
 	long_about = None,
 )]
 pub struct Cli {
-	/// Directory or file to process
+	/// Directory to process from
 	#[clap(short = 'i', long = "input")]
 	source: String,
 
-	/// Output directory to save file(s)
+	/// Output directory to save files to
 	#[clap(short = 'o', long)]
 	output: String,
 
@@ -29,6 +29,10 @@ pub struct Cli {
 	/// Sequence of characters to use when encoding
 	#[clap(long)]
 	alphabet: Option<String>,
+
+	/// Run processing operations concurrently where possible
+	#[clap(long)]
+	parallel: Option<Option<bool>>,
 }
 
 
@@ -41,6 +45,7 @@ pub struct Config {
 	pub alphabet: (Vec<char>, Vec<usize>),
 	pub start_index: usize,
 	pub current_step: ProcessingSteps,
+	pub parallel: bool,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -64,6 +69,12 @@ impl Config {
 
 		config.source = PathBuf::from(&args.source);
 		config.output = PathBuf::from(&args.output);
+		config.parallel = match &args.parallel {
+			None => false,
+			Some(None) => true,         // --parallel
+			Some(Some(true)) => true,   // --parallel=true
+			Some(Some(false)) => false, // --parallel=false
+		};
 
 		config
 	}
@@ -79,6 +90,7 @@ impl Default for Config {
 			),
 			start_index: 0,
 			current_step: ProcessingSteps::ReadingFromFiles,
+			parallel: false,
 		}
 	}
 }

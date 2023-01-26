@@ -1,11 +1,22 @@
-# v2.1.3
+# v2.2.0
 <sub>TBD</sub>
+
+### Updates
+- Add `--parallel` option to enable concurrent file processing
+
+<br>
+
+
+
+
+# v2.1.3
+<sub>17 Jan 2023</sub>
 
 ### Updates
 - Skip replacing selectors if they are only used in HTML
 
 ### Fixes
-- Convert any CSS escapes in prefixed selectors before adding to map
+- Convert any CSS character escapes in prefixed selectors before adding to map
 - HTML closing comment tag being errantly included as part of prefixed selector
 - Accept characters that would be invalid CSS characters in HTML attributes
 

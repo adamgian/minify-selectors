@@ -2,9 +2,11 @@ use std::error::Error;
 use std::ffi::OsStr;
 use std::fs;
 use std::path::Path;
+use std::sync::Mutex;
 use std::time::Instant;
 
 use minify_selectors_utils::*;
+use rayon::prelude::*;
 use walkdir::WalkDir;
 
 
@@ -27,24 +29,7 @@ fn minify_selectors() -> Result<(), Box<dyn Error>> {
 
 	// Multi-step process (stage 1/3):
 	// Read files and note down selectors and their occurrences.
-	for entry in WalkDir::new(&config.source)
-		.into_iter()
-		.filter_map(|e| e.ok())
-		.filter(|e| {
-			// Check that current path is a file
-			if !e.path().is_file() {
-				return false;
-			};
-			// Finally, check file has a extension that can be processed
-			matches!(
-				e.path().extension().and_then(OsStr::to_str),
-				Some("css") | Some("html") | Some("js") | Some("svg")
-			)
-		}) {
-		let mut selectors_in_file = Selectors::new();
-		process_file(entry.path(), &mut selectors_in_file, &config)?;
-		selectors.merge(selectors_in_file);
-	}
+	process_files(&mut selectors, &config)?;
 
 	// Multi-step process (stage 2/3):
 	// Process selectors list and encode into a minified identifier.
@@ -54,24 +39,79 @@ fn minify_selectors() -> Result<(), Box<dyn Error>> {
 	// Multi-step process (stage 3/3):
 	// Open files again and subsituite encoded selectors in place.
 	config.current_step = ProcessingSteps::WritingToFiles;
-	for entry in WalkDir::new(&config.source)
-		.into_iter()
-		.filter_map(|e| e.ok())
-		.filter(|e| {
-			// Check that current path is a file
-			if !e.path().is_file() {
-				return false;
-			};
-			// Finally, check file has a extension that can be processed
-			matches!(
-				e.path().extension().and_then(OsStr::to_str),
-				Some("css") | Some("html") | Some("js") | Some("svg")
-			)
-		}) {
-		process_file(entry.path(), &mut selectors, &config)?;
-	}
+	process_files(&mut selectors, &config)?;
 
 	println!("minify-selectors finished in: {:.2?}", stopwatch.elapsed());
+
+	Ok(())
+}
+
+///
+fn process_files(
+	selectors: &mut Selectors,
+	config: &Config,
+) -> Result<(), std::io::Error> {
+	if config.parallel {
+		let selectors_mutex = Mutex::new(selectors);
+		let files = WalkDir::new(&config.source)
+			.into_iter()
+			.filter_map(|e| e.ok())
+			.filter(is_processable)
+			.collect::<Vec<walkdir::DirEntry>>();
+
+		files.into_par_iter().for_each(|entry| {
+			handle_par_file(&selectors_mutex, config, &entry)
+				.expect("There was an issue processing this file.");
+		});
+	} else {
+		for entry in WalkDir::new(&config.source)
+			.into_iter()
+			.filter_map(|e| e.ok())
+			.filter(is_processable)
+		{
+			handle_file(selectors, config, &entry)?;
+		}
+	};
+
+	fn is_processable(item: &walkdir::DirEntry) -> bool {
+		// Check that current path is a file
+		if !item.path().is_file() {
+			return false;
+		};
+		// Finally, check file has a extension that can be processed
+		matches!(
+			item.path().extension().and_then(OsStr::to_str),
+			Some("css") | Some("html") | Some("js") | Some("svg")
+		)
+	}
+
+	fn handle_file(
+		selectors: &mut Selectors,
+		config: &Config,
+		file: &walkdir::DirEntry,
+	) -> Result<(), std::io::Error> {
+		let mut selectors_in_file = Selectors::new();
+		process_file(file.path(), &mut selectors_in_file, config)?;
+
+		if config.current_step == ProcessingSteps::ReadingFromFiles {
+			selectors.merge(selectors_in_file);
+		}
+		Ok(())
+	}
+
+	fn handle_par_file(
+		selectors: &Mutex<&mut Selectors>,
+		config: &Config,
+		file: &walkdir::DirEntry,
+	) -> Result<(), std::io::Error> {
+		let mut selectors_in_file = Selectors::new();
+		process_file(file.path(), &mut selectors_in_file, config)?;
+
+		if config.current_step == ProcessingSteps::ReadingFromFiles {
+			selectors.lock().unwrap().merge(selectors_in_file);
+		}
+		Ok(())
+	}
 
 	Ok(())
 }
