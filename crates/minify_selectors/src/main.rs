@@ -74,7 +74,7 @@ fn process_files(
 		{
 			handle_file(selectors, config, &entry)?;
 		}
-	};
+	}
 
 	fn is_processable(item: &walkdir::DirEntry) -> bool {
 		// Check that current path is a file
@@ -93,12 +93,7 @@ fn process_files(
 		config: &Config,
 		file: &walkdir::DirEntry,
 	) -> Result<(), std::io::Error> {
-		let mut selectors_in_file = Selectors::new();
-		process_file(file.path(), &mut selectors_in_file, config)?;
-
-		if config.current_step == ProcessingSteps::ReadingFromFiles {
-			selectors.merge(selectors_in_file);
-		}
+		process_file(file.path(), selectors, config)?;
 		Ok(())
 	}
 
