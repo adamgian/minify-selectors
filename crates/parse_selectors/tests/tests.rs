@@ -294,9 +294,9 @@ fn process_file(
 	let mut config = Config::default();
 
 	match file_type {
-		"css" => parse_selectors::from_css(&mut file, &mut selectors, &config),
-		"js" => parse_selectors::from_js(&mut file, &mut selectors, &config),
-		"html" | "svg" => parse_selectors::from_html(&mut file, &mut selectors, &config),
+		"css" => parse_selectors::read_from_css(&mut file, &mut selectors, &config),
+		"js" => parse_selectors::read_from_js(&mut file, &mut selectors, &config),
+		"html" | "svg" => parse_selectors::read_from_html(&mut file, &mut selectors, &config),
 		_ => panic!("file_type not one of the following: css, js, html or svg."),
 	}
 
@@ -305,9 +305,9 @@ fn process_file(
 	config.current_step = ProcessingSteps::WritingToFiles;
 
 	match file_type {
-		"css" => parse_selectors::from_css(&mut file, &mut selectors, &config),
-		"js" => parse_selectors::from_js(&mut file, &mut selectors, &config),
-		"html" | "svg" => parse_selectors::from_html(&mut file, &mut selectors, &config),
+		"css" => parse_selectors::write_to_css(&mut file, &mut selectors, &config),
+		"js" => parse_selectors::write_to_js(&mut file, &mut selectors, &config),
+		"html" | "svg" => parse_selectors::write_to_html(&mut file, &mut selectors, &config),
 		_ => panic!("file_type not one of the following: css, js, html or svg."),
 	}
 

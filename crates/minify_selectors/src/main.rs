@@ -2,7 +2,8 @@ use std::error::Error;
 use std::ffi::OsStr;
 use std::fs;
 use std::path::Path;
-use std::sync::Mutex;
+use std::sync::Arc;
+use std::sync::RwLock;
 use std::time::Instant;
 
 use minify_selectors_utils::*;
@@ -16,7 +17,7 @@ fn main() {
 	std::process::exit(match minify_selectors() {
 		Ok(_) => 0,
 		Err(error) => {
-			eprintln!("minify-selectors has encounted an error: {:?}", error);
+			eprintln!("minify-selectors has encounted an error: {error:?}");
 			1
 		},
 	});
@@ -55,7 +56,7 @@ fn process_files(
 	config: &Config,
 ) -> Result<(), std::io::Error> {
 	if config.parallel {
-		let selectors_mutex = Mutex::new(selectors);
+		let selectors_lock = Arc::new(RwLock::new(selectors));
 		let files = WalkDir::new(&config.source)
 			.into_iter()
 			.filter_map(|e| e.ok())
@@ -63,7 +64,7 @@ fn process_files(
 			.collect::<Vec<walkdir::DirEntry>>();
 
 		files.into_par_iter().for_each(|entry| {
-			handle_par_file(&selectors_mutex, config, &entry)
+			handle_par_file(&selectors_lock, config, &entry)
 				.expect("There was an issue processing this file.");
 		});
 	} else {
@@ -93,20 +94,25 @@ fn process_files(
 		config: &Config,
 		file: &walkdir::DirEntry,
 	) -> Result<(), std::io::Error> {
-		process_file(file.path(), selectors, config)?;
+		if config.current_step == ProcessingSteps::ReadingFromFiles {
+			analyse_file(file.path(), selectors, config)?;
+		} else {
+			write_to_file(file.path(), selectors, config)?;
+		}
 		Ok(())
 	}
 
 	fn handle_par_file(
-		selectors: &Mutex<&mut Selectors>,
+		selectors: &RwLock<&mut Selectors>,
 		config: &Config,
 		file: &walkdir::DirEntry,
 	) -> Result<(), std::io::Error> {
-		let mut selectors_in_file = Selectors::new();
-		process_file(file.path(), &mut selectors_in_file, config)?;
-
 		if config.current_step == ProcessingSteps::ReadingFromFiles {
-			selectors.lock().unwrap().merge(selectors_in_file);
+			let mut selectors_in_file = Selectors::new();
+			analyse_file(file.path(), &mut selectors_in_file, config)?;
+			selectors.write().unwrap().merge(selectors_in_file);
+		} else {
+			write_to_file(file.path(), &selectors.read().unwrap(), config)?;
 		}
 		Ok(())
 	}
@@ -114,30 +120,40 @@ fn process_files(
 	Ok(())
 }
 
-fn process_file(
+fn analyse_file(
 	file_path: &Path,
 	selectors: &mut Selectors,
 	config: &Config,
 ) -> Result<(), std::io::Error> {
 	let mut file_contents = fs::read_to_string(file_path)?;
-
-	if config.current_step == ProcessingSteps::WritingToFiles {
-		println!("Processing file: {}", file_path.display());
-	} else {
-		println!("Reading file: {}", file_path.display());
-	}
+	println!("Reading file: {}", file_path.display());
 
 	match file_path.extension().and_then(OsStr::to_str) {
-		Some("css") => parse_selectors::from_css(&mut file_contents, selectors, config),
+		Some("css") => parse_selectors::read_from_css(&mut file_contents, selectors, config),
 		Some("html") | Some("svg") => {
-			parse_selectors::from_html(&mut file_contents, selectors, config)
+			parse_selectors::read_from_html(&mut file_contents, selectors, config)
 		},
-		Some("js") => parse_selectors::from_js(&mut file_contents, selectors, config),
+		Some("js") => parse_selectors::read_from_js(&mut file_contents, selectors, config),
 		_ => (),
 	}
+	Ok(())
+}
 
-	if config.current_step == ProcessingSteps::ReadingFromFiles {
-		return Ok(());
+fn write_to_file(
+	file_path: &Path,
+	selectors: &Selectors,
+	config: &Config,
+) -> Result<(), std::io::Error> {
+	let mut file_contents = fs::read_to_string(file_path)?;
+	println!("Processing file: {}", file_path.display());
+
+	match file_path.extension().and_then(OsStr::to_str) {
+		Some("css") => parse_selectors::write_to_css(&mut file_contents, selectors, config),
+		Some("html") | Some("svg") => {
+			parse_selectors::write_to_html(&mut file_contents, selectors, config)
+		},
+		Some("js") => parse_selectors::write_to_js(&mut file_contents, selectors, config),
+		_ => (),
 	}
 
 	let output_path = match &config.source.is_dir() {
