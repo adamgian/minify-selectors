@@ -1,0 +1,59 @@
+[class=d] {}
+[class="a"] {}
+[class="a"] {}
+[class="a"] {}
+[class="a"] {}
+[class="a"] {}
+[class="a"] {}
+[class="a"] {}
+[class=a] {}
+[class='c'] {}
+[class=c] {}
+[class='c'] {}
+[class~=e] {}
+[class~="f"] {}
+[class~='g'] {}
+
+[id=b] {}
+[id=foo] {}
+[id="a"] {}
+[id='d'] {}
+[id~=e] {}
+[id~="f"] {}
+[id~='g'] {}
+
+[xlink\:href="https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/xlink:href#pattern"]
+[xlink\:href="/#b"]
+[xlink\:href="#a"]
+[xlink\3A href="#a"]
+[xlink\03A href="#a"]
+[xlink\003A href="#a"]
+[xlink\0003A href="#a"]
+[xlink\00003A href="#a"]
+[xlink\00003Ahref="#a"]
+
+[class=foo i] {}
+[class="foo" i] {}
+[class="foo"i] {}
+[class="foo" I] {}
+[class=b s] {}
+[class="b" s] {}
+[class="b"s] {}
+[class="b" S] {}
+[class="bar" x] {}
+
+[aria-describedby~='h'] {}
+[aria-labelledby~='i'] {}
+[for~='j'] {}
+[form~='k'] {}
+[headers~='c'] {}
+[itemref~='c'] {}
+[list~='l'] {}
+
+[class^="baz"],
+[class$="baz"],
+[class*="baz"] {}
+
+.d {}
+[data-toggle="baz"] {}
+[data-toggle="b"] {}

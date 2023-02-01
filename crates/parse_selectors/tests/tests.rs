@@ -16,11 +16,19 @@ fn css_files() {
 		fs::read_to_string(dir.clone().join("at-rules/output.css")).unwrap(),
 		process_file("css", &dir.clone().join("at-rules/source.css")),
 	);
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("at-rules/output-sorted.css")).unwrap(),
+		process_file_with_sort("css", &dir.clone().join("at-rules/source.css")),
+	);
 
 	// attribute selectors
 	assert_eq!(
 		fs::read_to_string(dir.clone().join("attribute-selectors/output.css")).unwrap(),
 		process_file("css", &dir.clone().join("attribute-selectors/source.css")),
+	);
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("attribute-selectors/output-sorted.css")).unwrap(),
+		process_file_with_sort("css", &dir.clone().join("attribute-selectors/source.css")),
 	);
 
 	// comments
@@ -28,11 +36,19 @@ fn css_files() {
 		fs::read_to_string(dir.clone().join("comments/output.css")).unwrap(),
 		process_file("css", &dir.clone().join("comments/source.css")),
 	);
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("comments/output-sorted.css")).unwrap(),
+		process_file_with_sort("css", &dir.clone().join("comments/source.css")),
+	);
 
 	// functions
 	assert_eq!(
 		fs::read_to_string(dir.clone().join("functions/output.css")).unwrap(),
 		process_file("css", &dir.clone().join("functions/source.css")),
+	);
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("functions/output-sorted.css")).unwrap(),
+		process_file_with_sort("css", &dir.clone().join("functions/source.css")),
 	);
 
 	// general selectors
@@ -40,11 +56,19 @@ fn css_files() {
 		fs::read_to_string(dir.clone().join("general-selectors/output.css")).unwrap(),
 		process_file("css", &dir.clone().join("general-selectors/source.css")),
 	);
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("general-selectors/output-sorted.css")).unwrap(),
+		process_file_with_sort("css", &dir.clone().join("general-selectors/source.css")),
+	);
 
 	// nesting
 	assert_eq!(
 		fs::read_to_string(dir.clone().join("nesting/output.css")).unwrap(),
 		process_file("css", &dir.clone().join("nesting/source.css")),
+	);
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("nesting/output-sorted.css")).unwrap(),
+		process_file_with_sort("css", &dir.clone().join("nesting/source.css")),
 	);
 
 	// pseudo classes
@@ -52,11 +76,19 @@ fn css_files() {
 		fs::read_to_string(dir.clone().join("pseudo-classes/output.css")).unwrap(),
 		process_file("css", &dir.clone().join("pseudo-classes/source.css")),
 	);
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("pseudo-classes/output-sorted.css")).unwrap(),
+		process_file_with_sort("css", &dir.clone().join("pseudo-classes/source.css")),
+	);
 
 	// pseudo elements
 	assert_eq!(
 		fs::read_to_string(dir.clone().join("pseudo-elements/output.css")).unwrap(),
 		process_file("css", &dir.clone().join("pseudo-elements/source.css")),
+	);
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("pseudo-elements/output-sorted.css")).unwrap(),
+		process_file_with_sort("css", &dir.clone().join("pseudo-elements/source.css")),
 	);
 }
 
@@ -69,11 +101,19 @@ fn js_files() {
 		fs::read_to_string(dir.clone().join("class-list/output.js")).unwrap(),
 		process_file("js", &dir.clone().join("class-list/source.js"))
 	);
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("class-list/output-sorted.js")).unwrap(),
+		process_file_with_sort("js", &dir.clone().join("class-list/source.js"))
+	);
 
 	// classList.add()
 	assert_eq!(
 		fs::read_to_string(dir.clone().join("class-list-add/output.js")).unwrap(),
 		process_file("js", &dir.clone().join("class-list-add/source.js"))
+	);
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("class-list-add/output-sorted.js")).unwrap(),
+		process_file_with_sort("js", &dir.clone().join("class-list-add/source.js"))
 	);
 
 	// classList.contains()
@@ -81,11 +121,19 @@ fn js_files() {
 		fs::read_to_string(dir.clone().join("class-list-contains/output.js")).unwrap(),
 		process_file("js", &dir.clone().join("class-list-contains/source.js"))
 	);
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("class-list-contains/output-sorted.js")).unwrap(),
+		process_file_with_sort("js", &dir.clone().join("class-list-contains/source.js"))
+	);
 
 	// classList.item()
 	assert_eq!(
 		fs::read_to_string(dir.clone().join("class-list-item/output.js")).unwrap(),
 		process_file("js", &dir.clone().join("class-list-item/source.js"))
+	);
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("class-list-item/output-sorted.js")).unwrap(),
+		process_file_with_sort("js", &dir.clone().join("class-list-item/source.js"))
 	);
 
 	// classList.remove()
@@ -93,11 +141,19 @@ fn js_files() {
 		fs::read_to_string(dir.clone().join("class-list-remove/output.js")).unwrap(),
 		process_file("js", &dir.clone().join("class-list-remove/source.js"))
 	);
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("class-list-remove/output-sorted.js")).unwrap(),
+		process_file_with_sort("js", &dir.clone().join("class-list-remove/source.js"))
+	);
 
 	// classList.replace()
 	assert_eq!(
 		fs::read_to_string(dir.clone().join("class-list-replace/output.js")).unwrap(),
 		process_file("js", &dir.clone().join("class-list-replace/source.js"))
+	);
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("class-list-replace/output-sorted.js")).unwrap(),
+		process_file_with_sort("js", &dir.clone().join("class-list-replace/source.js"))
 	);
 
 	// classList.toggle()
@@ -105,11 +161,19 @@ fn js_files() {
 		fs::read_to_string(dir.clone().join("class-list-toggle/output.js")).unwrap(),
 		process_file("js", &dir.clone().join("class-list-toggle/source.js"))
 	);
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("class-list-toggle/output-sorted.js")).unwrap(),
+		process_file_with_sort("js", &dir.clone().join("class-list-toggle/source.js"))
+	);
 
 	// classList.value
 	assert_eq!(
 		fs::read_to_string(dir.clone().join("class-list-value/output.js")).unwrap(),
 		process_file("js", &dir.clone().join("class-list-value/source.js"))
+	);
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("class-list-value/output-sorted.js")).unwrap(),
+		process_file_with_sort("js", &dir.clone().join("class-list-value/source.js"))
 	);
 
 	// className
@@ -117,11 +181,19 @@ fn js_files() {
 		fs::read_to_string(dir.clone().join("class-name/output.js")).unwrap(),
 		process_file("js", &dir.clone().join("class-name/source.js"))
 	);
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("class-name/output-sorted.js")).unwrap(),
+		process_file_with_sort("js", &dir.clone().join("class-name/source.js"))
+	);
 
 	// closest()
 	assert_eq!(
 		fs::read_to_string(dir.clone().join("closest/output.js")).unwrap(),
 		process_file("js", &dir.clone().join("closest/source.js"))
+	);
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("closest/output-sorted.js")).unwrap(),
+		process_file_with_sort("js", &dir.clone().join("closest/source.js"))
 	);
 
 	// matches()
@@ -129,11 +201,19 @@ fn js_files() {
 		fs::read_to_string(dir.clone().join("matches/output.js")).unwrap(),
 		process_file("js", &dir.clone().join("matches/source.js"))
 	);
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("matches/output-sorted.js")).unwrap(),
+		process_file_with_sort("js", &dir.clone().join("matches/source.js"))
+	);
 
 	// getElementById()
 	assert_eq!(
 		fs::read_to_string(dir.clone().join("get-element-by-id/output.js")).unwrap(),
 		process_file("js", &dir.clone().join("get-element-by-id/source.js"))
+	);
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("get-element-by-id/output-sorted.js")).unwrap(),
+		process_file_with_sort("js", &dir.clone().join("get-element-by-id/source.js"))
 	);
 
 	// getElementsByClassName()
@@ -144,11 +224,22 @@ fn js_files() {
 			&dir.clone().join("get-elements-by-class-name/source.js")
 		)
 	);
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("get-elements-by-class-name/output-sorted.js")).unwrap(),
+		process_file_with_sort(
+			"js",
+			&dir.clone().join("get-elements-by-class-name/source.js")
+		)
+	);
 
 	// history.pushState()
 	assert_eq!(
 		fs::read_to_string(dir.clone().join("history-push-state/output.js")).unwrap(),
 		process_file("js", &dir.clone().join("history-push-state/source.js"))
+	);
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("history-push-state/output-sorted.js")).unwrap(),
+		process_file_with_sort("js", &dir.clone().join("history-push-state/source.js"))
 	);
 
 	// history.replaceState()
@@ -156,11 +247,19 @@ fn js_files() {
 		fs::read_to_string(dir.clone().join("history-replace-state/output.js")).unwrap(),
 		process_file("js", &dir.clone().join("history-replace-state/source.js"))
 	);
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("history-replace-state/output-sorted.js")).unwrap(),
+		process_file_with_sort("js", &dir.clone().join("history-replace-state/source.js"))
+	);
 
 	// id
 	assert_eq!(
 		fs::read_to_string(dir.clone().join("id/output.js")).unwrap(),
 		process_file("js", &dir.clone().join("id/source.js"))
+	);
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("id/output-sorted.js")).unwrap(),
+		process_file_with_sort("js", &dir.clone().join("id/source.js"))
 	);
 
 	// innerHTML()
@@ -168,11 +267,19 @@ fn js_files() {
 		fs::read_to_string(dir.clone().join("inner-html/output.js")).unwrap(),
 		process_file("js", &dir.clone().join("inner-html/source.js"))
 	);
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("inner-html/output-sorted.js")).unwrap(),
+		process_file_with_sort("js", &dir.clone().join("inner-html/source.js"))
+	);
 
 	// insertAdjacentHTML()
 	assert_eq!(
 		fs::read_to_string(dir.clone().join("insert-adjacent-html/output.js")).unwrap(),
 		process_file("js", &dir.clone().join("insert-adjacent-html/source.js"))
+	);
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("insert-adjacent-html/output-sorted.js")).unwrap(),
+		process_file_with_sort("js", &dir.clone().join("insert-adjacent-html/source.js"))
 	);
 
 	// outerHTML()
@@ -180,11 +287,19 @@ fn js_files() {
 		fs::read_to_string(dir.clone().join("outer-html/output.js")).unwrap(),
 		process_file("js", &dir.clone().join("outer-html/source.js"))
 	);
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("outer-html/output-sorted.js")).unwrap(),
+		process_file_with_sort("js", &dir.clone().join("outer-html/source.js"))
+	);
 
 	// querySelector()
 	assert_eq!(
 		fs::read_to_string(dir.clone().join("query-selector/output.js")).unwrap(),
 		process_file("js", &dir.clone().join("query-selector/source.js"))
+	);
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("query-selector/output-sorted.js")).unwrap(),
+		process_file_with_sort("js", &dir.clone().join("query-selector/source.js"))
 	);
 
 	// querySelectorAll()
@@ -192,11 +307,19 @@ fn js_files() {
 		fs::read_to_string(dir.clone().join("query-selector-all/output.js")).unwrap(),
 		process_file("js", &dir.clone().join("query-selector-all/source.js"))
 	);
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("query-selector-all/output-sorted.js")).unwrap(),
+		process_file_with_sort("js", &dir.clone().join("query-selector-all/source.js"))
+	);
 
 	// setAttribute()
 	assert_eq!(
 		fs::read_to_string(dir.clone().join("set-attribute/output.js")).unwrap(),
 		process_file("js", &dir.clone().join("set-attribute/source.js"))
+	);
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("set-attribute/output-sorted.js")).unwrap(),
+		process_file_with_sort("js", &dir.clone().join("set-attribute/source.js"))
 	);
 
 	// window.location
@@ -204,11 +327,19 @@ fn js_files() {
 		fs::read_to_string(dir.clone().join("location/output.js")).unwrap(),
 		process_file("js", &dir.clone().join("location/source.js"))
 	);
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("location/output-sorted.js")).unwrap(),
+		process_file_with_sort("js", &dir.clone().join("location/source.js"))
+	);
 
 	// window.location.assign()
 	assert_eq!(
 		fs::read_to_string(dir.clone().join("window-location-assign/output.js")).unwrap(),
 		process_file("js", &dir.clone().join("window-location-assign/source.js"))
+	);
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("window-location-assign/output-sorted.js")).unwrap(),
+		process_file_with_sort("js", &dir.clone().join("window-location-assign/source.js"))
 	);
 
 	// window.location.replace()
@@ -216,11 +347,19 @@ fn js_files() {
 		fs::read_to_string(dir.clone().join("window-location-replace/output.js")).unwrap(),
 		process_file("js", &dir.clone().join("window-location-replace/source.js"))
 	);
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("window-location-replace/output-sorted.js")).unwrap(),
+		process_file_with_sort("js", &dir.clone().join("window-location-replace/source.js"))
+	);
 
 	// window.open()
 	assert_eq!(
 		fs::read_to_string(dir.clone().join("window-open/output.js")).unwrap(),
 		process_file("js", &dir.clone().join("window-open/source.js"))
+	);
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("window-open/output-sorted.js")).unwrap(),
+		process_file_with_sort("js", &dir.clone().join("window-open/source.js"))
 	);
 }
 
@@ -233,11 +372,19 @@ fn html_files() {
 		fs::read_to_string(dir.clone().join("anchor-links/output.html")).unwrap(),
 		process_file("html", &dir.clone().join("anchor-links/source.html")),
 	);
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("anchor-links/output-sorted.html")).unwrap(),
+		process_file_with_sort("html", &dir.clone().join("anchor-links/source.html")),
+	);
 
 	// Attributes
 	assert_eq!(
 		fs::read_to_string(dir.clone().join("attributes/output.html")).unwrap(),
 		process_file("html", &dir.clone().join("attributes/source.html")),
+	);
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("attributes/output-sorted.html")).unwrap(),
+		process_file_with_sort("html", &dir.clone().join("attributes/source.html")),
 	);
 
 	// Body only
@@ -245,11 +392,19 @@ fn html_files() {
 		fs::read_to_string(dir.clone().join("body-only/output.html")).unwrap(),
 		process_file("html", &dir.clone().join("body-only/source.html")),
 	);
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("body-only/output-sorted.html")).unwrap(),
+		process_file_with_sort("html", &dir.clone().join("body-only/source.html")),
+	);
 
 	// Escaped chars
 	assert_eq!(
 		fs::read_to_string(dir.clone().join("escaped-chars/output.html")).unwrap(),
 		process_file("html", &dir.clone().join("escaped-chars/source.html")),
+	);
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("escaped-chars/output-sorted.html")).unwrap(),
+		process_file_with_sort("html", &dir.clone().join("escaped-chars/source.html")),
 	);
 
 	// Edge cases
@@ -257,11 +412,19 @@ fn html_files() {
 		fs::read_to_string(dir.clone().join("edge-cases/output.html")).unwrap(),
 		process_file("html", &dir.clone().join("edge-cases/source.html")),
 	);
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("edge-cases/output-sorted.html")).unwrap(),
+		process_file_with_sort("html", &dir.clone().join("edge-cases/source.html")),
+	);
 
 	// Placeholders
 	assert_eq!(
 		fs::read_to_string(dir.clone().join("prefixed-selectors/output.html")).unwrap(),
 		process_file("html", &dir.clone().join("prefixed-selectors/source.html")),
+	);
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("prefixed-selectors/output-sorted.html")).unwrap(),
+		process_file_with_sort("html", &dir.clone().join("prefixed-selectors/source.html")),
 	);
 }
 
@@ -274,11 +437,19 @@ fn svg_files() {
 		fs::read_to_string(dir.clone().join("general-selectors/output.svg")).unwrap(),
 		process_file("svg", &dir.clone().join("general-selectors/source.svg")),
 	);
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("general-selectors/output-sorted.svg")).unwrap(),
+		process_file_with_sort("svg", &dir.clone().join("general-selectors/source.svg")),
+	);
 
 	// Attributes
 	assert_eq!(
 		fs::read_to_string(dir.clone().join("attributes/output.svg")).unwrap(),
 		process_file("svg", &dir.clone().join("attributes/source.svg")),
+	);
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("attributes/output-sorted.svg")).unwrap(),
+		process_file_with_sort("svg", &dir.clone().join("attributes/source.svg")),
 	);
 }
 
@@ -301,6 +472,36 @@ fn process_file(
 	}
 
 	config.current_step = ProcessingSteps::EncodingSelectors;
+	selectors.process(&mut config);
+	config.current_step = ProcessingSteps::WritingToFiles;
+
+	match file_type {
+		"css" => parse_selectors::write_to_css(&mut file, &mut selectors, &config),
+		"js" => parse_selectors::write_to_js(&mut file, &mut selectors, &config),
+		"html" | "svg" => parse_selectors::write_to_html(&mut file, &mut selectors, &config),
+		_ => panic!("file_type not one of the following: css, js, html or svg."),
+	}
+
+	file.to_owned()
+}
+
+fn process_file_with_sort(
+	file_type: &str,
+	file_path: &PathBuf,
+) -> String {
+	let mut file = fs::read_to_string(file_path).unwrap();
+	let mut selectors = Selectors::new();
+	let mut config = Config::default();
+
+	match file_type {
+		"css" => parse_selectors::read_from_css(&mut file, &mut selectors, &config),
+		"js" => parse_selectors::read_from_js(&mut file, &mut selectors, &config),
+		"html" | "svg" => parse_selectors::read_from_html(&mut file, &mut selectors, &config),
+		_ => panic!("file_type not one of the following: css, js, html or svg."),
+	}
+
+	config.current_step = ProcessingSteps::EncodingSelectors;
+	selectors.sort_by_frequency();
 	selectors.process(&mut config);
 	config.current_step = ProcessingSteps::WritingToFiles;
 

@@ -1,0 +1,39 @@
+<!-- a #a #c .c -->
+<button type="button" data-toggle="modal" data-target="#a"></button>
+<div id="foo" class="foo c b"></div>
+<component data-classes="b f foo"></component>
+<code>
+// See: http://example.com/#a
+// See: files/#b
+</code>
+
+<style>
+	#a {}
+	.b, .f, .foo {}
+
+	.g::after {
+		content: "./path/#b";
+	}
+
+	.g::before {
+		content: "./path/#foo";
+	}
+
+	#bar {}
+	[id="bar"] {}
+</style>
+
+<script>
+	a.classList.add(() => {
+		if (foo) return "a";
+		else if (bar) return "d a";
+		else if (baz) return "e";
+	});
+	document.getElementById('baz');
+	document.getElementsByClassName('foo');
+	document.querySelector('#baz');
+	b.classList.add('is-active', 'h');
+</script>
+
+<div style="mask-image: url(foo.svg#foo)"></div>
+<div style="mask-image: url('foo.svg#bar')"></div>

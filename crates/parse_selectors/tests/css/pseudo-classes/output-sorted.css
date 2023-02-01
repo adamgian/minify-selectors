@@ -1,0 +1,69 @@
+.a:autofill {}
+.a:enabled {}
+.a:disabled {}
+.a:read-only {}
+.a:read-write {}
+.a:placeholder-shown {}
+.a:default {}
+.a:checked {}
+.a:indeterminate {}
+.a:blank {}
+.a:valid {}
+.a:invalid {}
+.a:in-range {}
+.a:out-of-range {}
+.a:required {}
+.a:optional {}
+.a:user-invalid {}
+
+.d:dir(rtl) {}
+.d:lang(nl) {}
+.d:lang(en) > .a p {}
+
+.e:any-link {}
+.e:link {}
+.e:visited {}
+.e:local-link {}
+.e:target {}
+.e:target-within {}
+.e:scope {}
+
+.f:playing {}
+.f:paused {}
+
+.c:root {}
+.c:empty {}
+.c:nth-child(odd) {}
+.c:nth-last-child(even) {}
+.c:first-child {}
+.c:last-child {}
+.c:only-child {}
+.c:nth-of-type(2n+1) {}
+.c:nth-last-of-type(3n+4) {}
+.c:first-of-type {}
+.c:last-of-type {}
+.c:only-of-type {}
+
+.b:hover {}
+.b:active {}
+.b:focus {}
+.b:focus-within {}
+.b:focus-visible {}
+
+.b:has(#a) {}
+.b:has(> #b) {}
+.b:has(img) {}
+.b:has(foo) {}
+.b:has(foo + bar) {}
+.b:not(#c) {}
+.b:not(:has(#d)) {}
+.b:where(aside.a, footer.a) {}
+:is(thead.a, tfoot.a) :is(th.d, td.d) {}
+.b:is(aside.a, footer.a) {}
+
+.d:hover {}
+.d:hover {}
+.d:hover {}
+.d:hover {}
+.d:hover {}
+.d:hover {}

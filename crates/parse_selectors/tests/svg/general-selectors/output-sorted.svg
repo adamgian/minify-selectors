@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36">
+
+	<style>
+		.c, .e, .f, .g, .h, .l {}
+
+		.d {
+			fill: white;
+		}
+
+		.b.b path {
+			stroke: none !important;
+		}
+
+		.a {
+			fill: none;
+		}
+
+		.a.n {transform:translate(-2px, -2px)}
+		.a.i {transform:translate(-1px, -2px)}
+		.a.o {transform:translate(0, -2px)}
+		.a.p {transform:translate(-2px, -1px)}
+		.a.q {transform:translate(-1px, -1px)}
+		.a.r {transform:translate(0, -1px)}
+		.a.j {transform:translate(-2px, 0)}
+		.a.k {transform:translate(-1px, 0)}
+		.a.m {transform:translate(0, 0)}
+	</style>
+
+	<g class="b">
+		<rect class="c" height="0" width="0" x="18" y="18"/>
+		<path class="d" d="M23,20.5c0-2.76-2.24-5-5-5s-5,2.24-5,5H23z"/>
+		<path d="M18,15.5c-2.76,0-5,2.24-5,5h0.25h0.25h9h0.25H23C23,17.74,20.76,15.5,18,15.5z M13.55,20c0.25-2.25,2.13-4,4.45-4
+			s4.2,1.75,4.45,4H13.55z"/>
+		<text
+			class="e"
+			dominant-baseline="central"
+			text-anchor="middle"
+			x="24"
+			y="12">
+		</text>
+		<text
+			class="f"
+			dominant-baseline="central"
+			style="font-size:3px"
+			text-anchor="middle"
+			x="18"
+			y="18.33">
+		</text>
+		<g class="g">
+			<rect class="h" height="5" width="10" x="13" y="15.5"/>
+			<rect class="a i" height="2" width="2" x="18" y="15.5"/>
+			<rect class="a j" height="2" width="2" x="13" y="20.5"/>
+			<rect class="a k l" height="2" width="2" x="18" y="20.5"/>
+			<rect class="a m" height="2" width="2" x="23" y="20.5"/>
+		</g>
+		<a xlink:href="https://developer.mozilla.org/"></a>
+		<a xlink:href="https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/xlink:href#pattern"></a>
+		<a xlink:href="/#a"></a>
+		<a xlink:href="#b"></a>
+	</g>
+
+</svg>

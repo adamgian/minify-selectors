@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Document</title>
+	</head>
+
+	<body>
+		<!--
+			#d
+			#e
+			#f
+			#h
+			#i
+			#l
+			#j
+			#g
+			#k
+		-->
+
+		<section id="a" class="a b c">
+			<div id='c' class='a'></div>
+			<div id=b class=a></div>
+			<DIV ID=b CLASS=a></DIV>
+			<div id=d class=a />
+		</section>
+
+		<header class="a b c"></header>
+		<HEADER CLASS="a b c"></HEADER>
+
+		<div aria-describedby="a"></div>
+		<div ARIA-DESCRIBEDBY="a"></div>
+		<div aria-labelledby="a"></div>
+		<div ARIA-LABELLEDBY="a"></div>
+		<form id="e">
+			<input form="e" id="f">
+			<label for="f" itemref="f h"></label>
+			<input form="e" id="h" list="i"></input>
+			<datalist id="i"></datalist>
+		</form>
+		<form ID="l">
+			<input FORM="j" ID="g">
+			<label FOR="g" ITEMREF="g k"></label>
+			<input FORM="j" ID="k" LIST="c"></input>
+			<datalist ID="c"></datalist>
+		</form>
+
+		<div
+			class="
+				a b
+				c d
+			">
+		</div>
+
+		<table>
+			<tbody>
+				<tbody>
+					<tr>
+						<th id="b"></th>
+						<td headers="b"></td>
+					</tr>
+					<TR>
+						<TH ID="d"></TH>
+						<TD HEADERS="d"></TD>
+					</TR>
+				</tbody>
+			</tbody>
+		</table>
+
+		<a href="#a"></a>
+		<a href="/#a"></a>
+
+		<div style="mask-image: url(foo.svg#c)"></div>
+		<div style="mask-image: url('foo.svg#b')"></div>
+		<div style="mask-image: url('foo.svg#foo')"></div>
+		<svg class="a" aria-hidden="true"><use xlink:href="#a"></use></svg>
+
+		<!-- JS in event attributes -->
+		<button onclick="((el) => { setTimeout(() => { if (el.classList.contains('a')) { el.classList.add('b'); el.classList.remove('a'); } }, 3000) })(document.querySelector('.c.d'))"></button>
+		<div class="a" onclick="(() => this.classList.toggle('b'))()">
+	</body>
+</html>

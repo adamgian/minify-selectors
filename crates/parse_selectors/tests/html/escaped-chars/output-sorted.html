@@ -1,0 +1,33 @@
+<!--
+	#a
+	.a
+	.b
+	.c
+	.d
+-->
+
+<div class="a b c" id="a"></div>
+<div class="a b c" id="a"></div>
+<div class="a b c" id="a"></div>
+<div CLASS="a b c" ID="a"></div>
+<div CLASS="a b c" ID="a"></div>
+
+<!-- Named char ref -->
+<div class="d"></div>
+<div class="d"></div>
+<div class="d"></div>
+<!-- TODO: -->
+<!-- <div class="CLASS-&amp"></div> -->
+<!-- <div class="CLASS-&AMP"></div> -->
+<!-- <div class="CLASS-&amp;"></div> -->
+
+<!-- Invalid named char ref -->
+<!-- .e .f -->
+<div class="e"></div>
+<div class="f"></div>
+
+<!-- Need to escape in CSS -->
+<!-- .g .h -->
+<div class="g h"></div>
+
+<div cl&#x0041;ss="foo"></div>
