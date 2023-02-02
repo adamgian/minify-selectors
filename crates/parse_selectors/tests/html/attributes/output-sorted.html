@@ -20,15 +20,16 @@
 		-->
 
 		<section id="a" class="a b c">
-			<div id='c' class='a'></div>
-			<div id=b class=a></div>
-			<DIV ID=b CLASS=a></DIV>
+			<div id='b' class='a'></div>
+			<div id=c class=a></div>
+			<DIV ID=c CLASS=a></DIV>
 			<div id=d class=a />
 		</section>
 
 		<header class="a b c"></header>
 		<HEADER CLASS="a b c"></HEADER>
 
+		<div aria-controls="a b"></div>
 		<div aria-describedby="a"></div>
 		<div ARIA-DESCRIBEDBY="a"></div>
 		<div aria-labelledby="a"></div>
@@ -42,8 +43,8 @@
 		<form ID="l">
 			<input FORM="j" ID="g">
 			<label FOR="g" ITEMREF="g k"></label>
-			<input FORM="j" ID="k" LIST="c"></input>
-			<datalist ID="c"></datalist>
+			<input FORM="j" ID="k" LIST="b"></input>
+			<datalist ID="b"></datalist>
 		</form>
 
 		<div
@@ -57,8 +58,8 @@
 			<tbody>
 				<tbody>
 					<tr>
-						<th id="b"></th>
-						<td headers="b"></td>
+						<th id="c"></th>
+						<td headers="c"></td>
 					</tr>
 					<TR>
 						<TH ID="d"></TH>
@@ -71,8 +72,8 @@
 		<a href="#a"></a>
 		<a href="/#a"></a>
 
-		<div style="mask-image: url(foo.svg#c)"></div>
-		<div style="mask-image: url('foo.svg#b')"></div>
+		<div style="mask-image: url(foo.svg#b)"></div>
+		<div style="mask-image: url('foo.svg#c')"></div>
 		<div style="mask-image: url('foo.svg#foo')"></div>
 		<svg class="a" aria-hidden="true"><use xlink:href="#a"></use></svg>
 

@@ -1,9 +1,12 @@
-# v2.3.0
+# v2.3.1
 <sub>TBD</sub>
 
 ### Updates
 - Add `--parallel` option to enable concurrent file processing
 - Sort selectors by frequency before generating minified identifiers
+
+### Fixes
+- Missing support for aria-controls HTML attribute
 
 <br>
 

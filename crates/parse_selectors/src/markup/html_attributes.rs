@@ -11,6 +11,7 @@ lazy_static! {
 		(String::from("class"), String::from("class")),
 
 		(String::from("id"), String::from("id")),
+		(String::from("aria-controls"), String::from("id")),
 		(String::from("aria-describedby"), String::from("id")),
 		(String::from("aria-labelledby"), String::from("id")),
 		(String::from("for"), String::from("id")),
