@@ -1,4 +1,4 @@
-# v2.3.1
+# v2.3.2
 <sub>TBD</sub>
 
 ### Updates
@@ -6,7 +6,8 @@
 - Sort selectors by frequency before generating minified identifiers
 
 ### Fixes
-- Missing support for aria-controls HTML attribute
+- Missing support for `aria-controls` HTML attribute
+- Do not skip IDs that are only used in markup attributes
 
 <br>
 
@@ -17,7 +18,7 @@
 <sub>17 Jan 2023</sub>
 
 ### Updates
-- Skip replacing selectors if they are only used in HTML
+- Skip replacing selectors if they are only used in HTML attributes
 
 ### Fixes
 - Convert any CSS character escapes in prefixed selectors before adding to map

@@ -33,12 +33,7 @@ pub fn read_from_html(
 	selectors: &mut Selectors,
 	config: &Config,
 ) {
-	analyse_html(
-		file_string,
-		selectors,
-		config,
-		Some(SelectorUsage::Identifier),
-	);
+	analyse_html(file_string, selectors, config, None);
 }
 
 pub fn write_to_html(
@@ -96,7 +91,7 @@ pub fn get_encoded_selector(
 }
 
 /// Returns an iterator of function arguments.
-pub fn get_function_arguments<'r, 't>(string: &'t str) -> FindCaptures<'r, 't> {
+pub fn get_function_arguments(string: &str) -> FindCaptures {
 	regexes::STRING_DELIMITED_BY_COMMA.captures_iter(string)
 }
 

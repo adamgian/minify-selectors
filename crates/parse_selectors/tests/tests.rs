@@ -225,7 +225,11 @@ fn js_files() {
 		)
 	);
 	assert_eq!(
-		fs::read_to_string(dir.clone().join("get-elements-by-class-name/output-sorted.js")).unwrap(),
+		fs::read_to_string(
+			dir.clone()
+				.join("get-elements-by-class-name/output-sorted.js")
+		)
+		.unwrap(),
 		process_file_with_sort(
 			"js",
 			&dir.clone().join("get-elements-by-class-name/source.js")

@@ -74,7 +74,7 @@ pub fn analyse_html_attributes(
 		let attribute_name: &str = capture.at(1).unwrap();
 		let mut attribute_value: String = unescape_html_chars(capture.at(4).unwrap());
 
-		// Work out if value(s) are classes, IDs or selectors.
+		// Work out if value(s) are classes, IDs, selectors, etc.
 		let attribute_type_designation: &str =
 			WHITELIST.get(&attribute_name.to_ascii_lowercase()).unwrap();
 
@@ -84,7 +84,17 @@ pub fn analyse_html_attributes(
 					&mut attribute_value,
 					selectors,
 					attribute_type_designation,
-					usage,
+					if usage.is_none() {
+						Some(
+							if attribute_type_designation == "id" {
+								SelectorUsage::MarkupId
+							} else {
+								SelectorUsage::MarkupClass
+							},
+						)
+					} else {
+						usage
+					},
 				);
 			},
 
@@ -153,7 +163,7 @@ pub fn rewrite_html_attributes(
 		let attribute_quote: &str = capture.at(3).unwrap_or("");
 		let mut attribute_value: String = unescape_html_chars(capture.at(4).unwrap());
 
-		// Work out if value(s) are classes, IDs or selectors.
+		// Work out if value(s) are classes, IDs, selectors, etc.
 		let attribute_type_designation: &str =
 			WHITELIST.get(&attribute_name.to_ascii_lowercase()).unwrap();
 

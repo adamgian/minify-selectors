@@ -111,13 +111,14 @@ impl Default for Config {
 
 
 /// Metadata for selector
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct Selector {
-	pub r#type: SelectorType,
+	pub r#type: Option<SelectorType>,
 	pub replacement: Option<String>,
 	pub counter: usize,
+	pub markup_class_counter: usize,
+	pub markup_id_counter: usize,
 	pub selector_string_counter: usize,
-	pub identifier_counter: usize,
 	pub anchor_counter: usize,
 	pub style_counter: usize,
 	pub script_counter: usize,
@@ -128,13 +129,13 @@ pub struct Selector {
 pub enum SelectorType {
 	Class,
 	Id,
-	Undefined,
 }
 
 #[derive(Clone, Copy, Debug)]
 pub enum SelectorUsage {
-	Identifier,
-	Selector,
+	MarkupClass,
+	MarkupId,
+	SelectorString,
 	Anchor,
 	Style,
 	Script,
@@ -145,8 +146,8 @@ impl Selector {
 	pub fn new(selector: &str) -> Self {
 		Self {
 			r#type: match selector.chars().next() {
-				Some('.') => SelectorType::Class,
-				Some('#') => SelectorType::Id,
+				Some('.') => Some(SelectorType::Class),
+				Some('#') => Some(SelectorType::Id),
 				_ => panic!("Missing or unknown selector type"),
 			},
 			..Default::default()
@@ -161,8 +162,9 @@ impl Selector {
 			self.counter += 1;
 		}
 		match usage {
-			Some(SelectorUsage::Identifier) => self.identifier_counter += 1,
-			Some(SelectorUsage::Selector) => self.selector_string_counter += 1,
+			Some(SelectorUsage::MarkupClass) => self.markup_class_counter += 1,
+			Some(SelectorUsage::MarkupId) => self.markup_id_counter += 1,
+			Some(SelectorUsage::SelectorString) => self.selector_string_counter += 1,
 			Some(SelectorUsage::Anchor) => self.anchor_counter += 1,
 			Some(SelectorUsage::Style) => self.style_counter += 1,
 			Some(SelectorUsage::Script) => self.script_counter += 1,
@@ -176,7 +178,8 @@ impl Selector {
 		incoming: Selector,
 	) {
 		self.counter += incoming.counter;
-		self.identifier_counter += incoming.identifier_counter;
+		self.markup_class_counter += incoming.markup_class_counter;
+		self.markup_id_counter += incoming.markup_id_counter;
 		self.selector_string_counter += incoming.selector_string_counter;
 		self.anchor_counter += incoming.anchor_counter;
 		self.style_counter += incoming.style_counter;
@@ -189,22 +192,6 @@ impl Selector {
 		replacement: String,
 	) {
 		self.replacement = Some(replacement);
-	}
-}
-
-impl Default for Selector {
-	fn default() -> Self {
-		Self {
-			r#type: SelectorType::Undefined,
-			replacement: None,
-			counter: 0,
-			identifier_counter: 0,
-			selector_string_counter: 0,
-			anchor_counter: 0,
-			style_counter: 0,
-			script_counter: 0,
-			prefix_counter: 0,
-		}
 	}
 }
 
@@ -257,27 +244,28 @@ impl Selectors {
 		&mut self,
 		config: &mut Config,
 	) {
-		for val in self.map.values_mut() {
+		// Loop through selectors map and assign an encoded selector to each.
+		for value in self.map.values_mut() {
 			// Quick way to check if selectors are only being used in HTML
 			// attributes and no where else. Skip generating a replacement.
-			if val.identifier_counter == val.counter {
+			if value.markup_class_counter == value.counter {
 				continue;
 			}
 
-			val.set_replacement(encode_selector::to_radix(
-				match val.r#type {
-					SelectorType::Class => &self.class_counter,
-					SelectorType::Id => &self.id_counter,
-					SelectorType::Undefined => {
+			value.set_replacement(encode_selector::to_radix(
+				match value.r#type {
+					Some(SelectorType::Class) => &self.class_counter,
+					Some(SelectorType::Id) => &self.id_counter,
+					None => {
 						panic!("Trying to encode a selector with undefined type.")
 					},
 				},
 				&config.alphabet,
 			));
 
-			if val.r#type == SelectorType::Class {
+			if value.r#type == Some(SelectorType::Class) {
 				self.class_counter += 1;
-			} else if val.r#type == SelectorType::Id {
+			} else if value.r#type == Some(SelectorType::Id) {
 				self.id_counter += 1;
 			}
 		}
