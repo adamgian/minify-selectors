@@ -7,9 +7,9 @@
 
 		<style>
 			/* comment about .foo > .bar */
-			.i > .j {}
+			.j > .k {}
 			@media print {
-				.k {}
+				.l {}
 			}
 		</style>
 
@@ -21,7 +21,7 @@
 			 */
 			if (foo.bar < foo.baz) {
 				// document.classList.add('baz');
-				document.classList.add('f');
+				document.classList.add('g');
 			}
 		</script>
 	</head>
@@ -64,8 +64,10 @@
 			&lt;div class="foo"&gt;&lt;/div&gt;
 		</code>
 
+		<input class="a f m">
+
 		<script type="text/javascript">
-			a.className += 'g h';
+			a.className += 'h i';
 		</script>
 	</body>
 </html>

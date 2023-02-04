@@ -1,4 +1,4 @@
-# v2.3.2
+# v2.3.3
 <sub>TBD</sub>
 
 ### Updates
@@ -8,6 +8,7 @@
 ### Fixes
 - Missing support for `aria-controls` HTML attribute
 - Do not skip IDs that are only used in markup attributes
+- Encode skipped classes if it conflicts with an encoded one
 
 <br>
 

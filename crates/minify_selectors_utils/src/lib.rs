@@ -1,3 +1,4 @@
+use std::collections::HashSet;
 use std::path::PathBuf;
 
 use clap::Parser;
@@ -244,29 +245,66 @@ impl Selectors {
 		&mut self,
 		config: &mut Config,
 	) {
-		// Loop through selectors map and assign an encoded selector to each.
-		for value in self.map.values_mut() {
-			// Quick way to check if selectors are only being used in HTML
-			// attributes and no where else. Skip generating a replacement.
-			if value.markup_class_counter == value.counter {
-				continue;
+		let mut encoded_classes: HashSet<String> = HashSet::new();
+		let mut skipped_classes: HashSet<String> = HashSet::new();
+		let mut requires_recheck: bool;
+
+		loop {
+			requires_recheck = false;
+
+			// Loop through selectors map and assign an encoded selector to each.
+			for (key, value) in self.map.iter_mut() {
+
+				// Skip generating a replacement if classes are only being used
+				// in markup attributes and no where else.
+				if value.markup_class_counter == value.counter
+					&& !encoded_classes.contains(key.clone().strip_prefix('.').unwrap())
+				{
+					if !skipped_classes.contains(&key.clone()) {
+						skipped_classes.insert(key.clone());
+						requires_recheck = true;
+					}
+					continue;
+				}
+
+				// There will be a conflict with an encoded class with the skipped class name,
+				// therefore it cannot be skipped and will need to be encoded.
+				if value.markup_class_counter == value.counter
+					&& encoded_classes.contains(key.clone().strip_prefix('.').unwrap())
+					&& skipped_classes.contains(&key.clone())
+				{
+					skipped_classes.remove(&key.clone());
+					// Requests another loop over since there's a new encoded class being
+					// added. Need to make sure any remaining skipped classes still do not clash.
+					requires_recheck = true;
+				}
+
+				if value.replacement.is_some() {
+					continue;
+				}
+
+				value.set_replacement(encode_selector::to_radix(
+					match value.r#type {
+						Some(SelectorType::Class) => &self.class_counter,
+						Some(SelectorType::Id) => &self.id_counter,
+						None => {
+							panic!("Trying to encode a selector with undefined type.");
+						},
+					},
+					&config.alphabet,
+				));
+
+				if value.r#type == Some(SelectorType::Class) {
+					// Also keep track of encoded class name
+					encoded_classes.insert(value.replacement.to_owned().unwrap());
+					self.class_counter += 1;
+				} else if value.r#type == Some(SelectorType::Id) {
+					self.id_counter += 1;
+				}
 			}
 
-			value.set_replacement(encode_selector::to_radix(
-				match value.r#type {
-					Some(SelectorType::Class) => &self.class_counter,
-					Some(SelectorType::Id) => &self.id_counter,
-					None => {
-						panic!("Trying to encode a selector with undefined type.")
-					},
-				},
-				&config.alphabet,
-			));
-
-			if value.r#type == Some(SelectorType::Class) {
-				self.class_counter += 1;
-			} else if value.r#type == Some(SelectorType::Id) {
-				self.id_counter += 1;
+			if skipped_classes.is_empty() || !requires_recheck {
+				break;
 			}
 		}
 	}
