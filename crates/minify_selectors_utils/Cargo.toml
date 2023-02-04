@@ -7,7 +7,7 @@ keywords = []
 license = "Apache-2.0"
 name = "minify_selectors_utils"
 repository = "https://github.com/adamgian/minify-selectors.git"
-version = "2.1.3"
+version = "2.3.3"
 
 
 
@@ -16,4 +16,4 @@ version = "2.1.3"
 clap = { version = "4.0.15", features = ["derive"] }
 indexmap = { version = "1.9.2" }
 
-encode_selector = { version = "0.4.0", path = "../encode_selector" }
+encode_selector = { version = "0.4.1", path = "../encode_selector" }

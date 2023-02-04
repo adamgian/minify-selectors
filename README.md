@@ -312,5 +312,21 @@ Or, you do not want minify-selectors to encode certain selectors (for reasons su
 				<br><br>Default: <code>0</code>
 			</td>
 		</tr>
+		<tr>
+			<td valign="top">
+				<code lang="shell">--parallel</code>
+			</td>
+			<td>
+				Enable concurrent processing.
+			</td>
+		</tr>
+		<tr>
+			<td valign="top">
+				<code lang="shell">--disable-sort</code>
+			</td>
+			<td>
+				Skip reordering of selectors by frequency before minifying.
+			</td>
+		</tr>
 	</tbody>
 </table>

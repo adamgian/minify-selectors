@@ -1,5 +1,5 @@
 # v2.3.3
-<sub>TBD</sub>
+<sub>4 Feb 2023</sub>
 
 ### Updates
 - Add `--parallel` option to enable concurrent file processing
