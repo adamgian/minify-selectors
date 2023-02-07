@@ -1,3 +1,14 @@
+# v2.3.4
+<sub>TBD</sub>
+
+### Fixes
+- Rename `--disable-sort` CLI option to `--sort`
+
+<br>
+
+
+
+
 # v2.3.3
 <sub>4 Feb 2023</sub>
 

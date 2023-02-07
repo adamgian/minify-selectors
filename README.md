@@ -326,12 +326,12 @@ Or, you do not want minify-selectors to encode certain selectors (for reasons su
 		</tr>
 		<tr>
 			<td valign="top">
-				<code lang="shell">--disable-sort</code>
+				<code lang="shell">--sort</code>
 			</td>
 			<td>
 				<sup>Optional</sup><br>
-				Skip reordering of selectors by frequency before minifying.
-				<br><br>Default: <code>false</code>
+				Reorder selectors by frequency before minifying.
+				<br><br>Default: <code>true</code>
 			</td>
 		</tr>
 	</tbody>

@@ -35,9 +35,9 @@ pub struct Cli {
 	#[clap(long)]
 	parallel: Option<Option<bool>>,
 
-	/// Skip reordering of selectors by frequency before minifying
-	#[clap(long = "disable-sort")]
-	disable_sort: Option<Option<bool>>,
+	/// Reorder selectors by frequency before minifying
+	#[clap(long)]
+	sort: Option<Option<bool>>,
 }
 
 
@@ -51,7 +51,7 @@ pub struct Config {
 	pub start_index: usize,
 	pub current_step: ProcessingSteps,
 	pub parallel: bool,
-	pub disable_sort: bool,
+	pub sort: bool,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -81,11 +81,11 @@ impl Config {
 			Some(Some(true)) => true,   // --parallel=true
 			Some(Some(false)) => false, // --parallel=false
 		};
-		config.disable_sort = match &args.disable_sort {
-			None => false,
-			Some(None) => true,         // --disable-sort
-			Some(Some(true)) => true,   // --disable-sort=true
-			Some(Some(false)) => false, // --disable-sort=false
+		config.sort = match &args.sort {
+			None => true,
+			Some(None) => true,         // --sort
+			Some(Some(true)) => true,   // --sort=true
+			Some(Some(false)) => false, // --sort=false
 		};
 
 		config
@@ -103,7 +103,7 @@ impl Default for Config {
 			start_index: 0,
 			current_step: ProcessingSteps::ReadingFromFiles,
 			parallel: false,
-			disable_sort: false,
+			sort: true,
 		}
 	}
 }
