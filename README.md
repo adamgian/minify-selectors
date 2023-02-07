@@ -299,6 +299,7 @@ Or, you do not want minify-selectors to encode certain selectors (for reasons su
 				<code lang="shell">--alphabet</code>
 			</td>
 			<td>
+				<sup>Optional</sup><br>
 				String sequence of characters to use when encoding.
 				<br><br>Default: <code>"0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"</code>
 			</td>
@@ -308,6 +309,7 @@ Or, you do not want minify-selectors to encode certain selectors (for reasons su
 				<code lang="shell">--start-index</code>
 			</td>
 			<td>
+				<sup>Optional</sup><br>
 				Index to start incrementing and encoding from.
 				<br><br>Default: <code>0</code>
 			</td>
@@ -317,7 +319,9 @@ Or, you do not want minify-selectors to encode certain selectors (for reasons su
 				<code lang="shell">--parallel</code>
 			</td>
 			<td>
+				<sup>Optional</sup><br>
 				Enable concurrent processing.
+				<br><br>Default: <code>false</code>
 			</td>
 		</tr>
 		<tr>
@@ -325,7 +329,9 @@ Or, you do not want minify-selectors to encode certain selectors (for reasons su
 				<code lang="shell">--disable-sort</code>
 			</td>
 			<td>
+				<sup>Optional</sup><br>
 				Skip reordering of selectors by frequency before minifying.
+				<br><br>Default: <code>false</code>
 			</td>
 		</tr>
 	</tbody>
