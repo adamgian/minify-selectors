@@ -55,5 +55,6 @@
 [class*="baz"] {}
 
 .d {}
+[data-target="b"] {}
 [data-toggle="baz"] {}
 [data-toggle="b"] {}

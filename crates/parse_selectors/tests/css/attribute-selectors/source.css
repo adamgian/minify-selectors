@@ -55,5 +55,6 @@
 [class*="baz"] {}
 
 .CLASS-1 {}
+[data-target="ID-1"] {}
 [data-toggle="baz"] {}
 [data-toggle="__id--ID-1"] {}

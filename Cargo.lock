@@ -617,6 +617,7 @@ dependencies = [
  "encode_selector",
  "lazy_static",
  "minify_selectors_utils",
+ "once_cell",
  "onig",
 ]
 
