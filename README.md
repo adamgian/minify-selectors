@@ -273,7 +273,7 @@ Or, you do not want minify-selectors to encode certain selectors (for reasons su
 <table>
 	<thead>
 		<tr>
-			<th align="left" width="165">Option</th>
+			<th align="left" width="180">Option</th>
 			<th align="left">Description</th>
 		</tr>
 	</thead>
@@ -332,6 +332,60 @@ Or, you do not want minify-selectors to encode certain selectors (for reasons su
 				<sup>Optional</sup><br>
 				Reorder selectors by frequency before minifying.
 				<br><br>Default: <code>true</code>
+			</td>
+		</tr>
+		<tr>
+			<td valign="top">
+				<code lang="shell">--custom-class-attribute</code>
+			</td>
+			<td>
+				<sup>Optional</sup><br>
+				Custom HTML and SVG attributes that contain a space-separated list of classes.
+			</td>
+		</tr>
+		<tr>
+			<td valign="top">
+				<code lang="shell">--custom-id-attribute</code>
+			</td>
+			<td>
+				<sup>Optional</sup><br>
+				Custom HTML and SVG attributes that contain an ID (or space-separated list of IDs).
+			</td>
+		</tr>
+		<tr>
+			<td valign="top">
+				<code lang="shell">--custom-selector-attribute</code>
+			</td>
+			<td>
+				<sup>Optional</sup><br>
+				Custom HTML and SVG attributes that contain a selector string.
+			</td>
+		</tr>
+		<tr>
+			<td valign="top">
+				<code lang="shell">--custom-anchor-attribute</code>
+			</td>
+			<td>
+				<sup>Optional</sup><br>
+				Custom HTML and SVG attributes that contain a URL.
+			</td>
+		</tr>
+		<tr>
+			<td valign="top">
+				<code lang="shell">--custom-style-attribute</code>
+			</td>
+			<td>
+				<sup>Optional</sup><br>
+				Custom HTML and SVG attributes that contain CSS styles.
+			</td>
+		</tr>
+		<tr>
+			<td valign="top">
+				<code lang="shell">--custom-script-attribute</code>
+			</td>
+			<td>
+				<sup>Optional</sup><br>
+				Custom HTML and SVG attributes that contain JS code.
 			</td>
 		</tr>
 	</tbody>

@@ -38,6 +38,30 @@ pub struct Cli {
 	/// Reorder selectors by frequency before minifying
 	#[clap(long)]
 	sort: Option<Option<bool>>,
+
+	/// Custom attributes that contain space-separated list of classes.
+	#[clap(long = "custom-class-attribute", use_value_delimiter = true)]
+	custom_class_attribute: Option<Vec<String>>,
+
+	/// Custom attributes that contain an ID (or space-separated list of IDs).
+	#[clap(long = "custom-id-attribute", use_value_delimiter = true)]
+	custom_id_attribute: Option<Vec<String>>,
+
+	/// Custom attributes that contain a selector string.
+	#[clap(long = "custom-selector-attribute", use_value_delimiter = true)]
+	custom_selector_attribute: Option<Vec<String>>,
+
+	/// Custom attributes that contain a URL.
+	#[clap(long = "custom-anchor-attribute", use_value_delimiter = true)]
+	custom_anchor_attribute: Option<Vec<String>>,
+
+	/// Custom attributes that contain CSS styles.
+	#[clap(long = "custom-style-attribute", use_value_delimiter = true)]
+	custom_style_attribute: Option<Vec<String>>,
+
+	/// Custom attributes that contain JS code.
+	#[clap(long = "custom-script-attribute", use_value_delimiter = true)]
+	custom_script_attribute: Option<Vec<String>>,
 }
 
 
@@ -52,6 +76,7 @@ pub struct Config {
 	pub current_step: ProcessingSteps,
 	pub parallel: bool,
 	pub sort: bool,
+	pub custom_attributes: Vec<(String, String)>,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -75,6 +100,7 @@ impl Config {
 
 		config.source = PathBuf::from(&args.source);
 		config.output = PathBuf::from(&args.output);
+
 		config.parallel = match &args.parallel {
 			None => false,
 			Some(None) => true,         // --parallel
@@ -87,6 +113,41 @@ impl Config {
 			Some(Some(true)) => true,   // --sort=true
 			Some(Some(false)) => false, // --sort=false
 		};
+
+		let mut custom_attributes: Vec<(String, String)> = vec![];
+
+		if let Some(attributes) = &args.custom_class_attribute {
+			for name in attributes {
+				custom_attributes.push((name.to_string(), "class".to_string()));
+			}
+		}
+		if let Some(attributes) = &args.custom_id_attribute {
+			for name in attributes {
+				custom_attributes.push((name.to_string(), "id".to_string()));
+			}
+		}
+		if let Some(attributes) = &args.custom_selector_attribute {
+			for name in attributes {
+				custom_attributes.push((name.to_string(), "selector".to_string()));
+			}
+		}
+		if let Some(attributes) = &args.custom_anchor_attribute {
+			for name in attributes {
+				custom_attributes.push((name.to_string(), "anchor".to_string()));
+			}
+		}
+		if let Some(attributes) = &args.custom_style_attribute {
+			for name in attributes {
+				custom_attributes.push((name.to_string(), "style".to_string()));
+			}
+		}
+		if let Some(attributes) = &args.custom_script_attribute {
+			for name in attributes {
+				custom_attributes.push((name.to_string(), "script".to_string()));
+			}
+		}
+
+		config.custom_attributes = custom_attributes;
 
 		config
 	}
@@ -104,6 +165,7 @@ impl Default for Config {
 			current_step: ProcessingSteps::ReadingFromFiles,
 			parallel: false,
 			sort: true,
+			custom_attributes: vec![],
 		}
 	}
 }
@@ -254,7 +316,6 @@ impl Selectors {
 
 			// Loop through selectors map and assign an encoded selector to each.
 			for (key, value) in self.map.iter_mut() {
-
 				// Skip generating a replacement if classes are only being used
 				// in markup attributes and no where else.
 				if value.markup_class_counter == value.counter
@@ -267,8 +328,8 @@ impl Selectors {
 					continue;
 				}
 
-				// There will be a conflict with an encoded class with the skipped class name,
-				// therefore it cannot be skipped and will need to be encoded.
+				// Conflicts with an encoded class with the skipped class name,
+				// it cannot be skipped and will need to be encoded.
 				if value.markup_class_counter == value.counter
 					&& encoded_classes.contains(key.clone().strip_prefix('.').unwrap())
 					&& skipped_classes.contains(&key.clone())
