@@ -67,7 +67,11 @@ pub fn analyse_html_attributes(
 
 		// Attribute does not contain classes and/or IDs.
 		// Leave it as is.
-		if !WHITELIST.contains_key(&capture.at(1).unwrap().to_ascii_lowercase()) {
+		if !WHITELIST
+			.get()
+			.unwrap()
+			.contains_key(&capture.at(1).unwrap().to_ascii_lowercase())
+		{
 			continue;
 		}
 
@@ -75,8 +79,11 @@ pub fn analyse_html_attributes(
 		let mut attribute_value: String = unescape_html_chars(capture.at(4).unwrap());
 
 		// Work out if value(s) are classes, IDs, selectors, etc.
-		let attribute_type_designation: &str =
-			WHITELIST.get(&attribute_name.to_ascii_lowercase()).unwrap();
+		let attribute_type_designation: &str = WHITELIST
+			.get()
+			.unwrap()
+			.get(&attribute_name.to_ascii_lowercase())
+			.unwrap();
 
 		match attribute_type_designation {
 			"id" | "class" => {
@@ -155,7 +162,11 @@ pub fn rewrite_html_attributes(
 
 		// Attribute does not contain classes and/or IDs.
 		// Leave it as is.
-		if !WHITELIST.contains_key(&capture.at(1).unwrap().to_ascii_lowercase()) {
+		if !WHITELIST
+			.get()
+			.unwrap()
+			.contains_key(&capture.at(1).unwrap().to_ascii_lowercase())
+		{
 			return capture.at(0).unwrap().to_string();
 		}
 
@@ -164,8 +175,11 @@ pub fn rewrite_html_attributes(
 		let mut attribute_value: String = unescape_html_chars(capture.at(4).unwrap());
 
 		// Work out if value(s) are classes, IDs, selectors, etc.
-		let attribute_type_designation: &str =
-			WHITELIST.get(&attribute_name.to_ascii_lowercase()).unwrap();
+		let attribute_type_designation: &str = WHITELIST
+			.get()
+			.unwrap()
+			.get(&attribute_name.to_ascii_lowercase())
+			.unwrap();
 
 		match attribute_type_designation {
 			"id" | "class" => {

@@ -35,7 +35,7 @@ fn minify_selectors() -> Result<(), Box<dyn Error>> {
 	// Multi-step process (stage 2/3):
 	// Process selectors list and encode into a minified identifier.
 	config.current_step = ProcessingSteps::EncodingSelectors;
-	if !config.disable_sort {
+	if config.sort {
 		selectors.sort_by_frequency();
 	}
 	selectors.process(&mut config);

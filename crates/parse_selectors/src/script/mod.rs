@@ -3,7 +3,7 @@ pub mod regexes;
 use minify_selectors_utils::*;
 use onig::*;
 
-use crate::markup::html_attributes::*;
+use crate::markup::html_attributes::WHITELIST;
 use crate::markup::*;
 use crate::script::regexes as script_regex;
 use crate::style::*;
@@ -112,12 +112,12 @@ pub fn analyse_js_arguments(
 
 				// Check first argument is an known attribute which its value will have
 				// classses or an id. If it is not, leave value as is (second argument).
-				if WHITELIST.contains_key(attribute_name) {
+				if WHITELIST.get().unwrap().contains_key(attribute_name) {
 					if let Some(attribute_value) = function_args.next() {
 						if attribute_value.at(3).is_some() {
 							let mut replacement_value = attribute_value.at(3).unwrap().to_string();
 							let attribute_type_designation: &str =
-								WHITELIST.get(attribute_name).unwrap();
+								WHITELIST.get().unwrap().get(attribute_name).unwrap();
 
 
 							match attribute_type_designation {
@@ -292,12 +292,12 @@ pub fn rewrite_js_arguments(
 
 				// Check first argument is an known attribute which its value will have
 				// classses or an id. If it is not, leave value as is (second argument).
-				if WHITELIST.contains_key(attribute_name) {
+				if WHITELIST.get().unwrap().contains_key(attribute_name) {
 					if let Some(attribute_value) = function_args.next() {
 						if attribute_value.at(3).is_some() {
 							let mut replacement_value = attribute_value.at(3).unwrap().to_string();
 							let attribute_type_designation: &str =
-								WHITELIST.get(attribute_name).unwrap();
+								WHITELIST.get().unwrap().get(attribute_name).unwrap();
 
 
 							match attribute_type_designation {

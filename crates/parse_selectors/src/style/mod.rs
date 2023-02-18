@@ -100,7 +100,7 @@ pub fn analyse_css_attributes(
 		let attribute_flag: &str = capture.at(6).unwrap_or("");
 		let mut attribute_value: String = capture.at(4).unwrap().to_string();
 
-		if !WHITELIST.contains_key(&attribute_name) {
+		if !WHITELIST.get().unwrap().contains_key(&attribute_name) {
 			continue;
 		}
 
@@ -111,7 +111,8 @@ pub fn analyse_css_attributes(
 		}
 
 		// Work out if value(s) are classes, IDs or selectors.
-		let attribute_type_designation: &str = WHITELIST.get(&attribute_name).unwrap();
+		let attribute_type_designation: &str =
+			WHITELIST.get().unwrap().get(&attribute_name).unwrap();
 
 		match attribute_type_designation {
 			"id" | "class" => {
@@ -155,7 +156,7 @@ pub fn rewrite_css_attributes(
 		let mut attribute_value: String = capture.at(4).unwrap().to_string();
 
 		// Attribute does not contain classes and/or IDs. Leave it as is.
-		if !WHITELIST.contains_key(&attribute_name) {
+		if !WHITELIST.get().unwrap().contains_key(&attribute_name) {
 			return capture.at(0).unwrap().to_string();
 		}
 
@@ -166,7 +167,8 @@ pub fn rewrite_css_attributes(
 		}
 
 		// Work out if value(s) are classes, IDs or selectors.
-		let attribute_type_designation: &str = WHITELIST.get(&attribute_name).unwrap();
+		let attribute_type_designation: &str =
+			WHITELIST.get().unwrap().get(&attribute_name).unwrap();
 
 		match attribute_type_designation {
 			"id" | "class" => {

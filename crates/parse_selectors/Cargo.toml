@@ -12,6 +12,7 @@ version = "2.1.2"
 
 [dependencies]
 lazy_static = "1.4.0"
+once_cell = "1.17.0"
 onig = "6.4.0"
 
 minify_selectors_utils = { version = "2.3.3", path = "../minify_selectors_utils" }

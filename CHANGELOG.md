@@ -1,3 +1,17 @@
+# v2.4.0
+<sub>TBD</sub>
+
+### Updates
+- Ability to define custom attributes
+
+### Fixes
+- Rename `--disable-sort` CLI option to `--sort`
+
+<br>
+
+
+
+
 # v2.3.3
 <sub>4 Feb 2023</sub>
 

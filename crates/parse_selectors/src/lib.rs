@@ -17,6 +17,7 @@ pub fn read_from_css(
 	selectors: &mut Selectors,
 	config: &Config,
 ) {
+	markup::html_attributes::init(&config.custom_attributes);
 	analyse_css(file_string, selectors, config);
 }
 
@@ -33,6 +34,7 @@ pub fn read_from_html(
 	selectors: &mut Selectors,
 	config: &Config,
 ) {
+	markup::html_attributes::init(&config.custom_attributes);
 	analyse_html(file_string, selectors, config, None);
 }
 
@@ -49,6 +51,7 @@ pub fn read_from_js(
 	selectors: &mut Selectors,
 	config: &Config,
 ) {
+	markup::html_attributes::init(&config.custom_attributes);
 	analyse_js(file_string, selectors, config);
 }
 
