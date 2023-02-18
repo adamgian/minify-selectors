@@ -1,5 +1,5 @@
-# v2.4.0
-<sub>TBD</sub>
+# v2.4.1
+<sub>18 Feb 2023</sub>
 
 ### Updates
 - Ability to define custom attributes
