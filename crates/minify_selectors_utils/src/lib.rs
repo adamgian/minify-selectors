@@ -3,25 +3,35 @@ use std::path::PathBuf;
 
 use clap::Parser;
 use indexmap::IndexMap;
+use serde::Deserialize;
 
 
 
 
 /// Post-processor that minifies classes and IDs in CSS, HTML, JS and SVG files.
-#[derive(Parser, Debug)]
+#[derive(Debug, Parser)]
 #[clap(
 	name = "minify-selectors",
 	version,
 	long_about = None,
 )]
 pub struct Cli {
+	/// Path to minify-selectors config file
+	#[clap(
+		short = 'c',
+		long,
+		conflicts_with_all(["input", "output"]),
+		required_unless_present_all(["input", "output"]),
+	)]
+	config: Option<String>,
+
 	/// Directory to process from
-	#[clap(short = 'i', long = "input")]
-	source: String,
+	#[clap(short = 'i', long, requires("output"))]
+	input: Option<String>,
 
 	/// Output directory to save files to
-	#[clap(short = 'o', long)]
-	output: String,
+	#[clap(short = 'o', long, requires("input"))]
+	output: Option<String>,
 
 	/// Index to start encoding from
 	#[clap(long = "start-index")]
@@ -40,39 +50,41 @@ pub struct Cli {
 	sort: Option<Option<bool>>,
 
 	/// Custom attributes that contain space-separated list of classes.
-	#[clap(long = "custom-class-attribute", use_value_delimiter = true)]
+	#[clap(long = "custom-class-attribute", value_delimiter = ',')]
 	custom_class_attribute: Option<Vec<String>>,
 
 	/// Custom attributes that contain an ID (or space-separated list of IDs).
-	#[clap(long = "custom-id-attribute", use_value_delimiter = true)]
+	#[clap(long = "custom-id-attribute", value_delimiter = ',')]
 	custom_id_attribute: Option<Vec<String>>,
 
 	/// Custom attributes that contain a selector string.
-	#[clap(long = "custom-selector-attribute", use_value_delimiter = true)]
+	#[clap(long = "custom-selector-attribute", value_delimiter = ',')]
 	custom_selector_attribute: Option<Vec<String>>,
 
 	/// Custom attributes that contain a URL.
-	#[clap(long = "custom-anchor-attribute", use_value_delimiter = true)]
+	#[clap(long = "custom-anchor-attribute", value_delimiter = ',')]
 	custom_anchor_attribute: Option<Vec<String>>,
 
 	/// Custom attributes that contain CSS styles.
-	#[clap(long = "custom-style-attribute", use_value_delimiter = true)]
+	#[clap(long = "custom-style-attribute", value_delimiter = ',')]
 	custom_style_attribute: Option<Vec<String>>,
 
 	/// Custom attributes that contain JS code.
-	#[clap(long = "custom-script-attribute", use_value_delimiter = true)]
+	#[clap(long = "custom-script-attribute", value_delimiter = ',')]
 	custom_script_attribute: Option<Vec<String>>,
 }
 
 
 
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Deserialize)]
 pub struct Config {
-	pub source: PathBuf,
+	pub input: PathBuf,
 	pub output: PathBuf,
 	pub alphabet: (Vec<char>, Vec<usize>),
+	#[serde(rename = "startIndex")]
 	pub start_index: usize,
+	#[serde(skip)]
 	pub current_step: ProcessingSteps,
 	pub parallel: bool,
 	pub sort: bool,
@@ -86,10 +98,20 @@ pub enum ProcessingSteps {
 	WritingToFiles,
 }
 
+impl Default for ProcessingSteps {
+	fn default() -> ProcessingSteps {
+		ProcessingSteps::ReadingFromFiles
+	}
+}
+
 impl Config {
 	pub fn new() -> Self {
 		let args = Cli::parse();
 		let mut config: Config = Default::default();
+
+		if args.config.is_some() {
+			println!("{:?}", args.config);
+		}
 
 		if let Some(alphabet) = args.alphabet {
 			config.alphabet = encode_selector::into_alphabet_set(&alphabet);
@@ -98,8 +120,8 @@ impl Config {
 			config.start_index = index;
 		}
 
-		config.source = PathBuf::from(&args.source);
-		config.output = PathBuf::from(&args.output);
+		config.input = PathBuf::from(&args.input.unwrap());
+		config.output = PathBuf::from(&args.output.unwrap());
 
 		config.parallel = match &args.parallel {
 			None => false,
@@ -146,7 +168,6 @@ impl Config {
 				custom_attributes.push((name.to_string(), "script".to_string()));
 			}
 		}
-
 		config.custom_attributes = custom_attributes;
 
 		config
@@ -156,7 +177,7 @@ impl Config {
 impl Default for Config {
 	fn default() -> Self {
 		Self {
-			source: PathBuf::from(""),
+			input: PathBuf::from(""),
 			output: PathBuf::from(""),
 			alphabet: encode_selector::into_alphabet_set(
 				"0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
@@ -176,7 +197,7 @@ impl Default for Config {
 /// Metadata for selector
 #[derive(Clone, Debug, Default)]
 pub struct Selector {
-	pub r#type: Option<SelectorType>,
+	pub kind: Option<SelectorType>,
 	pub replacement: Option<String>,
 	pub counter: usize,
 	pub markup_class_counter: usize,
@@ -208,7 +229,7 @@ pub enum SelectorUsage {
 impl Selector {
 	pub fn new(selector: &str) -> Self {
 		Self {
-			r#type: match selector.chars().next() {
+			kind: match selector.chars().next() {
 				Some('.') => Some(SelectorType::Class),
 				Some('#') => Some(SelectorType::Id),
 				_ => panic!("Missing or unknown selector type"),
@@ -345,7 +366,7 @@ impl Selectors {
 				}
 
 				value.set_replacement(encode_selector::to_radix(
-					match value.r#type {
+					match value.kind {
 						Some(SelectorType::Class) => &self.class_counter,
 						Some(SelectorType::Id) => &self.id_counter,
 						None => {
@@ -355,11 +376,11 @@ impl Selectors {
 					&config.alphabet,
 				));
 
-				if value.r#type == Some(SelectorType::Class) {
+				if value.kind == Some(SelectorType::Class) {
 					// Also keep track of encoded class name
 					encoded_classes.insert(value.replacement.to_owned().unwrap());
 					self.class_counter += 1;
-				} else if value.r#type == Some(SelectorType::Id) {
+				} else if value.kind == Some(SelectorType::Id) {
 					self.id_counter += 1;
 				}
 			}

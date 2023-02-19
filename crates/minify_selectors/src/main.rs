@@ -57,7 +57,7 @@ fn process_files(
 ) -> Result<(), std::io::Error> {
 	if config.parallel {
 		let selectors_lock = Arc::new(RwLock::new(selectors));
-		let files = WalkDir::new(&config.source)
+		let files = WalkDir::new(&config.input)
 			.into_iter()
 			.filter_map(|e| e.ok())
 			.filter(is_processable)
@@ -68,7 +68,7 @@ fn process_files(
 				.expect("There was an issue processing this file.");
 		});
 	} else {
-		for entry in WalkDir::new(&config.source)
+		for entry in WalkDir::new(&config.input)
 			.into_iter()
 			.filter_map(|e| e.ok())
 			.filter(is_processable)
@@ -156,13 +156,13 @@ fn write_to_file(
 		_ => (),
 	}
 
-	let output_path = match &config.source.is_dir() {
+	let output_path = match &config.input.is_dir() {
 		// Remove given source directory to make each
 		// matched file relative to the output directory.
 		true => {
 			config
 				.output
-				.join(file_path.strip_prefix(&config.source).unwrap())
+				.join(file_path.strip_prefix(&config.input).unwrap())
 		},
 		// Or if input path was to a file, append only
 		// the file name to the given output directory
