@@ -43,6 +43,7 @@
 .c:first-of-type {}
 .c:last-of-type {}
 .c:only-of-type {}
+li:nth-child(2n of .c) {}
 
 .b:hover {}
 .b:active {}

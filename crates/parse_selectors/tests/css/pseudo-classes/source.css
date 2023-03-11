@@ -43,6 +43,7 @@
 .CLASS-5:first-of-type {}
 .CLASS-5:last-of-type {}
 .CLASS-5:only-of-type {}
+li:nth-child(2n of .CLASS-5) {}
 
 .CLASS-6:hover {}
 .CLASS-6:active {}
