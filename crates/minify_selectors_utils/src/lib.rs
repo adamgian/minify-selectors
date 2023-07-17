@@ -91,17 +91,12 @@ pub struct Config {
 	pub custom_attributes: Vec<(String, String)>,
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, Default, PartialEq)]
 pub enum ProcessingSteps {
+	#[default]
 	ReadingFromFiles,
 	EncodingSelectors,
 	WritingToFiles,
-}
-
-impl Default for ProcessingSteps {
-	fn default() -> ProcessingSteps {
-		ProcessingSteps::ReadingFromFiles
-	}
 }
 
 impl Config {
