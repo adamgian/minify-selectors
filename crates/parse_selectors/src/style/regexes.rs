@@ -41,7 +41,7 @@ lazy_static! {
 	// -  minify-selector specific prefixed selectors are ignored, to prevent
 	//    it being encoded twice.
 	pub static ref CSS_SELECTORS: Regex = Regex::new(
-		r##"(?x)
+		r#"(?x)
 			{[^{}]*}
 			| \[
 				\s*
@@ -75,7 +75,7 @@ lazy_static! {
 					)
 				)*
 			)
-		"##
+		"#
 	).unwrap();
 
 	// Extracts classes and IDs from a limited set of
@@ -83,7 +83,7 @@ lazy_static! {
 	// and use the exact match operator.
 	// i.e. [class="foo"][id="bar"]
 	pub static ref CSS_ATTRIBUTES: Regex = Regex::new(
-		r##"(?x)
+		r#"(?x)
 			\/\*[^*]*\*+(?>[^\/*][^*]*\*+)*\/
 			| \[\s*+
 			(?<attribute>
@@ -138,11 +138,11 @@ lazy_static! {
 			(?<spacer>\s*+)
 			(?<flag>[IiSs]?)
 			\s*+\]
-		"##
+		"#
 	).unwrap();
 
 	pub static ref CSS_FUNCTIONS: Regex = Regex::new(
-		r##"(?x)
+		r#"(?x)
 			(?<function>
 				url
 			)
@@ -163,18 +163,18 @@ lazy_static! {
 					[^\s\)]*
 				)
 			)
-		"##
+		"#
 	).unwrap();
 
 	pub static ref ESCAPED_CSS_CHARS: Regex = Regex::new(
-		r##"(?x)
+		r"(?x)
 			(?<unicode>
 				\\[0-9A-Fa-f]{1,6}(?>\r\n|[ \n\r\t\f])?
 			)
 			| (?<character>
 				\\[^\n\r\f0-9A-Fa-f]
 			)
-		"##
+		"
 	).unwrap();
 
 	// Invalid characters in a selector name are:
@@ -186,9 +186,9 @@ lazy_static! {
 	// -  \140: backtick (`)
 	// -  \173-\177: left brace ({) to delete
 	pub static ref INVALID_CSS_CHARACTERS: Regex = Regex::new(
-		r##"(?x)
+		r"(?x)
 			[\0-\54\56\57\72-\100\133-\136\140\173-\177]
-		"##
+		"
 	).unwrap();
 
 }
