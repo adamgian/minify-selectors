@@ -4,6 +4,7 @@ members = [
 	"crates/minify_selectors",
 	"crates/parse_selectors",
 ]
+resolver = "2"
 
 
 [profile.release]
