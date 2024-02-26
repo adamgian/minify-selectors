@@ -16,5 +16,6 @@ version = "2.4.1"
 clap = { version = "4.0.15", features = ["derive"] }
 indexmap = "1.9.2"
 serde = { version = "1.0.152", features = ["derive"] }
+serde_json = "1.0"
 
 encode_selector = { version = "0.4.1", path = "../encode_selector" }

@@ -1,9 +1,11 @@
 use std::collections::HashSet;
+use std::fs;
 use std::path::PathBuf;
 
 use clap::Parser;
 use indexmap::IndexMap;
 use serde::Deserialize;
+use serde_json::Result;
 
 
 
@@ -77,14 +79,12 @@ pub struct Cli {
 
 
 
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug)]
 pub struct Config {
 	pub input: PathBuf,
 	pub output: PathBuf,
 	pub alphabet: (Vec<char>, Vec<usize>),
-	#[serde(rename = "startIndex")]
 	pub start_index: usize,
-	#[serde(skip)]
 	pub current_step: ProcessingSteps,
 	pub parallel: bool,
 	pub sort: bool,
@@ -101,64 +101,102 @@ pub enum ProcessingSteps {
 
 impl Config {
 	pub fn new() -> Self {
-		let args = Cli::parse();
+		let cli_args = Cli::parse();
 		let mut config: Config = Default::default();
+		let external_config: Option<ExternalConfig> = cli_args.config.clone().map(|config_path| {
+			serde_json::from_str(
+				&fs::read_to_string(config_path).expect("Could not find or open config file"),
+			)
+			.expect("Could not parse config file")
+		});
 
-		if args.config.is_some() {
-			println!("{:?}", args.config);
-		}
+		println!("{:?}", external_config);
 
-		if let Some(alphabet) = args.alphabet {
-			config.alphabet = encode_selector::into_alphabet_set(&alphabet);
-		}
-		if let Some(index) = args.start_index {
-			config.start_index = index;
-		}
-
-		config.input = PathBuf::from(&args.input.unwrap());
-		config.output = PathBuf::from(&args.output.unwrap());
-
-		config.parallel = match &args.parallel {
-			None => false,
-			Some(None) => true,         // --parallel
-			Some(Some(true)) => true,   // --parallel=true
-			Some(Some(false)) => false, // --parallel=false
+		config.input = if cli_args.config.is_some() {
+			PathBuf::from(&external_config.as_ref().unwrap().input)
+		} else {
+			PathBuf::from(&cli_args.input.unwrap())
 		};
-		config.sort = match &args.sort {
-			None => true,
-			Some(None) => true,         // --sort
-			Some(Some(true)) => true,   // --sort=true
-			Some(Some(false)) => false, // --sort=false
+		config.output = if cli_args.config.is_some() {
+			PathBuf::from(&external_config.as_ref().unwrap().output)
+		} else {
+			PathBuf::from(&cli_args.output.unwrap())
 		};
+
+		if external_config.is_some() {
+			if let Some(alphabet) = &external_config.as_ref().unwrap().alphabet {
+				config.alphabet = encode_selector::into_alphabet_set(&alphabet);
+			}
+		} else {
+			if let Some(alphabet) = cli_args.alphabet {
+				config.alphabet = encode_selector::into_alphabet_set(&alphabet);
+			}
+		}
+
+		if external_config.is_some() {
+			if let Some(index) = external_config.as_ref().unwrap().start_index {
+				config.start_index = index;
+			}
+		} else {
+			if let Some(index) = cli_args.start_index {
+				config.start_index = index;
+			}
+		}
+
+		if external_config.is_some() {
+			if let Some(parallel) = external_config.as_ref().unwrap().parallel {
+				config.parallel = parallel;
+			}
+		} else {
+			config.parallel = match &cli_args.parallel {
+				None => false,
+				Some(None) => true,         // --parallel
+				Some(Some(true)) => true,   // --parallel=true
+				Some(Some(false)) => false, // --parallel=false
+			};
+		}
+
+		if external_config.is_some() {
+			if let Some(sort) = external_config.as_ref().unwrap().sort {
+				config.sort = sort;
+			}
+		} else {
+			config.sort = match &cli_args.sort {
+				None => true,
+				Some(None) => true,         // --sort
+				Some(Some(true)) => true,   // --sort=true
+				Some(Some(false)) => false, // --sort=false
+			};
+		}
 
 		let mut custom_attributes: Vec<(String, String)> = vec![];
 
-		if let Some(attributes) = &args.custom_class_attribute {
+		if let Some(attributes) = &cli_args.custom_class_attribute {
 			for name in attributes {
 				custom_attributes.push((name.to_string(), "class".to_string()));
 			}
 		}
-		if let Some(attributes) = &args.custom_id_attribute {
+		if let Some(attributes) = &cli_args.custom_id_attribute {
 			for name in attributes {
 				custom_attributes.push((name.to_string(), "id".to_string()));
 			}
 		}
-		if let Some(attributes) = &args.custom_selector_attribute {
+		if let Some(attributes) = &cli_args.custom_selector_attribute {
 			for name in attributes {
 				custom_attributes.push((name.to_string(), "selector".to_string()));
 			}
 		}
-		if let Some(attributes) = &args.custom_anchor_attribute {
+		if let Some(attributes) = &cli_args.custom_anchor_attribute {
 			for name in attributes {
 				custom_attributes.push((name.to_string(), "anchor".to_string()));
 			}
 		}
-		if let Some(attributes) = &args.custom_style_attribute {
+		if let Some(attributes) = &cli_args.custom_style_attribute {
 			for name in attributes {
 				custom_attributes.push((name.to_string(), "style".to_string()));
 			}
 		}
-		if let Some(attributes) = &args.custom_script_attribute {
+		if let Some(attributes) = &cli_args.custom_script_attribute {
 			for name in attributes {
 				custom_attributes.push((name.to_string(), "script".to_string()));
 			}
@@ -184,6 +222,24 @@ impl Default for Config {
 			custom_attributes: vec![],
 		}
 	}
+}
+
+
+
+
+/// Dedicated struct to handle the external config file specific structure
+#[allow(dead_code)]
+#[derive(Clone, Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct ExternalConfig {
+	input: String,
+	output: String,
+	alphabet: Option<String>,
+	// #[serde(rename = "startIndex")]
+	start_index: Option<usize>,
+	parallel: Option<bool>,
+	sort: Option<bool>,
+	custom_attributes: Option<Vec<(String, String)>>,
 }
 
 
