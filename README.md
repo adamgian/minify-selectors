@@ -336,20 +336,21 @@ Or, you do not want minify-selectors to encode certain selectors (for reasons su
 		</tr>
 		<tr>
 			<td valign="top">
+				<code lang="shell">--custom-id-attribute</code>
+			</td>
+			<td>
+				<sup>Optional</sup><br>
+				Custom HTML and SVG attributes that contain an ID (or space-separated list of IDs). For example, in Bootstrap you may have <code lang="html">data-bs-target=&quot;#exampleModal&quot;</code> and <code lang=html>data-bs-parent=&quot;#accordionExample&quot;</code>
+				<br><br>Usage: <code lang="shell">--custom-id-attribute data-bs-target data-bs-parent</code>
+			</td>
+		</tr>
+		<tr>
+			<td valign="top">
 				<code lang="shell">--custom-class-attribute</code>
 			</td>
 			<td>
 				<sup>Optional</sup><br>
 				Custom HTML and SVG attributes that contain a space-separated list of classes.
-			</td>
-		</tr>
-		<tr>
-			<td valign="top">
-				<code lang="shell">--custom-id-attribute</code>
-			</td>
-			<td>
-				<sup>Optional</sup><br>
-				Custom HTML and SVG attributes that contain an ID (or space-separated list of IDs).
 			</td>
 		</tr>
 		<tr>

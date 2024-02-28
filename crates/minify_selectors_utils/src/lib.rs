@@ -52,27 +52,27 @@ pub struct Cli {
 	sort: Option<Option<bool>>,
 
 	/// Custom attributes that contain space-separated list of classes.
-	#[clap(long = "custom-class-attribute", value_delimiter = ',')]
+	#[clap(long = "custom-class-attribute", value_delimiter = ' ', num_args = 1..)]
 	custom_class_attribute: Option<Vec<String>>,
 
 	/// Custom attributes that contain an ID (or space-separated list of IDs).
-	#[clap(long = "custom-id-attribute", value_delimiter = ',')]
+	#[clap(long = "custom-id-attribute", value_delimiter = ' ', num_args = 1..)]
 	custom_id_attribute: Option<Vec<String>>,
 
 	/// Custom attributes that contain a selector string.
-	#[clap(long = "custom-selector-attribute", value_delimiter = ',')]
+	#[clap(long = "custom-selector-attribute", value_delimiter = ' ', num_args = 1..)]
 	custom_selector_attribute: Option<Vec<String>>,
 
 	/// Custom attributes that contain a URL.
-	#[clap(long = "custom-anchor-attribute", value_delimiter = ',')]
+	#[clap(long = "custom-anchor-attribute", value_delimiter = ' ', num_args = 1..)]
 	custom_anchor_attribute: Option<Vec<String>>,
 
 	/// Custom attributes that contain CSS styles.
-	#[clap(long = "custom-style-attribute", value_delimiter = ',')]
+	#[clap(long = "custom-style-attribute", value_delimiter = ' ', num_args = 1..)]
 	custom_style_attribute: Option<Vec<String>>,
 
 	/// Custom attributes that contain JS code.
-	#[clap(long = "custom-script-attribute", value_delimiter = ',')]
+	#[clap(long = "custom-script-attribute", value_delimiter = ' ', num_args = 1..)]
 	custom_script_attribute: Option<Vec<String>>,
 }
 
@@ -171,30 +171,53 @@ impl Config {
 
 		let mut custom_attributes: Vec<(String, String)> = vec![];
 
+		if external_config.is_some() {
+		} else {
+		}
 		if let Some(attributes) = &cli_args.custom_class_attribute {
 			for name in attributes {
 				custom_attributes.push((name.to_string(), "class".to_string()));
 			}
+		}
+
+		if external_config.is_some() {
+		} else {
 		}
 		if let Some(attributes) = &cli_args.custom_id_attribute {
 			for name in attributes {
 				custom_attributes.push((name.to_string(), "id".to_string()));
 			}
 		}
+
+		if external_config.is_some() {
+		} else {
+		}
 		if let Some(attributes) = &cli_args.custom_selector_attribute {
 			for name in attributes {
 				custom_attributes.push((name.to_string(), "selector".to_string()));
 			}
+		}
+
+		if external_config.is_some() {
+		} else {
 		}
 		if let Some(attributes) = &cli_args.custom_anchor_attribute {
 			for name in attributes {
 				custom_attributes.push((name.to_string(), "anchor".to_string()));
 			}
 		}
+
+		if external_config.is_some() {
+		} else {
+		}
 		if let Some(attributes) = &cli_args.custom_style_attribute {
 			for name in attributes {
 				custom_attributes.push((name.to_string(), "style".to_string()));
 			}
+		}
+
+		if external_config.is_some() {
+		} else {
 		}
 		if let Some(attributes) = &cli_args.custom_script_attribute {
 			for name in attributes {
