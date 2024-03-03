@@ -5,7 +5,6 @@ use std::path::PathBuf;
 use clap::Parser;
 use indexmap::IndexMap;
 use serde::Deserialize;
-use serde_json::Result;
 
 
 
@@ -110,37 +109,28 @@ impl Config {
 			.expect("Could not parse config file")
 		});
 
-		println!("{:?}", external_config);
-
-		config.input = if cli_args.config.is_some() {
-			PathBuf::from(&external_config.as_ref().unwrap().input)
+		if cli_args.config.is_some() {
+			config.input = PathBuf::from(&external_config.as_ref().unwrap().input);
+			config.output = PathBuf::from(&external_config.as_ref().unwrap().output);
 		} else {
-			PathBuf::from(&cli_args.input.unwrap())
-		};
-		config.output = if cli_args.config.is_some() {
-			PathBuf::from(&external_config.as_ref().unwrap().output)
-		} else {
-			PathBuf::from(&cli_args.output.unwrap())
-		};
+			config.input = PathBuf::from(&cli_args.input.unwrap());
+			config.output = PathBuf::from(&cli_args.output.unwrap());
+		}
 
 		if external_config.is_some() {
 			if let Some(alphabet) = &external_config.as_ref().unwrap().alphabet {
-				config.alphabet = encode_selector::into_alphabet_set(&alphabet);
+				config.alphabet = encode_selector::into_alphabet_set(alphabet);
 			}
-		} else {
-			if let Some(alphabet) = cli_args.alphabet {
-				config.alphabet = encode_selector::into_alphabet_set(&alphabet);
-			}
+		} else if let Some(alphabet) = cli_args.alphabet {
+			config.alphabet = encode_selector::into_alphabet_set(&alphabet);
 		}
 
 		if external_config.is_some() {
 			if let Some(index) = external_config.as_ref().unwrap().start_index {
 				config.start_index = index;
 			}
-		} else {
-			if let Some(index) = cli_args.start_index {
-				config.start_index = index;
-			}
+		} else if let Some(index) = cli_args.start_index {
+			config.start_index = index;
 		}
 
 		if external_config.is_some() {
@@ -172,60 +162,102 @@ impl Config {
 		let mut custom_attributes: Vec<(String, String)> = vec![];
 
 		if external_config.is_some() {
-		} else {
-		}
-		if let Some(attributes) = &cli_args.custom_class_attribute {
+			if let Some(attributes) = external_config
+				.as_ref()
+				.and_then(|external_config| external_config.custom_attributes.as_ref())
+				.and_then(|custom_attributes| custom_attributes.id.as_ref())
+			{
+				for name in attributes {
+					custom_attributes.push((name.to_string(), "class".to_string()));
+				}
+			}
+		} else if let Some(attributes) = &cli_args.custom_class_attribute {
 			for name in attributes {
 				custom_attributes.push((name.to_string(), "class".to_string()));
 			}
 		}
 
 		if external_config.is_some() {
-		} else {
-		}
-		if let Some(attributes) = &cli_args.custom_id_attribute {
+			if let Some(attributes) = external_config
+				.as_ref()
+				.and_then(|external_config| external_config.custom_attributes.as_ref())
+				.and_then(|custom_attributes| custom_attributes.class.as_ref())
+			{
+				for name in attributes {
+					custom_attributes.push((name.to_string(), "id".to_string()));
+				}
+			}
+		} else if let Some(attributes) = &cli_args.custom_id_attribute {
 			for name in attributes {
 				custom_attributes.push((name.to_string(), "id".to_string()));
 			}
 		}
 
 		if external_config.is_some() {
-		} else {
-		}
-		if let Some(attributes) = &cli_args.custom_selector_attribute {
+			if let Some(attributes) = external_config
+				.as_ref()
+				.and_then(|external_config| external_config.custom_attributes.as_ref())
+				.and_then(|custom_attributes| custom_attributes.selector.as_ref())
+			{
+				for name in attributes {
+					custom_attributes.push((name.to_string(), "selector".to_string()));
+				}
+			}
+		} else if let Some(attributes) = &cli_args.custom_selector_attribute {
 			for name in attributes {
 				custom_attributes.push((name.to_string(), "selector".to_string()));
 			}
 		}
 
 		if external_config.is_some() {
-		} else {
-		}
-		if let Some(attributes) = &cli_args.custom_anchor_attribute {
+			if let Some(attributes) = external_config
+				.as_ref()
+				.and_then(|external_config| external_config.custom_attributes.as_ref())
+				.and_then(|custom_attributes| custom_attributes.anchor.as_ref())
+			{
+				for name in attributes {
+					custom_attributes.push((name.to_string(), "anchor".to_string()));
+				}
+			}
+		} else if let Some(attributes) = &cli_args.custom_anchor_attribute {
 			for name in attributes {
 				custom_attributes.push((name.to_string(), "anchor".to_string()));
 			}
 		}
 
 		if external_config.is_some() {
-		} else {
-		}
-		if let Some(attributes) = &cli_args.custom_style_attribute {
+			if let Some(attributes) = external_config
+				.as_ref()
+				.and_then(|external_config| external_config.custom_attributes.as_ref())
+				.and_then(|custom_attributes| custom_attributes.style.as_ref())
+			{
+				for name in attributes {
+					custom_attributes.push((name.to_string(), "style".to_string()));
+				}
+			}
+		} else if let Some(attributes) = &cli_args.custom_style_attribute {
 			for name in attributes {
 				custom_attributes.push((name.to_string(), "style".to_string()));
 			}
 		}
 
 		if external_config.is_some() {
-		} else {
-		}
-		if let Some(attributes) = &cli_args.custom_script_attribute {
+			if let Some(attributes) = external_config
+				.as_ref()
+				.and_then(|external_config| external_config.custom_attributes.as_ref())
+				.and_then(|custom_attributes| custom_attributes.script.as_ref())
+			{
+				for name in attributes {
+					custom_attributes.push((name.to_string(), "script".to_string()));
+				}
+			}
+		} else if let Some(attributes) = &cli_args.custom_script_attribute {
 			for name in attributes {
 				custom_attributes.push((name.to_string(), "script".to_string()));
 			}
 		}
-		config.custom_attributes = custom_attributes;
 
+		config.custom_attributes = custom_attributes;
 		config
 	}
 }
@@ -262,7 +294,18 @@ struct ExternalConfig {
 	start_index: Option<usize>,
 	parallel: Option<bool>,
 	sort: Option<bool>,
-	custom_attributes: Option<Vec<(String, String)>>,
+	// #[serde(rename = "customAttributes")]
+	custom_attributes: Option<CustomAttributes>,
+}
+#[allow(dead_code)]
+#[derive(Clone, Debug, Deserialize)]
+struct CustomAttributes {
+	class: Option<Vec<String>>,
+	id: Option<Vec<String>>,
+	selector: Option<Vec<String>>,
+	anchor: Option<Vec<String>>,
+	style: Option<Vec<String>>,
+	script: Option<Vec<String>>,
 }
 
 
