@@ -267,8 +267,9 @@ Or, you do not want minify-selectors to encode certain selectors (for reasons su
 
 
 
+## Configuration
 
-## Command line options
+### Command line options
 
 <table>
 	<thead>
@@ -280,7 +281,7 @@ Or, you do not want minify-selectors to encode certain selectors (for reasons su
 	<tbody>
 		<tr>
 			<td valign="top">
-				<code lang="shell">--input</code> (or <code lang="shell">-i</code>)
+				<code lang="shell">--input</code>, <code lang="shell">-i</code>
 			</td>
 			<td>
 				Directory to process. Any CSS, HTML, JS and SVG files in the given directory and sub-directories will be parsed.
@@ -288,7 +289,7 @@ Or, you do not want minify-selectors to encode certain selectors (for reasons su
 		</tr>
 		<tr>
 			<td valign="top">
-				<code lang="shell">--output</code> (or <code lang="shell">-o</code>)
+				<code lang="shell">--output</code>, <code lang="shell">-o</code>
 			</td>
 			<td>
 				Directory to place processed files into. Setting the output path to be the same as the input path will overwrite existing files.
@@ -296,10 +297,18 @@ Or, you do not want minify-selectors to encode certain selectors (for reasons su
 		</tr>
 		<tr>
 			<td valign="top">
+				<code lang="shell">--config</code>, <code lang="shell">-c</code>
+			</td>
+			<td>
+				Alternatively instead of using CLI arguments, an external JSON config file can be provided instead. See section below: '<a href="#external-json-config-options">External JSON config options</a>' for more information.
+			</td>
+		</tr>
+		<tr>
+			<td valign="top">
 				<code lang="shell">--alphabet</code>
 			</td>
 			<td>
-				<sup>Optional</sup><br>
+				<sup><i>Optional</i></sup><br>
 				String sequence of characters to use when encoding.
 				<br><br>Default: <code>"0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"</code>
 			</td>
@@ -309,7 +318,7 @@ Or, you do not want minify-selectors to encode certain selectors (for reasons su
 				<code lang="shell">--start-index</code>
 			</td>
 			<td>
-				<sup>Optional</sup><br>
+				<sup><i>Optional</i></sup><br>
 				Index to start incrementing and encoding from.
 				<br><br>Default: <code>0</code>
 			</td>
@@ -319,7 +328,7 @@ Or, you do not want minify-selectors to encode certain selectors (for reasons su
 				<code lang="shell">--parallel</code>
 			</td>
 			<td>
-				<sup>Optional</sup><br>
+				<sup><i>Optional</i></sup><br>
 				Enable concurrent processing.
 				<br><br>Default: <code>false</code>
 			</td>
@@ -329,8 +338,8 @@ Or, you do not want minify-selectors to encode certain selectors (for reasons su
 				<code lang="shell">--sort</code>
 			</td>
 			<td>
-				<sup>Optional</sup><br>
-				Reorder selectors by frequency before minifying.
+				<sup><i>Optional</i></sup><br>
+				Reorder selectors by descending frequency before assigning indexes and minifying.
 				<br><br>Default: <code>true</code>
 			</td>
 		</tr>
@@ -339,7 +348,7 @@ Or, you do not want minify-selectors to encode certain selectors (for reasons su
 				<code lang="shell">--custom-id-attribute</code>
 			</td>
 			<td>
-				<sup>Optional</sup><br>
+				<sup><i>Optional</i></sup><br>
 				Custom HTML and SVG attributes that contain an ID (or space-separated list of IDs). For example, in Bootstrap you may have <code lang="html">data-bs-target=&quot;#exampleModal&quot;</code> and <code lang=html>data-bs-parent=&quot;#accordionExample&quot;</code>
 				<br><br>Usage: <code lang="shell">--custom-id-attribute data-bs-target data-bs-parent</code>
 			</td>
@@ -349,7 +358,7 @@ Or, you do not want minify-selectors to encode certain selectors (for reasons su
 				<code lang="shell">--custom-class-attribute</code>
 			</td>
 			<td>
-				<sup>Optional</sup><br>
+				<sup><i>Optional</i></sup><br>
 				Custom HTML and SVG attributes that contain a space-separated list of classes.
 			</td>
 		</tr>
@@ -358,7 +367,7 @@ Or, you do not want minify-selectors to encode certain selectors (for reasons su
 				<code lang="shell">--custom-selector-attribute</code>
 			</td>
 			<td>
-				<sup>Optional</sup><br>
+				<sup><i>Optional</i></sup><br>
 				Custom HTML and SVG attributes that contain a selector string.
 			</td>
 		</tr>
@@ -367,7 +376,7 @@ Or, you do not want minify-selectors to encode certain selectors (for reasons su
 				<code lang="shell">--custom-anchor-attribute</code>
 			</td>
 			<td>
-				<sup>Optional</sup><br>
+				<sup><i>Optional</i></sup><br>
 				Custom HTML and SVG attributes that contain a URL.
 			</td>
 		</tr>
@@ -376,7 +385,7 @@ Or, you do not want minify-selectors to encode certain selectors (for reasons su
 				<code lang="shell">--custom-style-attribute</code>
 			</td>
 			<td>
-				<sup>Optional</sup><br>
+				<sup><i>Optional</i></sup><br>
 				Custom HTML and SVG attributes that contain CSS styles.
 			</td>
 		</tr>
@@ -385,8 +394,153 @@ Or, you do not want minify-selectors to encode certain selectors (for reasons su
 				<code lang="shell">--custom-script-attribute</code>
 			</td>
 			<td>
-				<sup>Optional</sup><br>
+				<sup><i>Optional</i></sup><br>
 				Custom HTML and SVG attributes that contain JS code.
+			</td>
+		</tr>
+	</tbody>
+</table>
+
+### External JSON config options
+
+An example config file:
+
+```json
+{
+    "input": "/User/Adam/Github/project/dist",
+    "output": "/User/Adam/Github/project/dist",
+    "parallel": true,
+    "customAttributes": {
+        "id": [
+            "data-bs-target",
+            "data-bs-parent"
+        ]
+    }
+}
+```
+
+<table>
+	<thead>
+		<tr>
+			<th align="left" width="180">Option</th>
+			<th align="left">Description</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td valign="top">
+				<code lang="shell">input</code>
+			</td>
+			<td>
+				Directory to process. Any CSS, HTML, JS and SVG files in the given directory and sub-directories will be parsed.
+			</td>
+		</tr>
+		<tr>
+			<td valign="top">
+				<code lang="shell">output</code>
+			</td>
+			<td>
+				Directory to place processed files into. Setting the output path to be the same as the input path will overwrite existing files.
+			</td>
+		</tr>
+		<tr>
+			<td valign="top">
+				<code lang="shell">alphabet</code>
+			</td>
+			<td>
+				<sup><i>Optional</i></sup><br>
+				String sequence of characters to use when encoding.
+				<br><br>Default: <code>"0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"</code>
+			</td>
+		</tr>
+		<tr>
+			<td valign="top">
+				<code lang="shell">start-index</code>
+			</td>
+			<td>
+				<sup><i>Optional</i></sup><br>
+				Index to start incrementing and encoding from.
+				<br><br>Default: <code>0</code>
+			</td>
+		</tr>
+		<tr>
+			<td valign="top">
+				<code lang="shell">parallel</code>
+			</td>
+			<td>
+				<sup><i>Optional</i></sup><br>
+				Enable concurrent processing.
+				<br><br>Default: <code>false</code>
+			</td>
+		</tr>
+		<tr>
+			<td valign="top">
+				<code lang="shell">sort</code>
+			</td>
+			<td>
+				<sup><i>Optional</i></sup><br>
+				Reorder selectors by descending frequency before assigning indexes and minifying.
+				<br><br>Default: <code>true</code>
+			</td>
+		</tr>
+		<tr>
+			<td valign="top">
+				<code lang="shell">customAttributes.id</code>
+			</td>
+			<td>
+				<sup><i>Optional</i></sup><br>
+				Custom HTML and SVG attributes that contain an ID (or space-separated list of IDs).
+				<br><br>Usage: <code lang="shell">"id": [ "foo", ..., "baz" ]</code>
+			</td>
+		</tr>
+		<tr>
+			<td valign="top">
+				<code lang="shell">customAttributes.class</code>
+			</td>
+			<td>
+				<sup><i>Optional</i></sup><br>
+				Custom HTML and SVG attributes that contain a space-separated list of classes.
+				<br><br>Usage: <code lang="shell">"class": [ "foo", ..., "baz" ]</code>
+			</td>
+		</tr>
+		<tr>
+			<td valign="top">
+				<code lang="shell">customAttributes.selector</code>
+			</td>
+			<td>
+				<sup><i>Optional</i></sup><br>
+				Custom HTML and SVG attributes that contain a selector string.
+				<br><br>Usage: <code lang="shell">"selector": [ "foo", ..., "baz" ]</code>
+			</td>
+		</tr>
+		<tr>
+			<td valign="top">
+				<code lang="shell">customAttributes.anchor</code>
+			</td>
+			<td>
+				<sup><i>Optional</i></sup><br>
+				Custom HTML and SVG attributes that contain a URL.
+				<br><br>Usage: <code lang="shell">"anchor": [ "foo", ..., "baz" ]</code>
+			</td>
+		</tr>
+		<tr>
+			<td valign="top">
+				<code lang="shell">customAttributes.style</code>
+			</td>
+			<td>
+				<sup><i>Optional</i></sup><br>
+				Custom HTML and SVG attributes that contain CSS styles.
+				<br><br>Usage: <code lang="shell">"style": [ "foo", ..., "baz" ]</code>
+			</td>
+		</tr>
+		<tr>
+			<td valign="top">
+				<code lang="shell">customAttributes.script</code>
+			</td>
+			<td>
+				<sup><i>Optional</i></sup><br>
+				Custom HTML and SVG attributes that contain JS code.
+				<br><br>Usage: <code lang="shell">"script": [ "foo", ..., "baz" ]</code>
 			</td>
 		</tr>
 	</tbody>

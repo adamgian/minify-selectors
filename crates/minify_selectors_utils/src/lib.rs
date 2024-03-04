@@ -508,7 +508,7 @@ impl Selectors {
 		}
 	}
 
-	/// Reorder selectors map, by highest frenquency first.
+	/// Reorder selectors map, by highest frequency first.
 	pub fn sort_by_frequency(&mut self) {
 		self.map
 			.sort_by(|_x_key, x_val, _y_key, y_val| y_val.counter.cmp(&x_val.counter));
