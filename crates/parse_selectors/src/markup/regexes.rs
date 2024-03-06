@@ -8,7 +8,7 @@ lazy_static! {
 
 	// Extract instances of <style></style> from HTML files.
 	pub static ref HTML_STYLE_ELEMENT: Regex = Regex::new(
-		r##"(?x)
+		r"(?x)
 			(?<tag_open>
 				<style[^>]*>
 			)
@@ -18,12 +18,12 @@ lazy_static! {
 			(?<tag_close>
 				<\/style>
 			)
-		"##
+		"
 	).unwrap();
 
 	// Extract instances of <script></script> from HTML files.
 	pub static ref HTML_SCRIPT_ELEMENT: Regex = Regex::new(
-		r##"(?x)
+		r"(?x)
 			(?<tag_open>
 				<script[^>]*>
 			)
@@ -33,7 +33,7 @@ lazy_static! {
 			(?<tag_close>
 				<\/script>
 			)
-		"##
+		"
 	).unwrap();
 
 	// Extracts all attributes with values from HTML.
@@ -69,7 +69,7 @@ lazy_static! {
 	//    - If followed by another attribute or /, there must be at least
 	//        a whitespace character before them.
 	pub static ref HTML_ATTRIBUTES: Regex = Regex::new(
-		r##"(?x)
+		r#"(?x)
 			<!--.*?-->
 			| <head[>\s](?:.|\s)*?<\/head>
 			| <style[>\s](?:.|\s)*?<\/style>
@@ -95,11 +95,11 @@ lazy_static! {
 				)
 				| [^\s\\<>"'=]+
 			)
-		"##
+		"#
 	).unwrap();
 
 	pub static ref ESCAPED_HTML_CHARS: Regex = Regex::new(
-		r##"(?x)
+		r"(?x)
 			(?<hexdecimal_char_ref>
 				&\#x[0-9A-Fa-f]{1,4};
 			)
@@ -109,7 +109,7 @@ lazy_static! {
 			| (?<named_char_ref>
 				&[A-Za-z]*+;?
 			)
-		"##
+		"
 	).unwrap();
 
 }

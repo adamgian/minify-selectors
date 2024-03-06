@@ -21,9 +21,9 @@ lazy_static! {
 	// - \140: backtick (`)
 	// - \173-\177: left brace ({) to delete
 	static ref INVALID_CHARACTERS: Regex = Regex::new(
-		r##"(?x)
+		r"(?x)
 			[\0-\54\56\57\72-\100\133-\136\140\173-\177]
-		"##
+		"
 	).unwrap();
 }
 

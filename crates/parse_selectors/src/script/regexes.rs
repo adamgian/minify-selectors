@@ -12,7 +12,7 @@ lazy_static! {
 	// Objective is to capture a string of the function
 	// input (between the parens) for further processing.
 	pub static ref JS_ARGUMENTS: Regex = Regex::new(
-		r##"(?x)
+		r#"(?x)
 			\/\*[^*]*\*+(?>[^\/*][^*]*\*+)*\/
 			| \/\/[^\n\r]*
 			| (?<function>
@@ -93,12 +93,12 @@ lazy_static! {
 					)?
 				)++
 			)
-		"##
+		"#
 	).unwrap();
 
 	// Extract the string value from JS property operations.
 	pub static ref JS_PROPERTIES : Regex = Regex::new(
-		r##"(?x)
+		r#"(?x)
 			\/\*[^*]*\*+(?>[^\/*][^*]*\*+)*\/
 			| \/\/[^\n\r]*
 			| (?<function>
@@ -138,12 +138,12 @@ lazy_static! {
 					[^)]'
 				)
 			)
-		"##
+		"#
 	).unwrap();
 
 	// Extract instances of <script></script> from HTML files.
 	pub static ref HTML_SCRIPT_ELEMENT: Regex = Regex::new(
-		r##"(?x)
+		r"(?x)
 			(?<tag_open>
 				<script[^>]*>
 			)
@@ -153,11 +153,11 @@ lazy_static! {
 			(?<tag_close>
 				<\/script>
 			)
-		"##
+		"
 	).unwrap();
 
 	pub static ref ESCAPED_JS_CHARS: Regex = Regex::new(
-		r##"(?x)
+		r"(?x)
 			(?<url_encoded_char>
 				%[0-9A-Fa-f]{2}
 			)
@@ -170,7 +170,7 @@ lazy_static! {
 			| (?<unicode_codepoint>
 				\\u{[0-9A-Fa-f]{1,}}
 			)
-		"##
+		"
 	).unwrap();
 
 }

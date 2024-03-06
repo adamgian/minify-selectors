@@ -1,27 +1,38 @@
 use std::collections::HashSet;
+use std::fs;
 use std::path::PathBuf;
 
 use clap::Parser;
 use indexmap::IndexMap;
+use serde::Deserialize;
 
 
 
 
 /// Post-processor that minifies classes and IDs in CSS, HTML, JS and SVG files.
-#[derive(Parser, Debug)]
+#[derive(Debug, Parser)]
 #[clap(
 	name = "minify-selectors",
 	version,
 	long_about = None,
 )]
 pub struct Cli {
+	/// Path to minify-selectors config file
+	#[clap(
+		short = 'c',
+		long,
+		conflicts_with_all(["input", "output"]),
+		required_unless_present_all(["input", "output"]),
+	)]
+	config: Option<String>,
+
 	/// Directory to process from
-	#[clap(short = 'i', long = "input")]
-	source: String,
+	#[clap(short = 'i', long, requires("output"))]
+	input: Option<String>,
 
 	/// Output directory to save files to
-	#[clap(short = 'o', long)]
-	output: String,
+	#[clap(short = 'o', long, requires("input"))]
+	output: Option<String>,
 
 	/// Index to start encoding from
 	#[clap(long = "start-index")]
@@ -40,27 +51,27 @@ pub struct Cli {
 	sort: Option<Option<bool>>,
 
 	/// Custom attributes that contain space-separated list of classes.
-	#[clap(long = "custom-class-attribute", use_value_delimiter = true)]
+	#[clap(long = "custom-class-attribute", value_delimiter = ' ', num_args = 1..)]
 	custom_class_attribute: Option<Vec<String>>,
 
 	/// Custom attributes that contain an ID (or space-separated list of IDs).
-	#[clap(long = "custom-id-attribute", use_value_delimiter = true)]
+	#[clap(long = "custom-id-attribute", value_delimiter = ' ', num_args = 1..)]
 	custom_id_attribute: Option<Vec<String>>,
 
 	/// Custom attributes that contain a selector string.
-	#[clap(long = "custom-selector-attribute", use_value_delimiter = true)]
+	#[clap(long = "custom-selector-attribute", value_delimiter = ' ', num_args = 1..)]
 	custom_selector_attribute: Option<Vec<String>>,
 
 	/// Custom attributes that contain a URL.
-	#[clap(long = "custom-anchor-attribute", use_value_delimiter = true)]
+	#[clap(long = "custom-anchor-attribute", value_delimiter = ' ', num_args = 1..)]
 	custom_anchor_attribute: Option<Vec<String>>,
 
 	/// Custom attributes that contain CSS styles.
-	#[clap(long = "custom-style-attribute", use_value_delimiter = true)]
+	#[clap(long = "custom-style-attribute", value_delimiter = ' ', num_args = 1..)]
 	custom_style_attribute: Option<Vec<String>>,
 
 	/// Custom attributes that contain JS code.
-	#[clap(long = "custom-script-attribute", use_value_delimiter = true)]
+	#[clap(long = "custom-script-attribute", value_delimiter = ' ', num_args = 1..)]
 	custom_script_attribute: Option<Vec<String>>,
 }
 
@@ -69,7 +80,7 @@ pub struct Cli {
 
 #[derive(Clone, Debug)]
 pub struct Config {
-	pub source: PathBuf,
+	pub input: PathBuf,
 	pub output: PathBuf,
 	pub alphabet: (Vec<char>, Vec<usize>),
 	pub start_index: usize,
@@ -79,8 +90,9 @@ pub struct Config {
 	pub custom_attributes: Vec<(String, String)>,
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, Default, PartialEq)]
 pub enum ProcessingSteps {
+	#[default]
 	ReadingFromFiles,
 	EncodingSelectors,
 	WritingToFiles,
@@ -88,67 +100,164 @@ pub enum ProcessingSteps {
 
 impl Config {
 	pub fn new() -> Self {
-		let args = Cli::parse();
+		let cli_args = Cli::parse();
 		let mut config: Config = Default::default();
+		let external_config: Option<ExternalConfig> = cli_args.config.clone().map(|config_path| {
+			serde_json::from_str(
+				&fs::read_to_string(config_path).expect("Could not find or open config file"),
+			)
+			.expect("Could not parse config file")
+		});
 
-		if let Some(alphabet) = args.alphabet {
+		if cli_args.config.is_some() {
+			config.input = PathBuf::from(&external_config.as_ref().unwrap().input);
+			config.output = PathBuf::from(&external_config.as_ref().unwrap().output);
+		} else {
+			config.input = PathBuf::from(&cli_args.input.unwrap());
+			config.output = PathBuf::from(&cli_args.output.unwrap());
+		}
+
+		if external_config.is_some() {
+			if let Some(alphabet) = &external_config.as_ref().unwrap().alphabet {
+				config.alphabet = encode_selector::into_alphabet_set(alphabet);
+			}
+		} else if let Some(alphabet) = cli_args.alphabet {
 			config.alphabet = encode_selector::into_alphabet_set(&alphabet);
 		}
-		if let Some(index) = args.start_index {
+
+		if external_config.is_some() {
+			if let Some(index) = external_config.as_ref().unwrap().start_index {
+				config.start_index = index;
+			}
+		} else if let Some(index) = cli_args.start_index {
 			config.start_index = index;
 		}
 
-		config.source = PathBuf::from(&args.source);
-		config.output = PathBuf::from(&args.output);
+		if external_config.is_some() {
+			if let Some(parallel) = external_config.as_ref().unwrap().parallel {
+				config.parallel = parallel;
+			}
+		} else {
+			config.parallel = match &cli_args.parallel {
+				None => false,
+				Some(None) => true,         // --parallel
+				Some(Some(true)) => true,   // --parallel=true
+				Some(Some(false)) => false, // --parallel=false
+			};
+		}
 
-		config.parallel = match &args.parallel {
-			None => false,
-			Some(None) => true,         // --parallel
-			Some(Some(true)) => true,   // --parallel=true
-			Some(Some(false)) => false, // --parallel=false
-		};
-		config.sort = match &args.sort {
-			None => true,
-			Some(None) => true,         // --sort
-			Some(Some(true)) => true,   // --sort=true
-			Some(Some(false)) => false, // --sort=false
-		};
+		if external_config.is_some() {
+			if let Some(sort) = external_config.as_ref().unwrap().sort {
+				config.sort = sort;
+			}
+		} else {
+			config.sort = match &cli_args.sort {
+				None => true,
+				Some(None) => true,         // --sort
+				Some(Some(true)) => true,   // --sort=true
+				Some(Some(false)) => false, // --sort=false
+			};
+		}
 
 		let mut custom_attributes: Vec<(String, String)> = vec![];
 
-		if let Some(attributes) = &args.custom_class_attribute {
+		if external_config.is_some() {
+			if let Some(attributes) = external_config
+				.as_ref()
+				.and_then(|external_config| external_config.custom_attributes.as_ref())
+				.and_then(|custom_attributes| custom_attributes.id.as_ref())
+			{
+				for name in attributes {
+					custom_attributes.push((name.to_string(), "class".to_string()));
+				}
+			}
+		} else if let Some(attributes) = &cli_args.custom_class_attribute {
 			for name in attributes {
 				custom_attributes.push((name.to_string(), "class".to_string()));
 			}
 		}
-		if let Some(attributes) = &args.custom_id_attribute {
+
+		if external_config.is_some() {
+			if let Some(attributes) = external_config
+				.as_ref()
+				.and_then(|external_config| external_config.custom_attributes.as_ref())
+				.and_then(|custom_attributes| custom_attributes.class.as_ref())
+			{
+				for name in attributes {
+					custom_attributes.push((name.to_string(), "id".to_string()));
+				}
+			}
+		} else if let Some(attributes) = &cli_args.custom_id_attribute {
 			for name in attributes {
 				custom_attributes.push((name.to_string(), "id".to_string()));
 			}
 		}
-		if let Some(attributes) = &args.custom_selector_attribute {
+
+		if external_config.is_some() {
+			if let Some(attributes) = external_config
+				.as_ref()
+				.and_then(|external_config| external_config.custom_attributes.as_ref())
+				.and_then(|custom_attributes| custom_attributes.selector.as_ref())
+			{
+				for name in attributes {
+					custom_attributes.push((name.to_string(), "selector".to_string()));
+				}
+			}
+		} else if let Some(attributes) = &cli_args.custom_selector_attribute {
 			for name in attributes {
 				custom_attributes.push((name.to_string(), "selector".to_string()));
 			}
 		}
-		if let Some(attributes) = &args.custom_anchor_attribute {
+
+		if external_config.is_some() {
+			if let Some(attributes) = external_config
+				.as_ref()
+				.and_then(|external_config| external_config.custom_attributes.as_ref())
+				.and_then(|custom_attributes| custom_attributes.anchor.as_ref())
+			{
+				for name in attributes {
+					custom_attributes.push((name.to_string(), "anchor".to_string()));
+				}
+			}
+		} else if let Some(attributes) = &cli_args.custom_anchor_attribute {
 			for name in attributes {
 				custom_attributes.push((name.to_string(), "anchor".to_string()));
 			}
 		}
-		if let Some(attributes) = &args.custom_style_attribute {
+
+		if external_config.is_some() {
+			if let Some(attributes) = external_config
+				.as_ref()
+				.and_then(|external_config| external_config.custom_attributes.as_ref())
+				.and_then(|custom_attributes| custom_attributes.style.as_ref())
+			{
+				for name in attributes {
+					custom_attributes.push((name.to_string(), "style".to_string()));
+				}
+			}
+		} else if let Some(attributes) = &cli_args.custom_style_attribute {
 			for name in attributes {
 				custom_attributes.push((name.to_string(), "style".to_string()));
 			}
 		}
-		if let Some(attributes) = &args.custom_script_attribute {
+
+		if external_config.is_some() {
+			if let Some(attributes) = external_config
+				.as_ref()
+				.and_then(|external_config| external_config.custom_attributes.as_ref())
+				.and_then(|custom_attributes| custom_attributes.script.as_ref())
+			{
+				for name in attributes {
+					custom_attributes.push((name.to_string(), "script".to_string()));
+				}
+			}
+		} else if let Some(attributes) = &cli_args.custom_script_attribute {
 			for name in attributes {
 				custom_attributes.push((name.to_string(), "script".to_string()));
 			}
 		}
 
 		config.custom_attributes = custom_attributes;
-
 		config
 	}
 }
@@ -156,7 +265,7 @@ impl Config {
 impl Default for Config {
 	fn default() -> Self {
 		Self {
-			source: PathBuf::from(""),
+			input: PathBuf::from(""),
 			output: PathBuf::from(""),
 			alphabet: encode_selector::into_alphabet_set(
 				"0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
@@ -173,10 +282,39 @@ impl Default for Config {
 
 
 
+/// Dedicated struct to handle the external config file specific structure
+#[allow(dead_code)]
+#[derive(Clone, Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct ExternalConfig {
+	input: String,
+	output: String,
+	alphabet: Option<String>,
+	// #[serde(rename = "startIndex")]
+	start_index: Option<usize>,
+	parallel: Option<bool>,
+	sort: Option<bool>,
+	// #[serde(rename = "customAttributes")]
+	custom_attributes: Option<CustomAttributes>,
+}
+#[allow(dead_code)]
+#[derive(Clone, Debug, Deserialize)]
+struct CustomAttributes {
+	class: Option<Vec<String>>,
+	id: Option<Vec<String>>,
+	selector: Option<Vec<String>>,
+	anchor: Option<Vec<String>>,
+	style: Option<Vec<String>>,
+	script: Option<Vec<String>>,
+}
+
+
+
+
 /// Metadata for selector
 #[derive(Clone, Debug, Default)]
 pub struct Selector {
-	pub r#type: Option<SelectorType>,
+	pub kind: Option<SelectorType>,
 	pub replacement: Option<String>,
 	pub counter: usize,
 	pub markup_class_counter: usize,
@@ -208,7 +346,7 @@ pub enum SelectorUsage {
 impl Selector {
 	pub fn new(selector: &str) -> Self {
 		Self {
-			r#type: match selector.chars().next() {
+			kind: match selector.chars().next() {
 				Some('.') => Some(SelectorType::Class),
 				Some('#') => Some(SelectorType::Id),
 				_ => panic!("Missing or unknown selector type"),
@@ -345,7 +483,7 @@ impl Selectors {
 				}
 
 				value.set_replacement(encode_selector::to_radix(
-					match value.r#type {
+					match value.kind {
 						Some(SelectorType::Class) => &self.class_counter,
 						Some(SelectorType::Id) => &self.id_counter,
 						None => {
@@ -355,11 +493,11 @@ impl Selectors {
 					&config.alphabet,
 				));
 
-				if value.r#type == Some(SelectorType::Class) {
+				if value.kind == Some(SelectorType::Class) {
 					// Also keep track of encoded class name
 					encoded_classes.insert(value.replacement.to_owned().unwrap());
 					self.class_counter += 1;
-				} else if value.r#type == Some(SelectorType::Id) {
+				} else if value.kind == Some(SelectorType::Id) {
 					self.id_counter += 1;
 				}
 			}
@@ -370,7 +508,7 @@ impl Selectors {
 		}
 	}
 
-	/// Reorder selectors map, by highest frenquency first.
+	/// Reorder selectors map, by highest frequency first.
 	pub fn sort_by_frequency(&mut self) {
 		self.map
 			.sort_by(|_x_key, x_val, _y_key, y_val| y_val.counter.cmp(&x_val.counter));

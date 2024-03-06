@@ -468,7 +468,9 @@ fn process_file(
 	let mut selectors = Selectors::new();
 	let mut config = Config::default();
 	// Inserting custom attribute to check
-	config.custom_attributes.push(("data-target".to_string(), "id".to_string()));
+	config
+		.custom_attributes
+		.push(("data-target".to_string(), "id".to_string()));
 
 	match file_type {
 		"css" => parse_selectors::read_from_css(&mut file, &mut selectors, &config),
@@ -499,7 +501,9 @@ fn process_file_with_sort(
 	let mut selectors = Selectors::new();
 	let mut config = Config::default();
 	// Inserting custom attribute to check
-	config.custom_attributes.push(("data-target".to_string(), "id".to_string()));
+	config
+		.custom_attributes
+		.push(("data-target".to_string(), "id".to_string()));
 
 	match file_type {
 		"css" => parse_selectors::read_from_css(&mut file, &mut selectors, &config),

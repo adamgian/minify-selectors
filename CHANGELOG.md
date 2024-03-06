@@ -1,3 +1,15 @@
+# v2.6.0
+<sub>TBD</sub>
+
+### Updates
+- Accept JSON configuration file
+- Breaking change: use white-space character to delimiter CLI arguments that can accept multiple values
+
+<br>
+
+
+
+
 # v2.4.1
 <sub>18 Feb 2023</sub>
 
