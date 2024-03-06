@@ -1,5 +1,13 @@
-# v2.6.0
+# v2.6.x
 <sub>TBD</sub>
+
+<br>
+
+
+
+
+# v2.6.0
+<sub>6 Mar 2024</sub>
 
 ### Updates
 - Accept JSON configuration file
