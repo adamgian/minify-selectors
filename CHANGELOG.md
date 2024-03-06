@@ -7,7 +7,7 @@
 
 
 # v2.6.0
-<sub>6 Mar 2024</sub>
+<sub>7 Mar 2024</sub>
 
 ### Updates
 - Accept JSON configuration file
