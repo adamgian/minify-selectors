@@ -7,7 +7,7 @@ keywords = [ "radix" ]
 license = "Apache-2.0"
 name = "encode_selector"
 repository = "https://github.com/adamgian/minify-selectors.git"
-version = "0.4.1"
+version = "0.4.2"
 
 
 
