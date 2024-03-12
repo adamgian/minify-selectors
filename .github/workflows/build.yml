@@ -5,6 +5,7 @@ on:
     inputs:
       tag:
         description: "Version tag"
+        required: true
 
 env:
   CARGO_TERM_COLOR: always
@@ -39,6 +40,8 @@ jobs:
         tar -C build -czvf build/minify-selectors-linux-64.tar.gz minify-selectors-linux-64
     - name: Upload binaries to draft release
       uses: softprops/action-gh-release@v2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         files: |
           build/minify-selectors-linux-arm64.tar.gz
@@ -46,8 +49,6 @@ jobs:
         draft: true
         name: "${{ github.event.inputs.tag }}"
         tag_name: "${{ github.event.inputs.tag }}"
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build-ubuntu-32:
     runs-on: ubuntu-20.04
@@ -67,13 +68,13 @@ jobs:
         tar -C build -czvf build/minify-selectors-linux-32.tar.gz minify-selectors-linux-32
     - name: Upload binaries to draft release
       uses: softprops/action-gh-release@v2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         files: build/minify-selectors-linux-32.tar.gz
         draft: true
         name: "${{ github.event.inputs.tag }}"
         tag_name: "${{ github.event.inputs.tag }}"
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build-macos:
     runs-on: macos-latest
@@ -98,6 +99,8 @@ jobs:
         tar -C build -czvf build/minify-selectors-macos-arm64.tar.gz minify-selectors-macos-arm64
     - name: Upload binaries to draft release
       uses: softprops/action-gh-release@v2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         files: |
           build/minify-selectors-macos-64.tar.gz
@@ -105,8 +108,6 @@ jobs:
         draft: true
         name: "${{ github.event.inputs.tag }}"
         tag_name: "${{ github.event.inputs.tag }}"
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build-windows-64:
     runs-on: windows-latest
@@ -124,14 +125,14 @@ jobs:
         tar -C build -czvf build/minify-selectors-windows-64.tar.gz minify-selectors-windows-64
     - name: Upload binaries to draft release
       uses: softprops/action-gh-release@v2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         files: |
           build/minify-selectors-windows-64.tar.gz
         draft: true
         name: "${{ github.event.inputs.tag }}"
         tag_name: "${{ github.event.inputs.tag }}"
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build-windows-32:
     runs-on: windows-latest
@@ -149,14 +150,14 @@ jobs:
         tar -C build -czvf build/minify-selectors-windows-32.tar.gz minify-selectors-windows-32
     - name: Upload binaries to draft release
       uses: softprops/action-gh-release@v2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         files: |
           build/minify-selectors-windows-32.tar.gz
         draft: true
         name: "${{ github.event.inputs.tag }}"
         tag_name: "${{ github.event.inputs.tag }}"
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   publish:
     runs-on: ubuntu-latest
@@ -177,5 +178,17 @@ jobs:
         node-version: 20
     - name: Set release version
       run: echo "RELEASE_VERSION=${{ github.ref_name }}" >> $GITHUB_ENV
-    - name: Tag npm release (default, latest)
+    - name: Set npm release tag
       run: echo "NPM_TAG=latest" >> $GITHUB_ENV
+    - name: Compose version notes
+      run: |
+        sed -n "/# ${{ github.event.inputs.tag }}/,/<br>/p" CHANGELOG.md \
+          | sed -n "/###/,/<br>/p" \
+          | sed "s/<br>//" > VERSION_NOTES.md
+    - name: Publish GitHub draft release
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        gh release edit ${{ github.event.inputs.tag }} \
+          --draft=false \
+          --notes-file VERSION_NOTES.md
