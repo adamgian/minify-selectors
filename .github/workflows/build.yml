@@ -195,3 +195,10 @@ jobs:
           --draft=false \
           --notes-file VERSION_NOTES.md \
           --latest=${{ !contains(github.event.inputs.tag, 'alpha') && !contains(github.event.inputs.tag, 'beta') }}
+    - name: Publish to npm
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      run: |
+        echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+        npm publish --provenance --access public --tag $NPM_TAG
