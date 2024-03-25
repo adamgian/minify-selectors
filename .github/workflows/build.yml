@@ -1,13 +1,18 @@
-name: Build binaries
+name: Build binaries and publish
 
 on:
   workflow_dispatch:
     inputs:
       tag:
         description: "Version tag"
+        required: true
 
 env:
   CARGO_TERM_COLOR: always
+
+permissions:
+  contents: write
+  id-token: write
 
 jobs:
   build-ubuntu-64:
@@ -34,7 +39,9 @@ jobs:
         cp target/x86_64-unknown-linux-gnu/release/minify-selectors build/minify-selectors-linux-64
         tar -C build -czvf build/minify-selectors-linux-64.tar.gz minify-selectors-linux-64
     - name: Upload binaries to draft release
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         files: |
           build/minify-selectors-linux-arm64.tar.gz
@@ -42,8 +49,6 @@ jobs:
         draft: true
         name: "${{ github.event.inputs.tag }}"
         tag_name: "${{ github.event.inputs.tag }}"
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build-ubuntu-32:
     runs-on: ubuntu-20.04
@@ -62,14 +67,14 @@ jobs:
         cp target/i686-unknown-linux-gnu/release/minify-selectors build/minify-selectors-linux-32
         tar -C build -czvf build/minify-selectors-linux-32.tar.gz minify-selectors-linux-32
     - name: Upload binaries to draft release
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         files: build/minify-selectors-linux-32.tar.gz
         draft: true
         name: "${{ github.event.inputs.tag }}"
         tag_name: "${{ github.event.inputs.tag }}"
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build-macos:
     runs-on: macos-latest
@@ -93,7 +98,9 @@ jobs:
         cp target/aarch64-apple-darwin/release/minify-selectors build/minify-selectors-macos-arm64
         tar -C build -czvf build/minify-selectors-macos-arm64.tar.gz minify-selectors-macos-arm64
     - name: Upload binaries to draft release
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         files: |
           build/minify-selectors-macos-64.tar.gz
@@ -101,10 +108,8 @@ jobs:
         draft: true
         name: "${{ github.event.inputs.tag }}"
         tag_name: "${{ github.event.inputs.tag }}"
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  build-windows:
+  build-windows-64:
     runs-on: windows-latest
     steps:
     - name: Checkout
@@ -112,27 +117,89 @@ jobs:
     - name: Install dependencies
       run: |
         rustup target add x86_64-pc-windows-msvc
-        rustup target add i686-pc-windows-msvc
     - name: Build Windows binary (64-bit)
       run: |
-        $env:RUST_BACKTRACE="full"; $env:CARGO_PROFILE_RELEASE_BUILD_OVERRIDE_DEBUG="true"; cargo build --release --target x86_64-pc-windows-msvc
+        $env:RUST_BACKTRACE="full"; $env:CARGO_PROFILE_RELEASE_BUILD_OVERRIDE_DEBUG="true"; `
+          cargo build --release --target x86_64-pc-windows-msvc
         mkdir -p build/minify-selectors-windows-64
         cp target/x86_64-pc-windows-msvc/release/minify-selectors.exe build/minify-selectors-windows-64
         tar -C build -czvf build/minify-selectors-windows-64.tar.gz minify-selectors-windows-64
+    - name: Upload binaries to draft release
+      uses: softprops/action-gh-release@v2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        files: |
+          build/minify-selectors-windows-64.tar.gz
+        draft: true
+        name: "${{ github.event.inputs.tag }}"
+        tag_name: "${{ github.event.inputs.tag }}"
+
+  build-windows-32:
+    runs-on: windows-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Install dependencies
+      run: |
+        rustup target add i686-pc-windows-msvc
     - name: Build Windows binary (32-bit)
       run: |
-        $env:RUST_BACKTRACE="full"; $env:CARGO_PROFILE_RELEASE_BUILD_OVERRIDE_DEBUG="true"; cargo build --release --target i686-pc-windows-msvc
+        $env:RUST_BACKTRACE="full"; $env:CARGO_PROFILE_RELEASE_BUILD_OVERRIDE_DEBUG="true"; `
+          cargo build --release --target i686-pc-windows-msvc
         mkdir -p build/minify-selectors-windows-32
         cp target/i686-pc-windows-msvc/release/minify-selectors.exe build/minify-selectors-windows-32
         tar -C build -czvf build/minify-selectors-windows-32.tar.gz minify-selectors-windows-32
     - name: Upload binaries to draft release
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         files: |
-          build/minify-selectors-windows-64.tar.gz
           build/minify-selectors-windows-32.tar.gz
         draft: true
         name: "${{ github.event.inputs.tag }}"
         tag_name: "${{ github.event.inputs.tag }}"
+
+  publish:
+    runs-on: ubuntu-latest
+    needs:
+      - build-ubuntu-64
+      - build-ubuntu-32
+      - build-macos
+      - build-windows-64
+      - build-windows-32
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Enable Corepack
+      run: corepack enable
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+    - name: Set up npm
+      run: |
+        git config user.email "contact@adamgian.com"
+        git config user.name "Adam Gian"
+        npm version ${{ github.event.inputs.tag }}
+    - name: Compose version notes
+      run: |
+        sed -n "/# ${{ github.event.inputs.tag }}/,/<br>/p" CHANGELOG.md \
+          | sed -n "/###/,/<br>/p" \
+          | sed "s/<br>//" > VERSION_NOTES.md
+    - name: Publish GitHub draft release
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        gh release edit ${{ github.event.inputs.tag }} \
+          --draft=false \
+          --notes-file VERSION_NOTES.md \
+          --latest=${{ !contains(github.event.inputs.tag, 'alpha') && !contains(github.event.inputs.tag, 'beta') }}
+    - name: Publish to npm
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      run: |
+        echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+        npm publish --provenance --access public --tag latest
