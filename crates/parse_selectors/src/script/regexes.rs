@@ -97,7 +97,7 @@ lazy_static! {
 	).unwrap();
 
 	// Extract the string value from JS property operations.
-	pub static ref JS_PROPERTIES : Regex = Regex::new(
+	pub static ref JS_PROPERTIES: Regex = Regex::new(
 		r#"(?x)
 			\/\*[^*]*\*+(?>[^\/*][^*]*\*+)*\/
 			| \/\/[^\n\r]*
@@ -123,6 +123,38 @@ lazy_static! {
 			)
 			(?<join>
 				\s*+[=+\-!<>]{1,3}\s*+
+			)
+			(?<value>
+				(?:
+					`(?:[^`\\] | \\.)*
+					[^)]`
+				)
+				| (?:
+					"(?:[^"\\] | \\.)*
+					[^)]
+				)
+				| (?:
+					'(?:[^'\\] | \\.)*
+					[^)]'
+				)
+			)
+		"#
+	).unwrap();
+
+	// Extracts string value from bracket notation property accessors
+	//
+	// Try to match multi-line or single-line comments first, to prevent
+	// any matches that occur within code comments. These kinds of
+	// matches will not have anything in the named groups.
+	pub static ref JS_BRACKET_ACCESSORS: Regex = Regex::new(
+		r#"(?x)
+			\/\*[^*]*\*+(?>[^\/*][^*]*\*+)*\/
+			| \/\/[^\n\r]*
+			| (?<property>
+				\.children
+			)
+			(?<open_bracket>
+				\s*+\[\s*+
 			)
 			(?<value>
 				(?:

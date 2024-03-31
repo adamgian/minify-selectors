@@ -120,24 +120,24 @@ pub fn analyse_prefixed_selectors(
 			continue;
 		}
 
-		let mut indentifier = unescape_css_chars(capture.at(3).unwrap().trim());
+		let mut identifier = unescape_css_chars(capture.at(3).unwrap().trim());
 
 		match capture.at(2) {
 			// "__class--foo"
-			Some("class") => indentifier = format!(".{indentifier}"),
+			Some("class") => identifier = format!(".{identifier}"),
 			// "__id--foo"
-			Some("id") => indentifier = format!("#{indentifier}"),
+			Some("id") => identifier = format!("#{identifier}"),
 			// "#__--foo" or ".__--bar"
 			Some(&_) | None => {
-				indentifier = format!(
+				identifier = format!(
 					"{prefix}{name}",
 					prefix = capture.at(1).unwrap(),
-					name = indentifier,
+					name = identifier,
 				)
 			},
 		}
 
-		add_selector_to_map(&indentifier, selectors, Some(SelectorUsage::Prefix));
+		add_selector_to_map(&identifier, selectors, Some(SelectorUsage::Prefix));
 	}
 }
 
@@ -147,46 +147,46 @@ pub fn rewrite_prefixed_selectors(
 	selectors: &Selectors,
 ) {
 	*file_string = regexes::PREFIXED_SELECTORS.replace_all(file_string, |capture: &Captures| {
-		let mut indentifier = unescape_css_chars(capture.at(3).unwrap().trim());
+		let mut identifier = unescape_css_chars(capture.at(3).unwrap().trim());
 
 		match capture.at(2) {
 			// "__class--foo"
 			Some("class") => {
-				indentifier = get_encoded_selector(&format!(".{indentifier}"), selectors)
-					.unwrap_or(indentifier);
+				identifier = get_encoded_selector(&format!(".{identifier}"), selectors)
+					.unwrap_or(identifier);
 			},
 			// "__id--foo"
 			Some("id") => {
-				indentifier = get_encoded_selector(&format!("#{indentifier}"), selectors)
-					.unwrap_or(indentifier);
+				identifier = get_encoded_selector(&format!("#{identifier}"), selectors)
+					.unwrap_or(identifier);
 			},
 			// "#__ignore--foo", ".__ignore--bar" or "__ignore--baz"
 			Some("ignore") => {
-				indentifier = format!(
+				identifier = format!(
 					"{prefix}{name}",
 					prefix = capture.at(1).unwrap_or(""),
-					name = indentifier,
+					name = identifier,
 				);
 			},
 			// "#__--foo" or ".__--bar"
 			Some(&_) | None => {
-				indentifier = format!(
+				identifier = format!(
 					"{prefix}{name}",
 					prefix = capture.at(1).unwrap(),
 					name = get_encoded_selector(
 						&format!(
 							"{prefix}{name}",
 							prefix = capture.at(1).unwrap(),
-							name = indentifier,
+							name = identifier,
 						),
 						selectors,
 					)
-					.unwrap_or(indentifier)
+					.unwrap_or(identifier)
 				);
 			},
 		}
 
-		indentifier
+		identifier
 	});
 }
 
@@ -196,7 +196,7 @@ pub fn rewrite_prefixed_selectors(
 ///  - As regexes::STRING_DELIMITED_BY_SPACE regex is simple - only grouping non
 ///    whitespace characters together - any quote delimiters will need to be
 ///    trimmed and added back on afterwards.
-///  - context is neseccary in order to determine what the token(s) should be
+///  - context is necessary in order to determine what the token(s) should be
 ///    processed as (e.g. class or id).
 pub fn analyse_string_of_tokens(
 	string: &mut String,
@@ -247,7 +247,7 @@ pub fn analyse_string_of_tokens(
 ///  - As regexes::STRING_DELIMITED_BY_SPACE regex is simple - only grouping non
 ///    whitespace characters together - any quote delimiters will need to be
 ///    trimmed and added back on afterwards.
-///  - context is neseccary in order to determine what the token(s) should be
+///  - context is necessary in order to determine what the token(s) should be
 ///    processed as (e.g. class or id).
 pub fn rewrite_string_of_tokens(
 	string: &mut String,
@@ -300,7 +300,7 @@ pub fn rewrite_string_of_tokens(
 /// Analyse function arguments, delimited by commas.
 ///
 /// Notes:
-///  - context is neseccary in order to determine what the token(s) should be
+///  - context is necessary in order to determine what the token(s) should be
 ///    processed as (e.g. class or id).
 pub fn analyse_string_of_arguments(
 	string: &mut str,
@@ -339,7 +339,7 @@ pub fn analyse_string_of_arguments(
 /// Rewrite function arguments, delimited by commas.
 ///
 /// Notes:
-///  - context is neseccary in order to determine what the token(s) should be
+///  - context is necessary in order to determine what the token(s) should be
 ///    processed as (e.g. class or id).
 pub fn rewrite_string_of_arguments(
 	string: &mut String,

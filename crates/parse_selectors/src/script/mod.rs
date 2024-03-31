@@ -19,6 +19,7 @@ pub fn analyse_js(
 ) {
 	analyse_js_arguments(file_string, selectors, config);
 	analyse_js_properties(file_string, selectors, config);
+	analyse_js_bracket_accessors(file_string, selectors);
 	super::analyse_prefixed_selectors(file_string, selectors);
 }
 
@@ -30,8 +31,10 @@ pub fn rewrite_js(
 ) {
 	rewrite_js_arguments(file_string, selectors, config);
 	rewrite_js_properties(file_string, selectors, config);
+	rewrite_js_bracket_accessors(file_string, selectors);
 	super::rewrite_prefixed_selectors(file_string, selectors);
 }
+
 
 /// Analyse JS function arguments.
 pub fn analyse_js_arguments(
@@ -222,7 +225,6 @@ pub fn analyse_js_arguments(
 	}
 }
 
-
 /// Rewrite JS function arguments.
 pub fn rewrite_js_arguments(
 	file_string: &mut String,
@@ -401,6 +403,7 @@ pub fn rewrite_js_arguments(
 	});
 }
 
+
 /// Analyse JS property operation values.
 pub fn analyse_js_properties(
 	file_string: &mut str,
@@ -408,7 +411,7 @@ pub fn analyse_js_properties(
 	config: &Config,
 ) {
 	for capture in script_regex::JS_PROPERTIES.captures_iter(file_string) {
-		// Matched string is a multiline or single line comment
+		// Matched string is a multi-line or single-line comment
 		// i.e. it does not have any further capture groups
 		if capture.at(1).is_none() {
 			continue;
@@ -463,7 +466,7 @@ pub fn rewrite_js_properties(
 	config: &Config,
 ) {
 	*file_string = script_regex::JS_PROPERTIES.replace_all(file_string, |capture: &Captures| {
-		// Matched string is a multiline or single line comment
+		// Matched string is a multi-line or single-line comment
 		// i.e. it does not have any further capture groups
 		if capture.at(1).is_none() {
 			return capture.at(0).unwrap().to_string();
@@ -497,6 +500,63 @@ pub fn rewrite_js_properties(
 		)
 	});
 }
+
+
+/// Analyse JS property accessors.
+pub fn analyse_js_bracket_accessors(
+	file_string: &mut str,
+	selectors: &mut Selectors,
+) {
+	for capture in script_regex::JS_BRACKET_ACCESSORS.captures_iter(file_string) {
+		// Matched string is a multi-line or single-line comment
+		// i.e. it does not have any further capture groups
+		if capture.at(1).is_none() {
+			continue;
+		}
+
+		let mut property_value: String = unescape_js_chars(capture.at(3).unwrap());
+		let property_name: &str = capture.at(1).unwrap();
+
+		if property_name == ".children" {
+			super::analyse_string_of_tokens(
+				&mut property_value,
+				selectors,
+				"id",
+				Some(SelectorUsage::Script),
+			);
+		}
+	}
+}
+
+/// Rewrite JS property accessors.
+pub fn rewrite_js_bracket_accessors(
+	file_string: &mut String,
+	selectors: &Selectors,
+) {
+	*file_string =
+		script_regex::JS_BRACKET_ACCESSORS.replace_all(file_string, |capture: &Captures| {
+			// Matched string is a multi-line or single-line comment
+			// i.e. it does not have any further capture groups
+			if capture.at(1).is_none() {
+				return capture.at(0).unwrap().to_string();
+			}
+
+			let mut property_value: String = unescape_js_chars(capture.at(3).unwrap());
+			let property_name: &str = capture.at(1).unwrap();
+
+			if property_name == ".children" {
+				super::rewrite_string_of_tokens(&mut property_value, selectors, "id");
+			}
+
+			format!(
+				"{name}{open_bracket}{value}",
+				name = property_name,
+				open_bracket = capture.at(2).unwrap(),
+				value = property_value,
+			)
+		});
+}
+
 
 // Converts any escaped chars in JS substring to UTF8 char.
 pub fn unescape_js_chars(js_string: &str) -> String {
