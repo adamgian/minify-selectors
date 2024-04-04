@@ -96,6 +96,16 @@ fn css_files() {
 fn js_files() {
 	let dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/js/");
 
+	// children
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("children/output.js")).unwrap(),
+		process_file("js", &dir.clone().join("children/source.js"))
+	);
+	assert_eq!(
+		fs::read_to_string(dir.clone().join("children/output-sorted.js")).unwrap(),
+		process_file_with_sort("js", &dir.clone().join("children/source.js"))
+	);
+
 	// classList
 	assert_eq!(
 		fs::read_to_string(dir.clone().join("class-list/output.js")).unwrap(),
