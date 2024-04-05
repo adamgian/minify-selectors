@@ -474,7 +474,7 @@ checksum = "6c8640c5d730cb13ebd907d8d04b52f55ac9a2eec55b440c8892f40d56c76c1d"
 
 [[package]]
 name = "minify_selectors"
-version = "2.7.0"
+version = "2.8.1"
 dependencies = [
  "clap 4.5.4",
  "encode_selector",

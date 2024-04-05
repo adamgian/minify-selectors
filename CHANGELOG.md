@@ -1,8 +1,12 @@
-# v2.7.0
+# v2.8.1
 <sub>TBD</sub>
 
 ### Updates
 - Support bracket notation accessors for the `.children` property
+- Process files with the following extensions as well: `.htm`, `.mjs` and `.cjs`
+
+### Fixes
+- Ignore casing of file extensions
 
 <br>
 
