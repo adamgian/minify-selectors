@@ -85,7 +85,10 @@ fn process_files(
 		// Finally, check file has a extension that can be processed
 		matches!(
 			item.path().extension().and_then(OsStr::to_str),
-			Some("css") | Some("html") | Some("js") | Some("svg")
+			Some("css")
+				| Some("html") | Some("htm")
+				| Some("js") | Some("mjs")
+				| Some("cjs") | Some("svg")
 		)
 	}
 
@@ -149,10 +152,12 @@ fn write_to_file(
 
 	match file_path.extension().and_then(OsStr::to_str) {
 		Some("css") => parse_selectors::write_to_css(&mut file_contents, selectors, config),
-		Some("html") | Some("svg") => {
+		Some("html") | Some("htm") | Some("svg") => {
 			parse_selectors::write_to_html(&mut file_contents, selectors, config)
 		},
-		Some("js") => parse_selectors::write_to_js(&mut file_contents, selectors, config),
+		Some("js") | Some("mjs") | Some("cjs") => {
+			parse_selectors::write_to_js(&mut file_contents, selectors, config)
+		},
 		_ => (),
 	}
 
