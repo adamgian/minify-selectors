@@ -1,5 +1,8 @@
-# v2.6.x
+# v2.7.0
 <sub>TBD</sub>
+
+### Updates
+- Support bracket notation accessors for the `.children` property
 
 <br>
 
@@ -102,7 +105,7 @@
 <sub>22 Nov 2022</sub>
 
 ### Updates
-- Add support for escaped decimal and hexadecimal charater references in HTML
+- Add support for escaped decimal and hexadecimal character references in HTML
 - Add support for encoded URLs in JS
 
 ### Fixes
@@ -169,7 +172,7 @@ No noteworthy changes since the last version
 - Keep track of IDs and classes separately
 
 ### Fixes
-- Convert captured attirbute names to lowercase before using
+- Convert captured attribute names to lowercase before using
 
 <br>
 
@@ -195,7 +198,7 @@ No noteworthy changes since the last version
 
 ### Updates
 - Parse and encode minify-selectors specific prefixed selectors ([#11](https://github.com/adamgian/minify-selectors/issues/11))
-- Add support for JS Location interface proprties: `window.location.hash`, `window.location.href` and `window.location`
+- Add support for JS Location interface properties: `window.location.hash`, `window.location.href` and `window.location`
 - Add support for JS URL methods: `history.pushState()`, `history.replaceState()`, `window.location.assign()`, `window.location.replace()` and `window.open()`
 
 ### Fixes

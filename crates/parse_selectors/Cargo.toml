@@ -7,7 +7,7 @@ keywords = [ "CSS", "selectors", "minifier", "API" ]
 license = "Apache-2.0"
 name = "parse_selectors"
 repository = "https://github.com/adamgian/minify-selectors.git"
-version = "2.1.2"
+version = "2.2.0"
 
 
 [dependencies]
