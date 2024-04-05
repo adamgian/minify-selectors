@@ -84,7 +84,11 @@ fn process_files(
 		};
 		// Finally, check file has a extension that can be processed
 		matches!(
-			item.path().extension().and_then(OsStr::to_str),
+			item.path()
+				.extension()
+				.and_then(OsStr::to_str)
+				.map(|ext| ext.to_lowercase())
+				.as_deref(),
 			Some("css")
 				| Some("html") | Some("htm")
 				| Some("js") | Some("mjs")
@@ -131,7 +135,12 @@ fn analyse_file(
 	let mut file_contents = fs::read_to_string(file_path)?;
 	println!("Reading file: {}", file_path.display());
 
-	match file_path.extension().and_then(OsStr::to_str) {
+	match file_path
+		.extension()
+		.and_then(OsStr::to_str)
+		.map(|extension| extension.to_lowercase())
+		.as_deref()
+	{
 		Some("css") => parse_selectors::read_from_css(&mut file_contents, selectors, config),
 		Some("html") | Some("svg") => {
 			parse_selectors::read_from_html(&mut file_contents, selectors, config)
@@ -150,7 +159,12 @@ fn write_to_file(
 	let mut file_contents = fs::read_to_string(file_path)?;
 	println!("Processing file: {}", file_path.display());
 
-	match file_path.extension().and_then(OsStr::to_str) {
+	match file_path
+		.extension()
+		.and_then(OsStr::to_str)
+		.map(|extension| extension.to_lowercase())
+		.as_deref()
+	{
 		Some("css") => parse_selectors::write_to_css(&mut file_contents, selectors, config),
 		Some("html") | Some("htm") | Some("svg") => {
 			parse_selectors::write_to_html(&mut file_contents, selectors, config)
