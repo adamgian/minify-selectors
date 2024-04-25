@@ -16,7 +16,7 @@ jq -c '.[]' npm/platforms.json | while read build; do
 	sed -i "s/FIXME_NODE_PLATFORM/$node_platform/g" "npm/$package_name/package.json"
 	sed -i "s/FIXME_ARCHITECTURE/$architecture/g" "npm/$package_name/package.json"
 
-	rust_target_path="target/$rust_target/release/"
+	rust_target_path="artifact/$rust_target/release/"
 	rust_target_name="minify-selectors"
 	if [ "$node_platform" == "win32" ]; then
 		rust_target_name+=".exe"

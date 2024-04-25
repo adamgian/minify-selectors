@@ -38,6 +38,13 @@ jobs:
   #       mkdir -p build/minify-selectors-linux-arm64
   #       cp target/aarch64-unknown-linux-gnu/release/minify-selectors build/minify-selectors-linux-arm64
   #       tar -C build -czvf build/minify-selectors-linux-arm64.tar.gz minify-selectors-linux-arm64
+  #   - name: 'Retain built binaries'
+  #     uses: actions/upload-artifact@v4
+  #     with:
+  #       path: |
+  #         target
+  #         !target/release
+  #         !target/*.*
   #   - name: Upload binaries to draft release
   #     uses: softprops/action-gh-release@v2
   #     env:
@@ -66,6 +73,13 @@ jobs:
         mkdir -p build/minify-selectors-linux-32
         cp target/i686-unknown-linux-gnu/release/minify-selectors build/minify-selectors-linux-32
         tar -C build -czvf build/minify-selectors-linux-32.tar.gz minify-selectors-linux-32
+    - name: 'Retain built binaries'
+      uses: actions/upload-artifact@v4
+      with:
+        path: |
+          target
+          !target/release
+          !target/*.*
     - name: Upload binaries to draft release
       uses: softprops/action-gh-release@v2
       env:
@@ -97,6 +111,13 @@ jobs:
   #       mkdir -p build/minify-selectors-darwin-arm64
   #       cp target/aarch64-apple-darwin/release/minify-selectors build/minify-selectors-darwin-arm64
   #       tar -C build -czvf build/minify-selectors-darwin-arm64.tar.gz minify-selectors-darwin-arm64
+  #   - name: 'Retain built binaries'
+  #     uses: actions/upload-artifact@v4
+  #     with:
+  #       path: |
+  #         target
+  #         !target/release
+  #         !target/*.*
   #   - name: Upload binaries to draft release
   #     uses: softprops/action-gh-release@v2
   #     env:
@@ -124,6 +145,13 @@ jobs:
   #       mkdir -p build/minify-selectors-windows-64
   #       cp target/x86_64-pc-windows-msvc/release/minify-selectors.exe build/minify-selectors-windows-64
   #       tar -C build -czvf build/minify-selectors-windows-64.tar.gz minify-selectors-windows-64
+  #   - name: 'Retain built binaries'
+  #     uses: actions/upload-artifact@v4
+  #     with:
+  #       path: |
+  #         target
+  #         !target/release
+  #         !target/*.*
   #   - name: Upload binaries to draft release
   #     uses: softprops/action-gh-release@v2
   #     env:
@@ -150,6 +178,13 @@ jobs:
   #       mkdir -p build/minify-selectors-windows-32
   #       cp target/i686-pc-windows-msvc/release/minify-selectors.exe build/minify-selectors-windows-32
   #       tar -C build -czvf build/minify-selectors-windows-32.tar.gz minify-selectors-windows-32
+  #   - name: 'Retain built binaries'
+  #     uses: actions/upload-artifact@v4
+  #     with:
+  #       path: |
+  #         target
+  #         !target/release
+  #         !target/*.*
   #   - name: Upload binaries to draft release
   #     uses: softprops/action-gh-release@v2
   #     env:
@@ -196,13 +231,24 @@ jobs:
     #       --draft=false \
     #       --notes-file VERSION_NOTES.md \
     #       --latest=${{ !contains(github.event.inputs.tag, 'alpha') && !contains(github.event.inputs.tag, 'beta') }}
+    - name: Fetch retained binaries from jobs
+      uses: actions/download-artifact@v4
     - name: Prepare npm packages for builds
       shell: bash
       # Note: passed in version needs to be without the "v" prefix
       run: |
         package_version="${{ github.event.inputs.tag }}"
         bash npm/deploy.sh "${package_version:1}"
-    # - name: Publish to npm
+    - name: Publish binary packages to npm
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      run: |
+        cd npm
+        for dir in */; do
+          echo $dir
+        done
+    # - name: Publish main npm package
     #   env:
     #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     #     NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
