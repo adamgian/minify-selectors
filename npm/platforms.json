@@ -1,0 +1,44 @@
+[
+	{
+		"platform": "Windows NT",
+		"nodePlatform": "win32",
+		"architecture": "x64",
+		"binary": "windows-64.exe"
+	},
+	{
+		"platform": "Windows NT",
+		"nodePlatform": "win32",
+		"architecture": "x32",
+		"binary": "windows-32.exe"
+	},
+	{
+		"platform": "Linux",
+		"nodePlatform": "linux",
+		"architecture": "x64",
+		"binary": "linux-64"
+	},
+	{
+		"platform": "Linux",
+		"nodePlatform": "linux",
+		"architecture": "arm64",
+		"binary": "linux-arm64"
+	},
+	{
+		"platform": "Linux",
+		"nodePlatform": "linux",
+		"architecture": "x32",
+		"binary": "linux-32"
+	},
+	{
+		"platform": "Darwin",
+		"nodePlatform": "darwin",
+		"architecture": "x64",
+		"binary": "darwin-x64"
+	},
+	{
+		"platform": "Darwin",
+		"nodePlatform": "darwin",
+		"architecture": "arm64",
+		"binary": "darwin-arm64"
+	}
+]
