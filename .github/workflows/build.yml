@@ -24,20 +24,20 @@ jobs:
   #     run: |
   #       sudo apt-get update
   #       sudo apt-get install gcc-aarch64-linux-gnu
-  #       rustup target add aarch64-unknown-linux-gnu
   #       rustup target add x86_64-unknown-linux-gnu
-  #   - name: Build Linux binary (Arm64)
-  #     run: |
-  #       RUST_BACKTRACE=full cargo build --release --target aarch64-unknown-linux-gnu
-  #       mkdir -p build/minify-selectors-linux-arm64
-  #       cp target/aarch64-unknown-linux-gnu/release/minify-selectors build/minify-selectors-linux-arm64
-  #       tar -C build -czvf build/minify-selectors-linux-arm64.tar.gz minify-selectors-linux-arm64
+  #       rustup target add aarch64-unknown-linux-gnu
   #   - name: Build Linux binary (64-bit)
   #     run: |
   #       RUST_BACKTRACE=full cargo build --release --target x86_64-unknown-linux-gnu
   #       mkdir -p build/minify-selectors-linux-64
   #       cp target/x86_64-unknown-linux-gnu/release/minify-selectors build/minify-selectors-linux-64
   #       tar -C build -czvf build/minify-selectors-linux-64.tar.gz minify-selectors-linux-64
+  #   - name: Build Linux binary (Arm64)
+  #     run: |
+  #       RUST_BACKTRACE=full cargo build --release --target aarch64-unknown-linux-gnu
+  #       mkdir -p build/minify-selectors-linux-arm64
+  #       cp target/aarch64-unknown-linux-gnu/release/minify-selectors build/minify-selectors-linux-arm64
+  #       tar -C build -czvf build/minify-selectors-linux-arm64.tar.gz minify-selectors-linux-arm64
   #   - name: Upload binaries to draft release
   #     uses: softprops/action-gh-release@v2
   #     env:
@@ -198,7 +198,7 @@ jobs:
     #       --latest=${{ !contains(github.event.inputs.tag, 'alpha') && !contains(github.event.inputs.tag, 'beta') }}
     - name: Prepare npm packages for builds
       shell: bash
-      # Note: passed in version needs to be without "v" prefix
+      # Note: passed in version needs to be without the "v" prefix
       run: |
         package_version="${{ github.event.inputs.tag }}"
         bash npm/deploy.sh "${package_version:1}"

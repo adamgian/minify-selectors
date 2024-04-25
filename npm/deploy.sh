@@ -1,19 +1,30 @@
 #!/bin/bash
 
 jq -c '.[]' npm/platforms.json | while read build; do
+	package_name=$(jq -r '.name' <<< "$build")
 	platform_label=$(jq -r '.platform' <<< "$build")
 	node_platform=$(jq -r '.nodePlatform' <<< "$build")
 	architecture=$(jq -r '.architecture' <<< "$build")
-	binary_label=$(jq -r '.binary' <<< "$build")
+	rust_target=$(jq -r '.rustTarget' <<< "$build")
 
-	mkdir -p "npm/$binary_label"
-	cp package.json "npm/$binary_label/package.json"
+	mkdir -p "npm/$package_name"
+	cp package.json "npm/$package_name/package.json"
 
-	sed -i "s/FIXME_VERSION/$1/g" "npm/$binary_label/package.json"
-	sed -i "s/FIXME_BINARY/$binary_label/g" "npm/$binary_label/package.json"
-	sed -i "s/FIXME_PLATFORM/$platform_label/g" "npm/$binary_label/package.json"
-	sed -i "s/FIXME_NODE_PLATFORM/$node_platform/g" "npm/$binary_label/package.json"
-	sed -i "s/FIXME_ARCHITECTURE/$architecture/g" "npm/$binary_label/package.json"
+	sed -i "s/FIXME_VERSION/$1/g" "npm/$package_name/package.json"
+	sed -i "s/FIXME_BINARY/$package_name/g" "npm/$package_name/package.json"
+	sed -i "s/FIXME_PLATFORM/$platform_label/g" "npm/$package_name/package.json"
+	sed -i "s/FIXME_NODE_PLATFORM/$node_platform/g" "npm/$package_name/package.json"
+	sed -i "s/FIXME_ARCHITECTURE/$architecture/g" "npm/$package_name/package.json"
 
-	echo "$binary_label @$1"
+	rust_target_path="target/$rust_target/release/"
+	rust_target_name="minify-selectors"
+	if [ "$node_platform" == "win32" ]; then
+		rust_target_name+=".exe"
+	fi
+
+	mkdir -p "npm/$package_name/bin"
+	cp "$rust_target_path$rust_target_name" "npm/$package_name/bin/$rust_target_name"
+
+	echo "$rust_target_path$rust_target_name@$1"
+	echo " "
 done
