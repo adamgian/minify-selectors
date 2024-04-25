@@ -88,23 +88,23 @@ jobs:
     - name: Build macOS binary (64-bit)
       run: |
         RUST_BACKTRACE=full cargo build --release --target x86_64-apple-darwin
-        mkdir -p build/minify-selectors-macos-64
-        cp target/x86_64-apple-darwin/release/minify-selectors build/minify-selectors-macos-64
-        tar -C build -czvf build/minify-selectors-macos-64.tar.gz minify-selectors-macos-64
+        mkdir -p build/minify-selectors-darwin-x64
+        cp target/x86_64-apple-darwin/release/minify-selectors build/minify-selectors-darwin-x64
+        tar -C build -czvf build/minify-selectors-darwin-x64.tar.gz minify-selectors-darwin-x64
     - name: Build macOS binary (Arm64)
       run: |
         RUST_BACKTRACE=full cargo build --release --target aarch64-apple-darwin
-        mkdir -p build/minify-selectors-macos-arm64
-        cp target/aarch64-apple-darwin/release/minify-selectors build/minify-selectors-macos-arm64
-        tar -C build -czvf build/minify-selectors-macos-arm64.tar.gz minify-selectors-macos-arm64
+        mkdir -p build/minify-selectors-darwin-arm64
+        cp target/aarch64-apple-darwin/release/minify-selectors build/minify-selectors-darwin-arm64
+        tar -C build -czvf build/minify-selectors-darwin-arm64.tar.gz minify-selectors-darwin-arm64
     - name: Upload binaries to draft release
       uses: softprops/action-gh-release@v2
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         files: |
-          build/minify-selectors-macos-64.tar.gz
-          build/minify-selectors-macos-arm64.tar.gz
+          build/minify-selectors-darwin-x64.tar.gz
+          build/minify-selectors-darwin-arm64.tar.gz
         draft: true
         name: "${{ github.event.inputs.tag }}"
         tag_name: "${{ github.event.inputs.tag }}"

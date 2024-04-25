@@ -35,12 +35,12 @@ const SUPPORTED_PLATFORMS = [
 	{
 		type: 'Darwin',
 		architecture: 'x64',
-		binary: 'macos-64',
+		binary: 'darwin-x64',
 	},
 	{
 		type: 'Darwin',
 		architecture: 'arm64',
-		binary: 'macos-arm64',
+		binary: 'darwin-arm64',
 	},
 ];
 
