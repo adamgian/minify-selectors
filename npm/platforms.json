@@ -35,7 +35,7 @@
 		"rustTarget": "i686-unknown-linux-gnu"
 	},
 	{
-		"name": "darwin-x64",
+		"name": "darwin-64",
 		"platform": "Darwin",
 		"nodePlatform": "darwin",
 		"architecture": "x64",
