@@ -1,7 +1,7 @@
 {
 	"name": "@minify-selectors/FIXME_BINARY",
 	"version": "FIXME_VERSION",
-	"description": "",
+	"description": "minify-selectors pre-built binary for the 'FIXME_PLATFORM' platform on the 'FIXME_ARCHITECTURE' architecture",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/adamgian/minify-selectors.git"
