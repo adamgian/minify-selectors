@@ -1,0 +1,51 @@
+[
+	{
+		"name": "windows-64",
+		"platform": "Windows NT",
+		"nodePlatform": "win32",
+		"architecture": "x64",
+		"rustTarget": "x86_64-pc-windows-msvc"
+	},
+	{
+		"name": "windows-32",
+		"platform": "Windows NT",
+		"nodePlatform": "win32",
+		"architecture": "x32",
+		"rustTarget": "i686-pc-windows-msvc"
+	},
+	{
+		"name": "linux-64",
+		"platform": "Linux",
+		"nodePlatform": "linux",
+		"architecture": "x64",
+		"rustTarget": "x86_64-unknown-linux-gnu"
+	},
+	{
+		"name": "linux-arm64",
+		"platform": "Linux",
+		"nodePlatform": "linux",
+		"architecture": "arm64",
+		"rustTarget": "aarch64-unknown-linux-gnu"
+	},
+	{
+		"name": "linux-32",
+		"platform": "Linux",
+		"nodePlatform": "linux",
+		"architecture": "x32",
+		"rustTarget": "i686-unknown-linux-gnu"
+	},
+	{
+		"name": "darwin-64",
+		"platform": "Darwin",
+		"nodePlatform": "darwin",
+		"architecture": "x64",
+		"rustTarget": "x86_64-apple-darwin"
+	},
+	{
+		"name": "darwin-arm64",
+		"platform": "Darwin",
+		"nodePlatform": "darwin",
+		"architecture": "arm64",
+		"rustTarget": "aarch64-apple-darwin"
+	}
+]

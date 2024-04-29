@@ -1,0 +1,19 @@
+{
+	"name": "@minify-selectors/FIXME_BINARY",
+	"version": "FIXME_VERSION",
+	"description": "minify-selectors pre-built binary for the 'FIXME_PLATFORM' platform on the 'FIXME_ARCHITECTURE' architecture",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/adamgian/minify-selectors.git"
+	},
+	"license": "Apache-2.0",
+	"preferUnplugged": true,
+	"engines": {
+		"node": ">=12"
+	},
+	"os": ["FIXME_NODE_PLATFORM"],
+	"cpu": ["FIXME_ARCHITECTURE"],
+	"bin": {
+		"minify-selectors": "./bin/FIXME_EXECUTABLE"
+	}
+}
