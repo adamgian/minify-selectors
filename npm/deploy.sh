@@ -33,5 +33,5 @@ jq -c '.[]' npm/platforms.json | while read build; do
 
 	# Create build README.md
 	cp "npm/README.md" "npm/$package_name/README.md"
-	sed -i "s/FIXME_RUST_TARGET/$rust_target_name/g" "npm/$package_name/package.json"
+	sed -i "s/FIXME_RUST_TARGET/$rust_target_name/g" "npm/$package_name/README.md"
 done
