@@ -34,7 +34,7 @@
 	],
 	"optionalDependencies": {
 		"@minify-selectors/darwin-arm64": "FIXME_VERSION",
-		"@minify-selectors/darwin-x64": "FIXME_VERSION",
+		"@minify-selectors/darwin-64": "FIXME_VERSION",
 		"@minify-selectors/linux-32": "FIXME_VERSION",
 		"@minify-selectors/linux-64": "FIXME_VERSION",
 		"@minify-selectors/linux-arm64": "FIXME_VERSION",
