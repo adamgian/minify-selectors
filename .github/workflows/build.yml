@@ -218,24 +218,23 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: 20
-    - name: Set up npm
+    - name: Set up env
       run: |
         git config user.email "contact@adamgian.com"
         git config user.name "Adam Gian"
-        npm version ${{ github.event.inputs.tag }}
     - name: Compose version notes
       run: |
         sed -n "/# ${{ github.event.inputs.tag }}/,/<br>/p" CHANGELOG.md \
           | sed -n "/###/,/<br>/p" \
           | sed "s/<br>//" > VERSION_NOTES.md
-    - name: Publish GitHub draft release
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        gh release edit ${{ github.event.inputs.tag }} \
-          --draft=false \
-          --notes-file VERSION_NOTES.md \
-          --latest=${{ !contains(github.event.inputs.tag, 'alpha') && !contains(github.event.inputs.tag, 'beta') }}
+    # - name: Publish GitHub draft release
+    #   env:
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    #   run: |
+    #     gh release edit ${{ github.event.inputs.tag }} \
+    #       --draft=false \
+    #       --notes-file VERSION_NOTES.md \
+    #       --latest=${{ !contains(github.event.inputs.tag, 'alpha') && !contains(github.event.inputs.tag, 'beta') }}
     - name: Combine job artifacts
       uses: actions/upload-artifact/merge@v4
       with:
@@ -273,4 +272,5 @@ jobs:
         NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       run: |
         echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
-        npm publish --provenance --access public --tag latest
+        npm publish --provenance --access public --tag alpha
+      # npm publish --provenance --access public --tag latest
