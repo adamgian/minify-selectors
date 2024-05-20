@@ -1,5 +1,8 @@
-# v2.6.x
-<sub>TBD</sub>
+# v2.6.2
+<sub>20 May 2024</sub>
+
+### Fixes
+- Corrected download URL for Windows platforms
 
 <br>
 
