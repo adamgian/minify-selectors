@@ -12,8 +12,5 @@
 		"node": ">=12"
 	},
 	"os": ["FIXME_NODE_PLATFORM"],
-	"cpu": ["FIXME_ARCHITECTURE"],
-	"bin": {
-		"minify-selectors": "./bin/FIXME_EXECUTABLE"
-	}
+	"cpu": ["FIXME_ARCHITECTURE"]
 }
