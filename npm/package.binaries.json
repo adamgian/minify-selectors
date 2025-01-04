@@ -9,7 +9,7 @@
 	"license": "Apache-2.0",
 	"preferUnplugged": true,
 	"engines": {
-		"node": ">=12"
+		"node": ">=18"
 	},
 	"os": ["FIXME_NODE_PLATFORM"],
 	"cpu": ["FIXME_ARCHITECTURE"]
