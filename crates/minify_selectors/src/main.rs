@@ -50,7 +50,6 @@ fn minify_selectors() -> Result<(), Box<dyn Error>> {
 	Ok(())
 }
 
-///
 fn process_files(
 	selectors: &mut Selectors,
 	config: &Config,

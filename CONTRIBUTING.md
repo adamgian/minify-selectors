@@ -4,13 +4,17 @@ https://www.rust-lang.org/tools/install
 
 
 ```shell
-npm run test
+cargo test
 ```
 
 ```shell
-npm run lint:clippy
+cargo bench
 ```
 
 ```shell
-npm run lint:rustfmt
+cargo clippy
+```
+
+```shell
+cargo +nightly fmt --check
 ```

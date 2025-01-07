@@ -23,7 +23,7 @@ jq -c '.[]' npm/platforms.json | while read build; do
 	fi
 
 	# Create build package.json
-	cp "npm/package.json" "npm/$package_name/package.json"
+	cp "npm/package.binaries.json" "npm/$package_name/package.json"
 	sed -i "s/FIXME_VERSION/$1/g" "npm/$package_name/package.json"
 	sed -i "s/FIXME_BINARY/$package_name/g" "npm/$package_name/package.json"
 	sed -i "s/FIXME_PLATFORM/$platform_label/g" "npm/$package_name/package.json"

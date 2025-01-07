@@ -386,7 +386,7 @@ pub fn rewrite_string_of_arguments(
 		} else {
 			// Capture group 5 (<object>) or 6 (<array>) .is_some() evaluates to true
 			// or another case. Either way nothing needs to be done to this argument.
-			return capture.at(0).unwrap().to_string();
+			capture.at(0).unwrap().to_string()
 		}
 	});
 }

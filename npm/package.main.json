@@ -8,12 +8,6 @@
 		"url": "adamgian.com"
 	},
 	"license": "Apache-2.0",
-	"scripts": {
-		"lint:clippy": "cargo clippy",
-		"lint:rustfmt": "cargo +nightly fmt --check",
-		"bench": "cargo bench",
-		"test": "cargo test"
-	},
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/adamgian/minify-selectors.git"
@@ -32,6 +26,12 @@
 		"minifier",
 		"CLI"
 	],
+	"bin": {
+		"minify-selectors": "bin/minify-selectors"
+	},
+	"files": [
+		"install.js"
+	],
 	"optionalDependencies": {
 		"@minify-selectors/darwin-arm64": "FIXME_VERSION",
 		"@minify-selectors/darwin-64": "FIXME_VERSION",
@@ -41,7 +41,7 @@
 		"@minify-selectors/windows-32": "FIXME_VERSION",
 		"@minify-selectors/windows-64": "FIXME_VERSION"
 	},
-	"files": [
-		"build/*"
-	]
+	"scripts": {
+		"postinstall": "node install.js"
+	}
 }
