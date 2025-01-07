@@ -59,14 +59,14 @@ var MINIFY_SELECTORS_BINARY_PATH = process.env.MINIFY_SELECTORS_BINARY_PATH || M
 var isValidBinaryPath = (x) => !!x && x !== "/usr/bin/minify-selectors";
 
 var availableBinaries = {
-	"win32, x64": "@minify-selectors/windows-64",
-	// TODO: "win32, arm64": "@minify-selectors/windows-arm64",
-	"win32, ia32": "@minify-selectors/windows-32",
 	"darwin, arm64": "@minify-selectors/darwin-64",
 	"darwin, arm64": "@minify-selectors/darwin-arm64",
 	"linux, x64": "@minify-selectors/linux-64",
 	"linux, arm64": "@minify-selectors/linux-arm64",
 	"linux, ia32": "@minify-selectors/linux-32",
+	"win32, x64": "@minify-selectors/windows-64",
+	// TODO: "win32, arm64": "@minify-selectors/windows-arm64",
+	"win32, ia32": "@minify-selectors/windows-32",
 };
 
 var versionFromPackageJSON = require(path.join(__dirname, "package.json")).version;
@@ -146,59 +146,30 @@ function generateBinPath() {
 
 				if (otherPkg) {
 					let suggestions = `
-Specifically the "${otherPkg}" package is present but this platform
-needs the "${pkg}" package instead. People often get into this
-situation by installing minify-selectors on Windows or macOS and copying "node_modules"
-into a Docker image that runs Linux, or by copying "node_modules" between
-Windows and WSL environments.
+Specifically the "${otherPkg}" package is present but this platform needs the "${pkg}" package instead. This situation often occurs by installing minify-selectors on Windows or macOS and copying "node_modules" into a Docker image that runs Linux, or by copying "node_modules" between Windows and WSL environments.
 
-If you are installing with npm, you can try not copying the "node_modules"
-directory when you copy the files over, and running "npm ci" or "npm install"
-on the destination platform after the copy. Or you could consider using yarn
-instead of npm which has built-in support for installing a package on multiple
-platforms simultaneously.
+If you are installing with npm, you can try not copying the "node_modules" directory when you copy the files over, and running "npm ci" or "npm install" on the destination platform after the copy. Or you could consider using yarn instead of npm which has built-in support for installing a package on multiple platforms simultaneously.
 
-If you are installing with yarn, you can try listing both this platform and the
-other platform in your ".yarnrc.yml" file using the "supportedArchitectures"
-feature: https://yarnpkg.com/configuration/yarnrc/#supportedArchitectures
-Keep in mind that this means multiple copies of minify-selectors will be present.
-`;
+If you are installing with yarn, you can try listing both this platform and the other platform in your ".yarnrc.yml" file using the "supportedArchitectures" feature: https://yarnpkg.com/configuration/yarnrc/#supportedArchitectures Keep in mind that this means multiple copies of minify-selectors will be present.`;
 					if (pkg === packageDarwin_x64 && otherPkg === packageDarwin_arm64 || pkg === packageDarwin_arm64 && otherPkg === packageDarwin_x64) {
 						suggestions = `
-Specifically the "${otherPkg}" package is present but this platform
-needs the "${pkg}" package instead. People often get into this
-situation by installing minify-selectors with npm running inside of Rosetta 2 and then
-trying to use it with node running outside of Rosetta 2, or vice versa (Rosetta
-2 is Apple's on-the-fly x86_64-to-arm64 translation service).
+Specifically the "${otherPkg}" package is present but this platform needs the "${pkg}" package instead. This situation often occurs by installing minify-selectors with npm running inside of Rosetta 2 and then trying to use it with node running outside of Rosetta 2, or vice versa (Rosetta 2 is Apple's on-the-fly x86_64-to-arm64 translation service).
 
-If you are installing with npm, you can try ensuring that both npm and node are
-not running under Rosetta 2 and then reinstalling minify-selectors. This likely involves
-changing how you installed npm and/or node. For example, installing node with
-the universal installer here should work: https://nodejs.org/en/download/. Or
-you could consider using yarn instead of npm which has built-in support for
-installing a package on multiple platforms simultaneously.
+If you are installing with npm, you can try ensuring that both npm and node are not running under Rosetta 2 and then reinstalling minify-selectors. This likely involves changing how you installed npm and/or node. For example, installing node with the universal installer here should work: https://nodejs.org/en/download/. Or you could consider using yarn instead of npm which has built-in support for installing a package on multiple platforms simultaneously.
 
-If you are installing with yarn, you can try listing both "arm64" and "x64"
-in your ".yarnrc.yml" file using the "supportedArchitectures" feature:
-https://yarnpkg.com/configuration/yarnrc/#supportedArchitectures
+If you are installing with yarn, you can try listing both "arm64" and "x64" in your ".yarnrc.yml" file using the "supportedArchitectures" feature: https://yarnpkg.com/configuration/yarnrc/#supportedArchitectures
 
 Keep in mind that this means multiple copies of minify-selectors will be present.
 `;
 					}
 
-					throw new Error(`
-You installed minify-selectors for another platform than the one you're currently using.
-This won't work because minify-selectors is written with native code and needs to
-install a platform-specific binary executable.
+					throw new Error(
+`You installed minify-selectors for another platform than the one you're currently using. This won't work because minify-selectors is written with native code and needs to install a platform-specific binary executable.
 
 ${suggestions}
 `);
 				}
-				throw new Error(`The package "${pkg}" could not be found, and is needed by minify-selectors.
-If you are installing minify-selectors with npm, make sure that you don't specify the
-"--no-optional" or "--omit=optional" flags. The "optionalDependencies" feature
-of "package.json" is used by minify-selectors to install the correct binary executable
-for your current platform.`);
+				throw new Error(`The package "${pkg}" could not be found, and is needed by minify-selectors. If you are installing minify-selectors with npm, make sure that you don't specify the "--no-optional" or "--omit=optional" flags. The "optionalDependencies" feature of "package.json" is used by minify-selectors to install the correct binary executable for your current platform.`);
 			}
 			throw e;
 		}

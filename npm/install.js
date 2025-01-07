@@ -10,18 +10,19 @@ var zlib = require("zlib");
 
 
 
+
 var MINIFY_SELECTORS_BINARY_PATH = process.env.MINIFY_SELECTORS_BINARY_PATH || MINIFY_SELECTORS_BINARY_PATH;
 var isValidBinaryPath = (x) => !!x && x !== "/usr/bin/minify-selectors";
 
 var availableBinaries = {
-	"win32, x64": "@minify-selectors/windows-64",
-	// TODO: "win32, arm64": "@minify-selectors/windows-arm64",
-	"win32, ia32": "@minify-selectors/windows-32",
 	"darwin, arm64": "@minify-selectors/darwin-64",
 	"darwin, arm64": "@minify-selectors/darwin-arm64",
 	"linux, x64": "@minify-selectors/linux-64",
 	"linux, arm64": "@minify-selectors/linux-arm64",
 	"linux, ia32": "@minify-selectors/linux-32",
+	"win32, x64": "@minify-selectors/windows-64",
+	// TODO: "win32, arm64": "@minify-selectors/windows-arm64",
+	"win32, ia32": "@minify-selectors/windows-32",
 };
 
 var versionFromPackageJSON = require(path.join(__dirname, "package.json")).version;
@@ -221,12 +222,7 @@ async function checkAndPreparePackage() {
 	try {
 		binPath = require.resolve(`${currentPlatform}/${subpath}`);
 	} catch (e) {
-		console.error(`[minify-selectors] Failed to find package "${currentPlatform}" on the file system
-This can happen if you use the "--no-optional" flag. The "optionalDependencies"
-package.json feature is used by minify-selectors to install the correct binary executable
-for your current platform. This install script will now attempt to work around
-this. If that fails, you need to remove the "--no-optional" flag to use minify-selectors.
-`);
+		console.error(`[minify-selectors] Failed to find package "${currentPlatform}" on the file system. This can happen if you use the "--no-optional" flag. The "optionalDependencies" feature in package.json is used by minify-selectors to install the correct binary executable for your current platform. This install script will now attempt to work around this. If that fails, you need to remove the "--no-optional" flag to use minify-selectors.`);
 		binPath = downloadedBinPath(currentPlatform, subpath);
 
 		try {

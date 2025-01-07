@@ -206,9 +206,9 @@ jobs:
     needs:
       - build-ubuntu-64
       - build-ubuntu-32
-      # - build-macos
-      # - build-windows-64
-      # - build-windows-32
+      - build-macos
+      - build-windows-64
+      - build-windows-32
     steps:
     - name: Checkout
       uses: actions/checkout@v4
@@ -227,15 +227,15 @@ jobs:
         sed -n "/# ${{ github.event.inputs.tag }}/,/<br>/p" CHANGELOG.md \
           | sed -n "/###/,/<br>/p" \
           | sed "s/<br>//" > VERSION_NOTES.md
-    # - name: Publish GitHub draft release
-    #   env:
-    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    #   run: |
-    #     gh release edit ${{ github.event.inputs.tag }} \
-    #       --target=${{ github.ref_name }}
-    #       --draft=false \
-    #       --notes-file VERSION_NOTES.md \
-    #       --latest=${{ !contains(github.event.inputs.tag, 'alpha') && !contains(github.event.inputs.tag, 'beta') }}
+    - name: Publish GitHub draft release
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        gh release edit ${{ github.event.inputs.tag }} \
+          --target=${{ github.ref_name }}
+          --draft=false \
+          --notes-file VERSION_NOTES.md \
+          --latest=${{ !contains(github.event.inputs.tag, 'alpha') && !contains(github.event.inputs.tag, 'beta') }}
     - name: Combine job artifacts
       uses: actions/upload-artifact/merge@v4
       with:
@@ -243,12 +243,12 @@ jobs:
         delete-merged: true
     - name: Load combined artifacts
       uses: actions/download-artifact@v4
-    - name: Prepare npm packages for builds
+    - name: Prepare npm platform packages for built binaries
       shell: bash
       # Note: passed in version needs to be without the "v" prefix
       run: |
         package_version="${{ github.event.inputs.tag }}"
-        bash npm/deploy.sh "${package_version:1}"
+        bash scripts/npm-platform-packages-pre-deploy.sh "${package_version:1}"
     - name: Publish binary packages to npm
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -275,5 +275,4 @@ jobs:
         NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       run: |
         echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
-        npm publish --provenance --access public --tag alpha
-      # npm publish --provenance --access public --tag latest
+        npm publish --provenance --access public --tag latest
