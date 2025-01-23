@@ -1,8 +1,9 @@
-# v2.8.x
-<sub>TBD</sub>
+# v2.8.2
+<sub>24 Jan 2025</sub>
 
 ### Updates
-- N/a
+- Add build for Windows ARM64
+- Add build for Linux RISC-V64 and ARMv7
 
 <br>
 
@@ -278,7 +279,7 @@ No noteworthy changes since the last version
 <sub>13 May 2022</sub>
 
 ### Updates:
-- Add build for macOS 64-bit arm platforms
+- Add build for macOS 64-bit ARM platforms
 - `.closest()` function support in JS file and scripts
 - Support for an optional custom alphabet argument (`--alphabet`)
 - Support for an optional starting index argument (`--start-index`)

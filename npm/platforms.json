@@ -7,6 +7,13 @@
 		"rustTarget": "x86_64-pc-windows-msvc"
 	},
 	{
+		"name": "windows-arm64",
+		"platform": "Windows NT",
+		"nodePlatform": "win32",
+		"architecture": "arm64",
+		"rustTarget": "aarch64-pc-windows-msvc"
+	},
+	{
 		"name": "windows-32",
 		"platform": "Windows NT",
 		"nodePlatform": "win32",
@@ -26,6 +33,20 @@
 		"nodePlatform": "linux",
 		"architecture": "arm64",
 		"rustTarget": "aarch64-unknown-linux-gnu"
+	},
+	{
+		"name": "linux-riscv64",
+		"platform": "Linux",
+		"nodePlatform": "linux",
+		"architecture": "riscv64",
+		"rustTarget": "riscv64gc-unknown-linux-gnu"
+	},
+	{
+		"name": "linux-armv7",
+		"platform": "Linux",
+		"nodePlatform": "linux",
+		"architecture": "arm",
+		"rustTarget": "armv7-unknown-linux-gnueabihf"
 	},
 	{
 		"name": "linux-32",
