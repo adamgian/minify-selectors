@@ -1,5 +1,5 @@
 # v2.8.2
-<sub>24 Jan 2025</sub>
+<sub>27 Jan 2025</sub>
 
 ### Updates
 - Add build for Windows ARM64
